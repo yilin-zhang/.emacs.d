@@ -132,7 +132,11 @@
 (use-package counsel
   :ensure t
   :diminish (counsel-mode)
-  :config (counsel-mode t)
+  :config
+  (counsel-mode t)
+  ;; Sort M-x commands by history
+  (use-package amx
+    :ensure t)
   )
 
 (use-package ivy

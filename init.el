@@ -57,7 +57,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (highlight-indent-guides doom-modeline beacon ibuffer-projectile projectile pdf-tools youdao-dictionary wttrin magit company-lsp lsp-mode lsp-ui dashboard diredfl doom-themes aggressive-indent company-box ox-hugo rust-mode popwin cdlatex auctex hungry-delete olivetti rainbow-delimiters expand-region emojify elpy diff-hl yasnippet markdown-mode org-bullets all-the-icons neotree avy swiper counsel company which-key try diminish use-package))))
+    (amx eglot highlight-indent-guides doom-modeline beacon ibuffer-projectile projectile pdf-tools youdao-dictionary wttrin magit dashboard diredfl doom-themes aggressive-indent company-box ox-hugo rust-mode popwin cdlatex auctex hungry-delete olivetti rainbow-delimiters expand-region emojify elpy diff-hl yasnippet markdown-mode org-bullets all-the-icons neotree avy swiper counsel company which-key try diminish use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

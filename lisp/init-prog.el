@@ -10,18 +10,22 @@
 ;; --------------------------------------------------------------
 ;; https://github.com/emacs-lsp/lsp-mode
 
-(use-package lsp-mode
-  :ensure t
-  :commands lsp
-  :hook (prog-mode . lsp))
+;; (use-package lsp-mode
+;; :ensure t
+;; :commands lsp
+;; :hook (prog-mode . lsp))
 
-(use-package lsp-ui
-  :ensure t
-  :commands lsp-ui-mode)
+;; (use-package lsp-ui
+;; :ensure t
+;; :commands lsp-ui-mode)
 
-(use-package company-lsp
+;; (use-package company-lsp
+;; :ensure t
+;; :commands company-lsp)
+
+(use-package eglot
   :ensure t
-  :commands company-lsp)
+  :hook (prog-mode . eglot-ensure))
 
 ;; --------------------------------------------------------------
 ;;                     Python Mode Configurations

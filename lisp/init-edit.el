@@ -173,12 +173,26 @@
   ;; :hook (after-init . global-company-mode)
   ;; :hook (org-mode . (lambda () (company-mode -1)))
   :hook (prog-mode . company-mode)
+  :bind (("M-/" . company-complete)
+	 ("<backtab>" . company-yasnippet)
+	 :map company-active-map
+	 ("C-p" . company-select-previous)
+	 ("C-n" . company-select-next)
+	 ("<tab>" . company-complete-common-or-cycle)
+	 ("<backtab>" . my-company-yasnippet)
+	 ;; ("C-c C-y" . my-company-yasnippet)
+	 :map company-search-map
+	 ("C-p" . company-select-previous)
+	 ("C-n" . company-select-next))
   :config
-  (setq company-idle-delay 0.08)
-  (setq company-minimum-prefix-length 1)
-  ;; use C-n and C-p to select auto-complete items
-  (define-key company-active-map (kbd "C-n") 'company-select-next-or-abort)
-  (define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort))
+  (setq company-tooltip-align-annotations t ; aligns annotation to the right
+	company-tooltip-limit 12            ; bigger popup window
+	company-idle-delay .2               ; decrease delay before autocompletion popup shows
+	company-echo-delay 0                ; remove annoying blinking
+	company-minimum-prefix-length 2
+	company-require-match nil
+	company-dabbrev-ignore-case nil
+	company-dabbrev-downcase nil))
 
 ;; show icons for company
 (when (version<= "26" emacs-version)

@@ -24,8 +24,8 @@
   :init
   (setq lsp-ui-doc-enable t
 	lsp-ui-doc-include-signature t
-	lsp-ui-doc-position 'at-point
-	;; lsp-ui-doc-use-webkit t
+	lsp-ui-doc-position 'top
+	lsp-ui-doc-use-webkit t
 	lsp-ui-doc-border (face-foreground 'default)
 
 	lsp-ui-sideline-enable nil
@@ -56,6 +56,13 @@
   :ensure t
   :diminish yapf-mode
   :hook (python-mode . yapf-mode))
+
+;; --------------------------------------------------------------
+;;                     Ruby Mode Configurations
+;; --------------------------------------------------------------
+;; https://github.com/senny/rvm.el
+(use-package rvm
+  :ensure nil)
 
 ;; --------------------------------------------------------------
 ;;                     Rust Mode Configurations

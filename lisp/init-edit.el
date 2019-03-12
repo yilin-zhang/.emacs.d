@@ -1,6 +1,12 @@
 ;; init-edit.el --- Configurations for a better editing experience. -*- lexical-binding: t -*-
 
 ;; --------------------------------------------------------------
+;;                            Key Bindings
+;; --------------------------------------------------------------
+;; Use M-l as backspace
+(global-set-key (kbd "M-l") (kbd "<backspace>"))
+
+;; --------------------------------------------------------------
 ;;                      Template and Spellchecker
 ;; --------------------------------------------------------------
 

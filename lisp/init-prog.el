@@ -16,7 +16,9 @@
   :hook (prog-mode . lsp)
   :init
   ;; Detect project root
-  (setq lsp-auto-guess-root t))
+  (setq lsp-auto-guess-root t)
+  ;; use flycheck
+  (setq lsp-prefer-flymake nil))
 
 (use-package lsp-ui
   :ensure t

@@ -31,6 +31,31 @@
   (setq ispell-program-name "aspell")
   (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together")))
 
+(use-package flycheck
+  :ensure t
+  :diminish flycheck-mode
+  :hook (after-init . global-flycheck-mode)
+  :config
+  (setq flycheck-indication-mode 'right-fringe)
+  (setq flycheck-emacs-lisp-load-path 'inherit)
+  (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+
+  ;; Only check while saving and opening files
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+
+  ;; Display Flycheck errors in GUI tooltips
+  (if (display-graphic-p)
+      ;; (if emacs/>=26p
+      ;; (use-package flycheck-posframe
+      ;; :hook (flycheck-mode . flycheck-posframe-mode))
+      ;; (use-package flycheck-pos-tip
+      ;; :defines flycheck-pos-tip-timeout
+      ;; :hook (global-flycheck-mode . flycheck-pos-tip-mode)
+      ;; :config (setq flycheck-pos-tip-timeout 30)))
+      (use-package flycheck-popup-tip
+	:ensure t
+	:hook (flycheck-mode . flycheck-popup-tip-mode))))
+
 ;; --------------------------------------------------------------
 ;;                      Parentheses and Region
 ;; --------------------------------------------------------------
@@ -147,12 +172,16 @@
 
 (use-package ivy
   :ensure t
-  :diminish (ivy-mode)
+  :diminish
   :config
   (ivy-mode t)
   (setq ivy-use-virtual-buffers t)
   (global-set-key (kbd "C-c C-r") 'ivy-resume)
-  (global-set-key (kbd "<f6>") 'ivy-resume))
+  (global-set-key (kbd "<f6>") 'ivy-resume)
+  (use-package ivy-rich
+    :ensure t
+    :config
+    (ivy-rich-mode 1)))
 
 (use-package swiper
   :ensure t

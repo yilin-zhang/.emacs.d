@@ -109,7 +109,16 @@
 ;; --------------------------------------------------------------
 ;;                             Terminal
 ;; --------------------------------------------------------------
-(global-set-key (kbd "<f9>") 'ansi-term)
+;; (global-set-key (kbd "<f9>") 'ansi-term)
+
+;; Shell Pop
+(use-package shell-pop
+  :ensure t
+  :bind ([f9] . shell-pop)
+  :init
+  '(shell-pop-shell-type (quote ("ansi-term" "*ansi-term*"
+				 (lambda nil
+				   (ansi-term shell-pop-term-shell))))))
 
 ;; --------------------------------------------------------------
 ;;                              Files

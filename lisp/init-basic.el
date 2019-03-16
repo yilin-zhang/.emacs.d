@@ -116,9 +116,8 @@
   :ensure t
   :bind ([f9] . shell-pop)
   :init
-  '(shell-pop-shell-type (quote ("ansi-term" "*ansi-term*"
-				 (lambda nil
-				   (ansi-term shell-pop-term-shell))))))
+  (setq shell-pop-shell-type '("ansi-term" "*ansi-term*"
+			       (lambda () (ansi-term shell-pop-term-shell)))))
 
 ;; --------------------------------------------------------------
 ;;                              Files

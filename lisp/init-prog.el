@@ -66,9 +66,6 @@
 (use-package rvm
   :ensure nil)
 
-(use-package ruby-end
-  :ensure t)
-
 ;; --------------------------------------------------------------
 ;;                     Rust Mode Configurations
 ;; --------------------------------------------------------------

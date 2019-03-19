@@ -5,8 +5,8 @@
   :ensure t
   :commands transient-insert-suffix
   :bind (("C-x g" . magit-status)
-	 ("C-x M-g" . magit-dispatch-popup)
-	 ("C-c M-g" . magit-file-popup)))
+         ("C-x M-g" . magit-dispatch-popup)
+         ("C-c M-g" . magit-file-popup)))
 
 ;; Highlight uncommitted changes
 (use-package diff-hl
@@ -18,9 +18,9 @@
   (diff-hl-delete ((t (:background "#ff6c6b"))))
   (diff-hl-insert ((t (:background "#98be65"))))
   :bind (:map diff-hl-command-map
-	      ("SPC" . diff-hl-mark-hunk))
+              ("SPC" . diff-hl-mark-hunk))
   :hook ((after-init . global-diff-hl-mode)
-	 (dired-mode . diff-hl-dired-mode))
+         (dired-mode . diff-hl-dired-mode))
   :config
   ;; Highlight on-the-fly
   (diff-hl-flydiff-mode 1)
@@ -34,7 +34,7 @@
     ;; Avoid restoring `diff-hl-margin-mode'
     (with-eval-after-load 'desktop
       (add-to-list 'desktop-minor-mode-table
-		   '(diff-hl-margin-mode nil))))
+           '(diff-hl-margin-mode nil))))
 
   ;; Integration with magit
   (with-eval-after-load 'magit

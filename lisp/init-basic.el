@@ -27,7 +27,24 @@
 ;; disable welcome screen
 (setq inhibit-splash-screen 1)
 
-(global-set-key (kbd "<f11>") 'toggle-frame-fullscreen)
+
+;; The setting of this variable must come before enable
+;; display-time-mode, or it will not work.
+(setq display-time-default-load-average nil)
+
+(defvar my/frame-fullscreen nil
+  "Indicates whether the frame is toggled fullscreen or not.")
+
+(defun my/toggle-frame-fullscreen ()
+  "toggle-frame-fullscreen plus display-time-mode."
+  (interactive)
+  (toggle-frame-fullscreen)
+  (if my/frame-fullscreen
+      (progn (setq my/frame-fullscreen nil)
+             (display-time-mode -1))
+    (progn (setq my/frame-fullscreen t)(display-time-mode 1))))
+
+(global-set-key (kbd "<f11>") 'my/toggle-frame-fullscreen)
 
 ;; Set key-binding for switching from a horizontal
 ;; split to a vertical split and vice versa.
@@ -35,26 +52,26 @@
   (interactive)
   (if (= (count-windows) 2)
       (let* ((this-win-buffer (window-buffer))
-	     (next-win-buffer (window-buffer (next-window)))
-	     (this-win-edges (window-edges (selected-window)))
-	     (next-win-edges (window-edges (next-window)))
-	     (this-win-2nd (not (and (<= (car this-win-edges)
-					 (car next-win-edges))
-				     (<= (cadr this-win-edges)
-					 (cadr next-win-edges)))))
-	     (splitter
-	      (if (= (car this-win-edges)
-		     (car (window-edges (next-window))))
-		  'split-window-horizontally
-		'split-window-vertically)))
-	(delete-other-windows)
-	(let ((first-win (selected-window)))
-	  (funcall splitter)
-	  (if this-win-2nd (other-window 1))
-	  (set-window-buffer (selected-window) this-win-buffer)
-	  (set-window-buffer (next-window) next-win-buffer)
-	  (select-window first-win)
-	  (if this-win-2nd (other-window 1))))))
+             (next-win-buffer (window-buffer (next-window)))
+             (this-win-edges (window-edges (selected-window)))
+             (next-win-edges (window-edges (next-window)))
+             (this-win-2nd (not (and (<= (car this-win-edges)
+                                         (car next-win-edges))
+                                     (<= (cadr this-win-edges)
+                                         (cadr next-win-edges)))))
+             (splitter
+              (if (= (car this-win-edges)
+                     (car (window-edges (next-window))))
+                  'split-window-horizontally
+                'split-window-vertically)))
+        (delete-other-windows)
+        (let ((first-win (selected-window)))
+          (funcall splitter)
+          (if this-win-2nd (other-window 1))
+          (set-window-buffer (selected-window) this-win-buffer)
+          (set-window-buffer (next-window) next-win-buffer)
+          (select-window first-win)
+          (if this-win-2nd (other-window 1))))))
 
 (global-set-key (kbd "C-x |") 'toggle-window-split)
 
@@ -117,7 +134,7 @@
   :bind ([f9] . shell-pop)
   :init
   (setq shell-pop-shell-type '("ansi-term" "*ansi-term*"
-			       (lambda () (ansi-term shell-pop-term-shell)))))
+                   (lambda () (ansi-term shell-pop-term-shell)))))
 
 ;; --------------------------------------------------------------
 ;;                              Files
@@ -150,9 +167,9 @@
 
 ;; support displaying emoji
 (use-package emojify
-  :ensure t
+  :ensure t)
   ;; only display emoji for org mode
-  :hook (org-mode . emojify-mode))
+  ;; :hook (org-mode . emojify-mode))
 
 ;; --------------------------------------------------------------
 ;;                              Fonts
@@ -165,8 +182,8 @@
 ;; set chinese font
 (dolist (charset '(kana han symbol cjk-misc bopomofo))
   (set-fontset-font (frame-parameter nil 'font)
-		    charset
-		    (font-spec :family "Microsoft Yahei")))
+            charset
+            (font-spec :family "Microsoft Yahei")))
 
 ;; --------------------------------------------------------------
 ;;                        Theme and Modeline
@@ -186,11 +203,15 @@
   :ensure t
   :hook (after-init . doom-modeline-mode)
   :config
-  ;; The setting of this variable must come before enable
-  ;; display-time-mode, or it will not work.
-  (setq display-time-default-load-average nil)
-  (display-time-mode t)
   (setq find-file-visit-truename t))
+
+(use-package nyan-mode
+  :ensure t
+  :hook (after-init . nyan-mode)
+  :config
+  ;; WORKAROUND (setq nyan-animate-nyancat t) seems useless, I don't
+  ;; know why.
+  (nyan-start-animation))
 
 ;; --------------------------------------------------------------
 ;;                            Dashboard
@@ -200,14 +221,15 @@
   :ensure t
   :after all-the-icons projectile
   :diminish page-break-lines-mode
+  :hook
+  (after-init . dashboard-setup-startup-hook)
   :config
-  (dashboard-setup-startup-hook)
   (setq dashboard-banner-logo-title "Have a nice day! ❤")
   ;; Set the banner
   (setq dashboard-startup-banner "~/.emacs.d/logo.png")
   (setq dashboard-items '((recents  . 5)
-			  (bookmarks . 5)
-			  (agenda . 5))))
+                          (bookmarks . 5)
+                          (agenda . 5))))
 
 ;; --------------------------------------------------------------
 ;;                            Backup

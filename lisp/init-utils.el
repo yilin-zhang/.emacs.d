@@ -32,8 +32,8 @@
   (pdf-view-mode . pdf-annot-minor-mode)
   (pdf-view-mode . (lambda()(line-number-mode -1)))
   :bind (:map pdf-view-mode-map
-	      ("C-s" . pdf-occur)
-	      ("o" . pdf-outline))
+              ("C-s" . pdf-occur)
+              ("o" . pdf-outline))
   :config (pdf-tools-install))
 
 ;; --------------------------------------------------------------
@@ -52,8 +52,8 @@
   :ensure t
   :diminish
   :bind (:map projectile-mode-map
-	      ("s-t" . projectile-find-file) ; `cmd-t' or `super-t'
-	      ("C-c p" . projectile-command-map))
+          ("s-t" . projectile-find-file) ; `cmd-t' or `super-t'
+          ("C-c p" . projectile-command-map))
   :hook (after-init . projectile-mode)
   :init
   (setq projectile-mode-line-prefix "")
@@ -68,19 +68,19 @@
   :ensure t
   :functions all-the-icons-octicon
   :hook ((ibuffer . (lambda ()
-		      (ibuffer-projectile-set-filter-groups)
-		      (unless (eq ibuffer-sorting-mode 'alphabetic)
-			(ibuffer-do-sort-by-alphabetic)))))
+              (ibuffer-projectile-set-filter-groups)
+              (unless (eq ibuffer-sorting-mode 'alphabetic)
+            (ibuffer-do-sort-by-alphabetic)))))
   :config
   (setq ibuffer-projectile-prefix
-	(if (display-graphic-p)
-	    (concat
-	     (all-the-icons-octicon "file-directory"
-				    :face ibuffer-filter-group-name-face
-				    :v-adjust -0.04
-				    :height 1.1)
-	     " ")
-	  "Project: ")))
+    (if (display-graphic-p)
+        (concat
+         (all-the-icons-octicon "file-directory"
+                    :face ibuffer-filter-group-name-face
+                    :v-adjust -0.04
+                    :height 1.1)
+         " ")
+      "Project: ")))
 
 ;; --------------------------------------------------------------
 ;;                           Fancy Stuff
@@ -101,7 +101,7 @@
 (use-package youdao-dictionary
   :ensure t
   :bind (("C-c y" . youdao-dictionary-search-at-point)
-	 ("C-c Y" . youdao-dictionary-search-at-point-tooltip))
+     ("C-c Y" . youdao-dictionary-search-at-point-tooltip))
   :config
   ;; Cache documents
   (setq url-automatic-caching t)

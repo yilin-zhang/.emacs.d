@@ -26,8 +26,8 @@
 
 ;; automatically return
 (add-hook 'org-mode-hook
-	  (lambda()
-	    (setq truncate-lines nil)))
+          (lambda()
+            (setq truncate-lines nil)))
 
 (use-package org-bullets
   :ensure t
@@ -66,7 +66,7 @@
 (global-set-key (kbd "C-c b") 'org-switchb)
 
 (setq org-todo-keywords '((sequence "TODO(t)" "DOING(i)" "HANGUP(h)"
-				    "|" "DONE(d)" "CANCEL(c)")))
+                    "|" "DONE(d)" "CANCEL(c)")))
 
 ;; --------------------------------------------------------------
 ;;                            Capture

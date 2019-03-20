@@ -147,10 +147,11 @@
 (setq auto-save-default nil)
 
 ;; enable recentf-mode
-(require 'recentf)
-(recentf-mode t)
-(setq recentf-max-menu-items 25)
-(global-set-key "\C-x\ \C-r" 'recentf-open-files)
+(use-package recentf
+  :ensure nil
+  :bind ("\C-x\ \C-r" . recentf-open-files)
+  :config
+  (recentf-mode 1))
 
 ;; --------------------------------------------------------------
 ;;                             Buffer

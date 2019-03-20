@@ -57,7 +57,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (nyan-mode hl-todo symbol-overlay shell-pop flycheck-popup-tip flycheck ivy-rich gnuplot-mode lsp-mode lsp-ui company-lsp yapfify amx highlight-indent-guides doom-modeline beacon ibuffer-projectile projectile pdf-tools youdao-dictionary wttrin magit dashboard diredfl doom-themes aggressive-indent company-box ox-hugo rust-mode popwin cdlatex auctex hungry-delete olivetti rainbow-delimiters expand-region emojify diff-hl pyvenv yasnippet markdown-mode org-bullets all-the-icons neotree avy swiper counsel company which-key try diminish use-package))))
+    (lsp-mode lsp-ui company-lsp flymake-diagnostic-at-point nyan-mode hl-todo symbol-overlay shell-pop ivy-rich gnuplot-mode yapfify amx highlight-indent-guides doom-modeline beacon ibuffer-projectile projectile pdf-tools youdao-dictionary wttrin magit dashboard diredfl doom-themes aggressive-indent company-box ox-hugo rust-mode popwin cdlatex auctex hungry-delete olivetti rainbow-delimiters expand-region emojify diff-hl pyvenv yasnippet markdown-mode org-bullets all-the-icons neotree avy swiper counsel company which-key try diminish use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

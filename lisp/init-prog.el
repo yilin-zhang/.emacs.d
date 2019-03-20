@@ -6,10 +6,25 @@
 (diminish 'eldoc-mode)
 
 ;; --------------------------------------------------------------
+;;                     Flymake Configuration
+;; --------------------------------------------------------------
+(use-package flymake
+  :ensure nil
+  :config
+  (use-package flymake-diagnostic-at-point
+    :ensure t
+    :after flymake
+    :custom
+    (flymake-diagnostic-at-point-timer-delay 0.1)
+    (flymake-diagnostic-at-point-error-prefix "⚠")
+    (flymake-diagnostic-at-point-display-diagnostic-function 'flymake-diagnostic-at-point-display-popup)
+    :hook
+    (flymake-mode . flymake-diagnostic-at-point-mode)))
+
+;; --------------------------------------------------------------
 ;;                     LSP Configurations
 ;; --------------------------------------------------------------
 ;; https://github.com/emacs-lsp/lsp-mode
-
 (use-package lsp-mode
   :ensure t
   :commands lsp
@@ -17,34 +32,29 @@
   :init
   ;; Detect project root
   (setq lsp-auto-guess-root t)
-  ;; use flycheck
-  (setq lsp-prefer-flymake nil))
 
-(use-package lsp-ui
-  :ensure t
-  :commands lsp-ui-mode
-  :init
-  (setq lsp-ui-doc-enable t
-        lsp-ui-doc-include-signature t
-        lsp-ui-doc-position 'top
-        lsp-ui-doc-use-webkit t
-        lsp-ui-doc-border (face-foreground 'default)
-
-        lsp-ui-sideline-enable nil
-        lsp-ui-sideline-ignore-duplicate t)
   :config
-  ;; WORKAROUND Hide mode-line of the lsp-ui-imenu buffer
-  ;; https://github.com/emacs-lsp/lsp-ui/issues/243
-  (defadvice lsp-ui-imenu (after hide-lsp-ui-imenu-mode-line activate)
-    (setq mode-line-format nil)))
+  (use-package lsp-ui
+    :ensure t
+    :commands lsp-ui-mode
+    :init
+    (setq lsp-ui-doc-enable t
+          lsp-ui-doc-header t
+          lsp-ui-doc-include-signature t
+          lsp-ui-doc-position 'top
+          lsp-ui-doc-use-webkit t
+          lsp-ui-doc-border (face-foreground 'default)
+          lsp-ui-sideline-enable nil
+          lsp-ui-sideline-ignore-duplicate t)
+    :config
+    ;; WORKAROUND Hide mode-line of the lsp-ui-imenu buffer
+    ;; https://github.com/emacs-lsp/lsp-ui/issues/243
+    (defadvice lsp-ui-imenu (after hide-lsp-ui-imenu-mode-line activate)
+      (setq mode-line-format nil)))
 
-(use-package company-lsp
-  :ensure t
-  :commands company-lsp)
-
-;; (use-package eglot
-;; :ensure t
-;; :hook (prog-mode . eglot-ensure))
+  (use-package company-lsp
+    :ensure t
+    :commands company-lsp))
 
 ;; --------------------------------------------------------------
 ;;                     Python Mode Configurations

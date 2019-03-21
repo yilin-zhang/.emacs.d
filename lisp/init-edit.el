@@ -22,14 +22,18 @@
   :diminish
   :if (executable-find "aspell")
   :hook (((text-mode outline-mode) . flyspell-mode)
-         (prog-mode . flyspell-prog-mode)
+         ;; WORKAROUND When using eglot, flyspell-prog-mode leads to
+         ;; "<t> undefined" problem. The problem seems to be addressed
+         ;; in Emacs 26.2
+         ;; https://github.com/company-mode/company-mode/issues/760
+         ;; (prog-mode . flyspell-prog-mode)
          (flyspell-mode . (lambda ()
                             (dolist (key '("C-;" "C-," "C-."))
                               (unbind-key key flyspell-mode-map)))))
   :init
-  (setq flyspell-issue-message-flag nil)
-  (setq ispell-program-name "aspell")
-  (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together")))
+  (setq flyspell-issue-message-flag nil
+        ispell-program-name "aspell"
+        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together")))
 
 ;; --------------------------------------------------------------
 ;;                      Parentheses and Region
@@ -41,7 +45,8 @@
 (use-package elec-pair
   :ensure nil
   :hook (after-init . electric-pair-mode)
-  :init (setq electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit))
+  :init
+  (setq electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit))
 
 ;; rainbow parentheses
 (use-package rainbow-delimiters
@@ -68,24 +73,24 @@
   :diminish
   :hook ((prog-mode outline-mode conf-mode) . whitespace-mode)
   :config
-  (setq whitespace-line-column fill-column) ;; limit line length
-  ;; automatically clean up bad whitespace
-  (setq whitespace-action '(auto-cleanup))
-  ;; only show bad whitespace
-  (setq whitespace-style '(face
-               trailing space-before-tab
-               indentation empty space-after-tab)))
+  (setq whitespace-line-column fill-column ;; limit line length
+        ;; automatically clean up bad whitespace
+        whitespace-action '(auto-cleanup)
+        ;; only show bad whitespace
+        whitespace-style '(face
+                           trailing space-before-tab
+                           indentation empty space-after-tab)))
 
 ;; Minor mode to aggressively keep your code always indented
 (use-package aggressive-indent
   :ensure t
   :diminish
   :hook ((after-init . global-aggressive-indent-mode)
-     ;; FIXME: Disable in big files due to the performance issues
-     ;; https://github.com/Malabarba/aggressive-indent-mode/issues/73
-     (find-file . (lambda ()
-            (if (> (buffer-size) (* 3000 80))
-                (aggressive-indent-mode -1)))))
+         ;; FIXME: Disable in big files due to the performance issues
+         ;; https://github.com/Malabarba/aggressive-indent-mode/issues/73
+         (find-file . (lambda ()
+                        (if (> (buffer-size) (* 3000 80))
+                            (aggressive-indent-mode -1)))))
   :config
   ;; Disable in some modes
   (dolist (mode '(asm-mode web-mode html-mode css-mode robot-mode))
@@ -95,13 +100,13 @@
   (add-to-list
    'aggressive-indent-dont-indent-if
    '(and (or (derived-mode-p 'c-mode)
-         (derived-mode-p 'c++-mode)
-         (derived-mode-p 'csharp-mode)
-         (derived-mode-p 'java-mode)
-         (derived-mode-p 'go-mode)
-         (derived-mode-p 'swift-mode))
-     (null (string-match "\\([;{}]\\|\\b\\(if\\|for\\|while\\)\\b\\)"
-                 (thing-at-point 'line))))))
+             (derived-mode-p 'c++-mode)
+             (derived-mode-p 'csharp-mode)
+             (derived-mode-p 'java-mode)
+             (derived-mode-p 'go-mode)
+             (derived-mode-p 'swift-mode))
+         (null (string-match "\\([;{}]\\|\\b\\(if\\|for\\|while\\)\\b\\)"
+                             (thing-at-point 'line))))))
 
 ;; Note that this package has conflict with smartparens.
 ;; The solution is written inside smartparens' configurations.
@@ -213,25 +218,25 @@
   ;; :hook (org-mode . (lambda () (company-mode -1)))
   :hook (prog-mode . company-mode)
   :bind (("M-/" . company-complete)
-     ("<backtab>" . company-yasnippet)
-     :map company-active-map
-     ("C-p" . company-select-previous)
-     ("C-n" . company-select-next)
-     ("<tab>" . company-complete-common-or-cycle)
-     ("<backtab>" . my-company-yasnippet)
-     ;; ("C-c C-y" . my-company-yasnippet)
-     :map company-search-map
-     ("C-p" . company-select-previous)
-     ("C-n" . company-select-next))
+         ("<backtab>" . company-yasnippet)
+         :map company-active-map
+         ("C-p" . company-select-previous)
+         ("C-n" . company-select-next)
+         ("<tab>" . company-complete-common-or-cycle)
+         ("<backtab>" . my-company-yasnippet)
+         ;; ("C-c C-y" . my-company-yasnippet)
+         :map company-search-map
+         ("C-p" . company-select-previous)
+         ("C-n" . company-select-next))
   :config
   (setq company-tooltip-align-annotations t ; aligns annotation to the right
-    company-tooltip-limit 12            ; bigger popup window
-    company-idle-delay .2               ; decrease delay before autocompletion popup shows
-    company-echo-delay 0                ; remove annoying blinking
-    company-minimum-prefix-length 2
-    company-require-match nil
-    company-dabbrev-ignore-case nil
-    company-dabbrev-downcase nil))
+        company-tooltip-limit 12            ; bigger popup window
+        company-idle-delay .2               ; decrease delay before autocompletion popup shows
+        company-echo-delay 0                ; remove annoying blinking
+        company-minimum-prefix-length 2
+        company-require-match nil
+        company-dabbrev-ignore-case nil
+        company-dabbrev-downcase nil))
 
 ;; show icons for company
 (when (version<= "26" emacs-version)
@@ -249,19 +254,19 @@
   :diminish
   :hook (prog-mode . highlight-indent-guides-mode)
   :config
-  (setq highlight-indent-guides-method 'character)
-  (setq highlight-indent-guides-responsive t)
+  (setq highlight-indent-guides-method 'character
+        highlight-indent-guides-responsive t)
   ;; Disable `highlight-indet-guides-mode' in `swiper'
   ;; https://github.com/DarthFennec/highlight-indent-guides/issues/40
   (with-eval-after-load 'ivy
     (defadvice ivy-cleanup-string (after my-ivy-cleanup-hig activate)
       (let ((pos 0) (next 0) (limit (length str)) (prop 'highlight-indent-guides-prop))
-    (while (and pos next)
-      (setq next (text-property-not-all pos limit prop nil str))
-      (when next
-        (setq pos (text-property-any next limit prop nil str))
-        (ignore-errors
-          (remove-text-properties next pos '(display nil face nil) str))))))))
+        (while (and pos next)
+          (setq next (text-property-not-all pos limit prop nil str))
+          (when next
+            (setq pos (text-property-any next limit prop nil str))
+            (ignore-errors
+              (remove-text-properties next pos '(display nil face nil) str))))))))
 
 ;; Highlight TODO and similar keywords in comments and strings
 (use-package hl-todo

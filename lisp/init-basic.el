@@ -163,8 +163,7 @@
 ;;                          Icons and Emoji
 ;; --------------------------------------------------------------
 (use-package all-the-icons
-  :ensure t
-  :config (setq neo-theme (if (display-graphic-p) 'icons 'arrow)))
+  :ensure t)
 
 ;; support displaying emoji
 (use-package emojify

@@ -43,7 +43,9 @@
   :ensure t
   :config
   (global-set-key (kbd "<f8>") 'neotree-toggle)
-  (setq neo-smart-open t))
+  (setq neo-smart-open t)
+  ;; requires all-the-icons
+  (setq neo-theme (if (display-graphic-p) 'icons 'arrow)))
 
 ;; --------------------------------------------------------------
 ;;                           Projectile
@@ -52,8 +54,8 @@
   :ensure t
   :diminish
   :bind (:map projectile-mode-map
-          ("s-t" . projectile-find-file) ; `cmd-t' or `super-t'
-          ("C-c p" . projectile-command-map))
+              ("s-t" . projectile-find-file) ; `cmd-t' or `super-t'
+              ("C-c p" . projectile-command-map))
   :hook (after-init . projectile-mode)
   :init
   (setq projectile-mode-line-prefix "")
@@ -68,19 +70,30 @@
   :ensure t
   :functions all-the-icons-octicon
   :hook ((ibuffer . (lambda ()
-              (ibuffer-projectile-set-filter-groups)
-              (unless (eq ibuffer-sorting-mode 'alphabetic)
-            (ibuffer-do-sort-by-alphabetic)))))
+                      (ibuffer-projectile-set-filter-groups)
+                      (unless (eq ibuffer-sorting-mode 'alphabetic)
+                        (ibuffer-do-sort-by-alphabetic)))))
   :config
   (setq ibuffer-projectile-prefix
-    (if (display-graphic-p)
-        (concat
-         (all-the-icons-octicon "file-directory"
-                    :face ibuffer-filter-group-name-face
-                    :v-adjust -0.04
-                    :height 1.1)
-         " ")
-      "Project: ")))
+        (if (display-graphic-p)
+            (concat
+             (all-the-icons-octicon "file-directory"
+                                    :face ibuffer-filter-group-name-face
+                                    :v-adjust -0.04
+                                    :height 1.1)
+             " ")
+          "Project: ")))
+
+;; awesome-tab requires projectile
+(use-package awesome-tab
+  :load-path "site-lisp"
+  :ensure nil
+  :after projectile
+  :config
+  (setq awesome-tab-style "box")
+  (setq awesome-tab-background-color "#1D1F21")
+  (setq awesome-tab-display-sticky-function-name nil)
+  (awesome-tab-mode t))
 
 ;; --------------------------------------------------------------
 ;;                           Fancy Stuff
@@ -101,7 +114,7 @@
 (use-package youdao-dictionary
   :ensure t
   :bind (("C-c y" . youdao-dictionary-search-at-point)
-     ("C-c Y" . youdao-dictionary-search-at-point-tooltip))
+         ("C-c Y" . youdao-dictionary-search-at-point-tooltip))
   :config
   ;; Cache documents
   (setq url-automatic-caching t)

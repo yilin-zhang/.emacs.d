@@ -15,7 +15,7 @@
     :ensure t
     :after flymake
     :custom
-    (flymake-diagnostic-at-point-error-prefix "⚠")
+    (flymake-diagnostic-at-point-error-prefix "⚠ ")
     (flymake-diagnostic-at-point-display-diagnostic-function 'flymake-diagnostic-at-point-display-popup)
     :hook
     (flymake-mode . flymake-diagnostic-at-point-mode)
@@ -28,7 +28,7 @@
 (use-package eglot
   :ensure t
   :bind (:map eglot-mode-map
-              ("C-c d" . xref-find-definitions))
+              ("C-c r" . eglot-rename))
   :hook (prog-mode . eglot-ensure)
   :config
   (use-package eldoc-box
@@ -55,6 +55,7 @@
 ;; --------------------------------------------------------------
 ;; https://github.com/senny/rvm.el
 (use-package rvm
+  :load-path "site-lisp"
   :ensure nil)
 
 ;; --------------------------------------------------------------

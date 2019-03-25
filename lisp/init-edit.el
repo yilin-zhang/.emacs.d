@@ -141,9 +141,9 @@
   :ensure t
   :diminish
   :config
-  (ivy-mode t)
   (setq ivy-use-virtual-buffers t)
   (global-set-key (kbd "C-c C-r") 'ivy-resume)
+  (ivy-mode t)
 
   (use-package ivy-rich
     :ensure t

@@ -101,9 +101,9 @@
   :ensure t
   :diminish
   :config
-  (beacon-mode 1)
   (setq beacon-color 0.5)
-  (setq beacon-size 20))
+  (setq beacon-size 20)
+  (beacon-mode 1))
 
 ;; move the cursor to the newly created window
 ;; makes people easier to close it (C-g)

@@ -53,10 +53,14 @@
 ;; --------------------------------------------------------------
 ;;                     Ruby Mode Configurations
 ;; --------------------------------------------------------------
-;; https://github.com/senny/rvm.el
-(use-package rvm
+
+;;https://github.com/senny/rbenv.el
+(use-package rbenv
   :load-path "site-lisp"
-  :ensure nil)
+  :ensure nil
+  :config
+  (setq rbenv-show-active-ruby-in-modeline nil)
+  (global-rbenv-mode 1))
 
 ;; --------------------------------------------------------------
 ;;                     Rust Mode Configurations

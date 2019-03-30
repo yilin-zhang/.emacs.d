@@ -20,22 +20,65 @@
 ;;                           PDF Reading
 ;; --------------------------------------------------------------
 
-;; `TODO' o is not binded to pdf-outline, which is weird,
-;; so I force it to be binded.
-(use-package pdf-tools
-  :ensure t
-  :mode ("\\.[pP][dD][fF]\\'" . pdf-view-mode)
-  :hook
-  (pdf-view-mode . pdf-links-minor-mode)
-  (pdf-view-mode . pdf-misc-context-menu-minor-mode)
-  (pdf-view-mode . pdf-outline-minor-mode)
-  (pdf-view-mode . pdf-annot-minor-mode)
-  (pdf-view-mode . (lambda()(line-number-mode -1)))
-  :bind (:map pdf-view-mode-map
-              ("C-s" . pdf-occur)
-              ("o" . pdf-outline))
-  :config (pdf-tools-install))
+;; ;; `TODO' o is not binded to pdf-outline, which is weird,
+;; ;; so I force it to be binded.
+;; (use-package pdf-tools
+;;   :ensure t
+;;   :mode ("\\.[pP][dD][fF]\\'" . pdf-view-mode)
+;;   :hook
+;;   (pdf-view-mode . pdf-links-minor-mode)
+;;   (pdf-view-mode . pdf-misc-context-menu-minor-mode)
+;;   (pdf-view-mode . pdf-outline-minor-mode)
+;;   (pdf-view-mode . pdf-annot-minor-mode)
+;;   (pdf-view-mode . (lambda()(line-number-mode -1)))
+;;   :bind (:map pdf-view-mode-map
+;;               ("C-s" . pdf-occur)
+;;               ("o" . pdf-outline))
+;;   :config (pdf-tools-install))
 
+(when (display-graphic-p)
+  (use-package pdf-view
+    :ensure pdf-tools
+    :diminish (pdf-view-midnight-minor-mode pdf-view-printer-minor-mode)
+    :mode ("\\.[pP][dD][fF]\\'" . pdf-view-mode)
+    :magic ("%PDF" . pdf-view-mode)
+    :preface
+    (defun my-pdf-set-midnight-colors ()
+      (setq pdf-view-midnight-colors
+            `(,(face-foreground 'default) . ,(face-background 'default))))
+
+    ;; Workaround for pdf-tools not reopening to last-viewed page
+    ;; https://github.com/politza/pdf-tools/issues/18
+    (defun my-pdf-set-last-viewed-bookmark ()
+      (interactive)
+      (when (eq major-mode 'pdf-view-mode)
+        (bookmark-set (my-pdf-generate-bookmark-name))))
+
+    (defun my-pdf-jump-last-viewed-bookmark ()
+      (when (my-pdf-has-last-viewed-bookmark)
+        (bookmark-jump (my-pdf-generate-bookmark-name))))
+
+    (defun my-pdf-has-last-viewed-bookmark ()
+      (assoc
+       (my-pdf-generate-bookmark-name) bookmark-alist))
+
+    (defun my-pdf-generate-bookmark-name ()
+      (concat "LAST-VIEWED: " (buffer-name)))
+
+    (defun my-pdf-set-all-last-viewed-bookmarks ()
+      (dolist (buf (buffer-list))
+        (with-current-buffer buf
+          (my-pdf-set-last-viewed-bookmark))))
+    :bind (:map pdf-view-mode-map
+                ("C-s" . isearch-forward))
+    :hook ((after-load-theme . my-pdf-set-midnight-colors)
+           (kill-buffer . my-pdf-set-last-viewed-bookmark)
+           (pdf-view-mode . my-pdf-jump-last-viewed-bookmark)
+           (kill-emacs . (lambda ()
+                           (unless noninteractive  ; as `save-place-mode' does
+                             (my-pdf-set-all-last-viewed-bookmarks)))))
+    :init (my-pdf-set-midnight-colors)
+    :config (pdf-tools-install t nil t t)))
 ;; --------------------------------------------------------------
 ;;                           File Tree
 ;; --------------------------------------------------------------
@@ -89,6 +132,7 @@
   :load-path "site-lisp"
   :ensure nil
   :after projectile
+  :bind ("<f6>" . awesome-tab-mode)
   :config
   (setq awesome-tab-style "box")
   (setq awesome-tab-background-color "#1D1F21")

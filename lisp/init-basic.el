@@ -1,6 +1,14 @@
 ;; init-basic.el --- Basic configurations. -*- lexical-binding: t -*-
 
 ;; --------------------------------------------------------------
+;;                            Server
+;; --------------------------------------------------------------
+;; Start server
+(use-package server
+  :ensure nil
+  :hook (after-init . server-mode))
+
+;; --------------------------------------------------------------
 ;;                            Features
 ;; --------------------------------------------------------------
 ;; disable ring-bell-function

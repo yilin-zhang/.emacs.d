@@ -142,7 +142,7 @@
   :bind ([f9] . shell-pop)
   :init
   (setq shell-pop-shell-type '("ansi-term" "*ansi-term*"
-                   (lambda () (ansi-term shell-pop-term-shell)))))
+                               (lambda () (ansi-term shell-pop-term-shell)))))
 
 ;; --------------------------------------------------------------
 ;;                              Files

@@ -70,13 +70,16 @@
         (with-current-buffer buf
           (my-pdf-set-last-viewed-bookmark))))
     :bind (:map pdf-view-mode-map
-                ("C-s" . isearch-forward))
+                ("C-s" . pdf-occur))
     :hook ((after-load-theme . my-pdf-set-midnight-colors)
            (kill-buffer . my-pdf-set-last-viewed-bookmark)
            (pdf-view-mode . my-pdf-jump-last-viewed-bookmark)
            (kill-emacs . (lambda ()
                            (unless noninteractive  ; as `save-place-mode' does
-                             (my-pdf-set-all-last-viewed-bookmarks)))))
+                             (my-pdf-set-all-last-viewed-bookmarks))))
+           ;; TODO enable line number might cause Emacs freeze
+           (pdf-view-mode . (lambda()(linum-mode -1)))
+           (pdf-view-mode . (lambda()(line-number-mode -1))))
     :init (my-pdf-set-midnight-colors)
     :config (pdf-tools-install t nil t t)))
 ;; --------------------------------------------------------------

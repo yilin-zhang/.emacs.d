@@ -39,6 +39,12 @@
     ))
 
 ;; --------------------------------------------------------------
+;;                     Lisp Mode Configurations
+;; --------------------------------------------------------------
+(use-package lispy
+  :ensure t)
+
+;; --------------------------------------------------------------
 ;;                     Python Mode Configurations
 ;; --------------------------------------------------------------
 (use-package pyvenv
@@ -50,6 +56,11 @@
   :ensure t
   :diminish yapf-mode
   :hook (python-mode . yapf-mode))
+
+;; This package requires `lispy', which should be installed first
+(use-package lpy
+  :load-path "site-lisp/lpy"
+  :ensure nil)
 
 ;; --------------------------------------------------------------
 ;;                     Ruby Mode Configurations

@@ -43,7 +43,8 @@
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; one line at a time
 (setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
 (setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
-(setq scroll-step 1) ;; keyboard scroll one line at a time
+(setq scroll-step 1
+      scroll-conservatively 100000) ;; keyboard scroll one line at a time
 
 ;; lock the cursor postion when scrolling up and down
 (setq scroll-preserve-screen-position 'always)
@@ -110,6 +111,8 @@
 (use-package recentf
   :ensure nil
   :bind ("\C-x\ \C-r" . recentf-open-files)
+  :init
+  (setq recentf-max-saved-items 50)
   :config
   (recentf-mode 1))
 
@@ -142,8 +145,8 @@
 ;; set chinese font
 (dolist (charset '(kana han symbol cjk-misc bopomofo))
   (set-fontset-font (frame-parameter nil 'font)
-            charset
-            (font-spec :family "Microsoft Yahei")))
+                    charset
+                    (font-spec :family "Microsoft Yahei")))
 
 ;; --------------------------------------------------------------
 ;;                        Theme and Modeline
@@ -153,7 +156,7 @@
 (use-package doom-themes
   :ensure t
   :config
-  (load-theme 'doom-tomorrow-night t)
+  (load-theme 'doom-vibrant t)
   (doom-themes-neotree-config)
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
@@ -186,7 +189,7 @@
   :config
   (setq dashboard-banner-logo-title "Have a nice day! ❤")
   ;; Set the banner
-  (setq dashboard-startup-banner "~/.emacs.d/logo.png")
+  (setq dashboard-startup-banner 3)
   (setq dashboard-items '((recents  . 5)
                           (bookmarks . 5)
                           (agenda . 5))))

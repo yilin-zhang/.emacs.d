@@ -5,20 +5,13 @@
 ;; --------------------------------------------------------------
 ;;                            Features
 ;; --------------------------------------------------------------
-;; add time stamp after an item is DONE
-(setq org-log-done 'time)
 
-;; fontify code in code blocks
-(setq org-src-fontify-natively t)
-
-;; indent at startup
-(setq org-startup-indented t)
-
-;; hide emphasis markers
-(setq org-hide-emphasis-markers t)
-
-;; makes special character format visible
-(setq org-pretty-entities t)
+(setq org-log-done 'time          ; add time stamp after an item is DONE
+      org-src-fontify-natively t  ; fontify code in code blocks
+      org-startup-indented t      ; indent at startup
+      org-hide-emphasis-markers t ; hide emphasis markers
+      org-pretty-entities t       ; makes special character format visible
+      )
 
 ;; set org-indent-mode
 (add-hook 'org-mode-hook 'org-indent-mode)
@@ -65,8 +58,10 @@
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c b") 'org-switchb)
 
+;; Set keywords properties
 (setq org-todo-keywords '((sequence "TODO(t)" "DOING(i)" "HANGUP(h)"
-                    "|" "DONE(d)" "CANCEL(c)")))
+                                    "|" "DONE(d)" "CANCEL(c)"))
+      org-todo-keyword-faces '(("HANGUP" . warning)))
 
 ;; --------------------------------------------------------------
 ;;                            Capture

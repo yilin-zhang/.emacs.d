@@ -29,7 +29,7 @@
          ;; (prog-mode . flyspell-prog-mode)
          (flyspell-mode . (lambda ()
                             (dolist (key '("C-;" "C-," "C-."))
-                              (unbind-key key flyspell-mode-map)))))
+                            (unbind-key key flyspell-mode-map)))))
   :init
   (setq flyspell-issue-message-flag nil
         ispell-program-name "aspell"
@@ -147,28 +147,6 @@
 
   (use-package ivy-rich
     :ensure t
-    :preface
-    (defun ivy-rich-switch-buffer-icon (candidate)
-      (with-current-buffer
-          (get-buffer candidate)
-        (let ((icon (all-the-icons-icon-for-mode major-mode)))
-          (if (symbolp icon)
-              (all-the-icons-icon-for-mode 'fundamental-mode)
-            icon))))
-    :init
-    (setq ivy-rich-display-transformers-list
-          '(ivy-switch-buffer
-            (:columns
-             ((ivy-rich-switch-buffer-icon :width 2)
-              (ivy-rich-candidate (:width 30))
-              (ivy-rich-switch-buffer-size (:width 7))
-              (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
-              (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
-              (ivy-rich-switch-buffer-project (:width 15 :face success))
-              (ivy-rich-switch-buffer-path
-               (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
-             :predicate
-             (lambda (cand) (get-buffer cand)))))
     :config
     (ivy-rich-mode 1)))
 
@@ -178,29 +156,25 @@
   (global-set-key "\C-s" 'swiper)
   )
 
-(use-package avy
-  :ensure t
-  :bind ("M-s" . avy-goto-char))
-
 ;; Highlight symbols
 (use-package symbol-overlay
   :ensure t
   :diminish
   :defines iedit-mode
   :commands (symbol-overlay-get-symbol
-         symbol-overlay-assoc
-         symbol-overlay-get-list
-         symbol-overlay-jump-call)
+             symbol-overlay-assoc
+             symbol-overlay-get-list
+             symbol-overlay-jump-call)
   :bind (("M-i" . symbol-overlay-put)
-     ("M-n" . symbol-overlay-jump-next)
-     ("M-p" . symbol-overlay-jump-prev)
-     ("M-N" . symbol-overlay-switch-forward)
-     ("M-P" . symbol-overlay-switch-backward)
-     ("M-C" . symbol-overlay-remove-all)
-     ([M-f3] . symbol-overlay-remove-all))
+         ("M-n" . symbol-overlay-jump-next)
+         ("M-p" . symbol-overlay-jump-prev)
+         ("M-N" . symbol-overlay-switch-forward)
+         ("M-P" . symbol-overlay-switch-backward)
+         ("M-C" . symbol-overlay-remove-all)
+         ([M-f3] . symbol-overlay-remove-all))
   :hook ((prog-mode . symbol-overlay-mode)
-     (iedit-mode . (lambda () (symbol-overlay-mode -1)))
-     (iedit-mode-end . symbol-overlay-mode)))
+         (iedit-mode . (lambda () (symbol-overlay-mode -1)))
+         (iedit-mode-end . symbol-overlay-mode)))
 
 ;; --------------------------------------------------------------
 ;;                           Completion

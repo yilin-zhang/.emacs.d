@@ -194,7 +194,7 @@
   :bind ("<f6>" . awesome-tab-mode)
   :config
   (setq awesome-tab-style "box")
-  (setq awesome-tab-background-color "#1D1F21")
+  (setq awesome-tab-background-color "#242730")
   (setq awesome-tab-display-sticky-function-name nil))
 
 ;; --------------------------------------------------------------

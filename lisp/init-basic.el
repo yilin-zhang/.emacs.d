@@ -56,6 +56,9 @@
 ;; enable delete-selection-mode
 (delete-selection-mode t)
 
+;; highlight the current line
+(global-hl-line-mode 1)
+
 ;; Make the cursor have a tail, which is easier for
 ;; users to locate the cursor.
 (use-package beacon
@@ -81,7 +84,10 @@
 ;; (add-hook 'prog-mode-hook 'linum-mode)
 ;; (global-display-line-numbers-mode)
 (if (version<= "26" emacs-version )
-    (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+    (progn
+      (setq display-line-numbers-type 'relative)
+      (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+      )
   (add-hook 'prog-mode-hook 'linum-mode))
 
 ;; --------------------------------------------------------------

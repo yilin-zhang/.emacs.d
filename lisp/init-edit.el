@@ -6,6 +6,16 @@
 ;; Use M-l as backspace
 ;; (global-set-key (kbd "M-l") (kbd "<backspace>"))
 
+(use-package evil
+  :ensure t
+  :bind ("<f5>" . evil-mode))
+
+(use-package fcitx
+  :ensure t
+  :config
+  (fcitx-aggressive-setup)
+  (setq fcitx-use-dbus t))
+
 ;; --------------------------------------------------------------
 ;;                      Template and Spellchecker
 ;; --------------------------------------------------------------

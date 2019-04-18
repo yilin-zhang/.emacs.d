@@ -59,16 +59,6 @@
 ;; highlight the current line
 (global-hl-line-mode 1)
 
-;; Make the cursor have a tail, which is easier for
-;; users to locate the cursor.
-(use-package beacon
-  :ensure t
-  :diminish
-  :config
-  (setq beacon-color 0.5)
-  (setq beacon-size 20)
-  (beacon-mode 1))
-
 ;; move the cursor to the newly created window
 ;; makes people easier to close it (C-g)
 (use-package popwin

@@ -8,7 +8,12 @@
 
 (use-package evil
   :ensure t
-  :bind ("<f5>" . evil-mode))
+  :bind ("<f5>" . evil-mode)
+  :config
+  (use-package evil-surround
+    :ensure t
+    :config
+    (global-evil-surround-mode 1)))
 
 (use-package fcitx
   :ensure t

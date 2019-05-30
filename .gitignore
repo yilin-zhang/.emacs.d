@@ -1,7 +1,6 @@
 /*
 !.gitignore
 !init.el
-!readme.org
 !/lisp
 !/site-lisp
 !logo.png

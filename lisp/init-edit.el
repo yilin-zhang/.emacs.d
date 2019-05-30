@@ -205,7 +205,9 @@
   ;; `TODO' it seems like the hook is useless and company mode will always start
   ;; :hook (after-init . global-company-mode)
   ;; :hook (org-mode . (lambda () (company-mode -1)))
-  :hook (prog-mode . company-mode)
+  :hook
+  (prog-mode . company-mode)
+  (LaTeX-mode . company-mode)
   :bind (("M-/" . company-complete)
          ("<backtab>" . company-yasnippet)
          :map company-active-map

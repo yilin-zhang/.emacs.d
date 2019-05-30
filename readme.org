@@ -1,9 +1,0 @@
-* .emacs.d
-
-My personal Emacs configuration. It's aimed at note taking and document writing.
-
-I'm an Emacs beginner, so the configuration is far from excellent.
-
-Default agenda file path: =~/agenda.org=
-
-Thanks to [[https://github.com/seagle0128/.emacs.d/][Centaur Emacs]] that gives me ideas to improve my configuration.

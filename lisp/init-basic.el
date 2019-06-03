@@ -184,6 +184,8 @@
   (after-init . dashboard-setup-startup-hook)
   :config
   (setq dashboard-banner-logo-title "Have a nice day! ❤")
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
   ;; Set the banner
   (setq dashboard-startup-banner 3)
   (setq dashboard-items '((recents  . 5)

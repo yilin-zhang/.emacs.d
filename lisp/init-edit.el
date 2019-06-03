@@ -9,6 +9,8 @@
 (use-package evil
   :ensure t
   :bind ("<f5>" . evil-mode)
+  :init
+  (evil-mode 1)
   :config
   (use-package evil-surround
     :ensure t

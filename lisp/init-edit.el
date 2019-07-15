@@ -232,11 +232,11 @@
         company-dabbrev-downcase nil))
 
 ;; show icons for company
-(when (version<= "26" emacs-version)
-  (use-package company-box
-    :ensure t
-    :diminish (company-box-mode)
-    :hook (company-mode . company-box-mode)))
+;; (when (version<= "26" emacs-version)
+;;   (use-package company-box
+;;     :ensure t
+;;     :diminish (company-box-mode)
+;;     :hook (company-mode . company-box-mode)))
 
 ;; --------------------------------------------------------------
 ;;                            Hightlight

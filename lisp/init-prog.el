@@ -26,17 +26,17 @@
 ;; --------------------------------------------------------------
 ;;                     LSP Configurations
 ;; --------------------------------------------------------------
-(use-package eglot
-  :ensure t
-  :bind (:map eglot-mode-map
-              ("C-c r" . eglot-rename))
-  :hook (prog-mode . eglot-ensure)
-  :config
-  (use-package eldoc-box
-    :ensure t
-    :hook
-    (eglot--managed-mode . eldoc-box-hover-mode)
-    ))
+;; (use-package eglot
+;;   :ensure t
+;;   :bind (:map eglot-mode-map
+;;               ("C-c r" . eglot-rename))
+;;   :hook (prog-mode . eglot-ensure)
+;;   :config
+;;   (use-package eldoc-box
+;;     :ensure t
+;;     :hook
+;;     (eglot--managed-mode . eldoc-box-hover-mode)
+;;     ))
 
 ;; --------------------------------------------------------------
 ;;                     Lisp Mode Configurations
@@ -47,6 +47,17 @@
 ;; --------------------------------------------------------------
 ;;                     Python Mode Configurations
 ;; --------------------------------------------------------------
+(use-package anaconda-mode
+  :ensure t
+  :hook (python-mode . anaconda-mode)
+  :bind (:map anaconda-mode-map ("C-c C-d" . anaconda-mode-show-doc))
+  :config
+  (use-package company-anaconda
+    :ensure t
+    :config
+    (eval-after-load 'company
+      '(add-to-list 'company-backends '(company-anaconda :with company-capf)))))
+
 (use-package pyvenv
   :ensure t
   :init
@@ -66,6 +77,14 @@
 ;;                     Ruby Mode Configurations
 ;; --------------------------------------------------------------
 
+;; First start inf-ruby, then use robe-start to launch it.
+(use-package robe
+  :ensure t
+  :hook (ruby-mode . robe-mode)
+  :config
+  (eval-after-load 'company
+    '(push 'company-robe company-backends)))
+
 ;;https://github.com/senny/rbenv.el
 (use-package rbenv
   :load-path "site-lisp"
@@ -74,26 +93,26 @@
   (setq rbenv-show-active-ruby-in-modeline nil)
   (global-rbenv-mode 1))
 
+(use-package ruby-electric
+  :ensure t
+  :hook (ruby-mode . ruby-electric-mode))
+
 ;; --------------------------------------------------------------
 ;;                     Rust Mode Configurations
 ;; --------------------------------------------------------------
 (use-package rust-mode
   :ensure t)
 
-;; (use-package flycheck-rust
-;; :ensure t
-;; :hook(flycheck-mode . flycheck-rust-setup))
-
 ;; --------------------------------------------------------------
 ;;                     Haskell Mode Configurations
 ;; --------------------------------------------------------------
 (use-package haskell-mode
-  :ensure t)
+  :ensure t
+  :hook (haskell-mode . interactive-haskell-mode))
 
 ;; --------------------------------------------------------------
 ;;                            Backup
 ;; --------------------------------------------------------------
-
 
 ;; (use-package flycheck
 ;;   :ensure t

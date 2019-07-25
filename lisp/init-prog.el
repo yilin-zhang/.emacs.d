@@ -8,21 +8,22 @@
 ;; --------------------------------------------------------------
 ;;                     Checker Configuration
 ;; --------------------------------------------------------------
-(use-package flymake
-  :ensure nil
+(use-package flycheck
+  :ensure t
+  :diminish flycheck-mode
+  :hook (after-init . global-flycheck-mode)
   :config
-  (setq flymake-fringe-indicator-position 'right-fringe)
-  (use-package flymake-diagnostic-at-point
+  (setq flycheck-indication-mode 'right-fringe)
+  (setq flycheck-emacs-lisp-load-path 'inherit)
+  (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc ruby-rubylint))
+  ;; Only check while saving and opening files
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (use-package flycheck-posframe
     :ensure t
-    :after flymake
-    :custom
-    ;; (flymake-diagnostic-at-point-error-prefix "⚠ ")
-    (flymake-diagnostic-at-point-display-diagnostic-function 'flymake-diagnostic-at-point-display-popup)
-    :hook
-    (flymake-mode . flymake-diagnostic-at-point-mode)
-    :config
-    (setq flymake-diagnostic-at-point-timer-delay 1)))
+    :hook (flycheck-mode . flycheck-posframe-mode)))
 
+;; ;; :config (add-to-list 'flycheck-posframe-inhibit-functions
+;;                      #'(lambda () (bound-and-true-p company-backend)))))
 ;; --------------------------------------------------------------
 ;;                     LSP Configurations
 ;; --------------------------------------------------------------
@@ -76,6 +77,7 @@
 ;; --------------------------------------------------------------
 ;;                     Ruby Mode Configurations
 ;; --------------------------------------------------------------
+;; Install rubocop and ruby-lint gems.
 
 ;; First start inf-ruby, then use robe-start to launch it.
 (use-package robe
@@ -97,6 +99,10 @@
   :ensure t
   :hook (ruby-mode . ruby-electric-mode))
 
+(use-package rubocop
+  :ensure t
+  :hook (ruby-mode . rubocop-mode))
+
 ;; --------------------------------------------------------------
 ;;                     Rust Mode Configurations
 ;; --------------------------------------------------------------
@@ -111,26 +117,29 @@
   :hook (haskell-mode . interactive-haskell-mode))
 
 ;; --------------------------------------------------------------
+;;                     Racket Mode Configurations
+;; --------------------------------------------------------------
+(use-package racket-mode
+  :ensure t)
+
+;; --------------------------------------------------------------
 ;;                            Backup
 ;; --------------------------------------------------------------
 
-;; (use-package flycheck
-;;   :ensure t
-;;   :diminish flycheck-mode
-;;   :hook (after-init . global-flycheck-mode)
+;; (use-package flymake
+;;   :ensure nil
 ;;   :config
-;;   (setq flycheck-indication-mode 'right-fringe)
-;;   (setq flycheck-emacs-lisp-load-path 'inherit)
-;;   (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
-
-;;   ;; Only check while saving and opening files
-;;   (setq flycheck-check-syntax-automatically '(save mode-enabled))
-
-;;   (use-package flycheck-posframe
+;;   (setq flymake-fringe-indicator-position 'right-fringe)
+;;   (use-package flymake-diagnostic-at-point
 ;;     :ensure t
-;;     :hook (flycheck-mode . flycheck-posframe-mode)))
-;; ;; :config (add-to-list 'flycheck-posframe-inhibit-functions
-;; ;; #'(lambda () (bound-and-true-p company-backend)))))
+;;     :after flymake
+;;     :custom
+;;     ;; (flymake-diagnostic-at-point-error-prefix "⚠ ")
+;;     (flymake-diagnostic-at-point-display-diagnostic-function 'flymake-diagnostic-at-point-display-popup)
+;;     :hook
+;;     (flymake-mode . flymake-diagnostic-at-point-mode)
+;;     :config
+;;     (setq flymake-diagnostic-at-point-timer-delay 1)))
 
 ;; ;; https://github.com/emacs-lsp/lsp-mode
 ;; (use-package lsp-mode

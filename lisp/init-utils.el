@@ -21,7 +21,7 @@
              (display-time-mode -1))
     (progn (setq my/frame-fullscreen t)(display-time-mode 1))))
 
-(global-set-key (kbd "<f11>") 'my/toggle-frame-fullscreen)
+(global-set-key (kbd "<f12>") 'my/toggle-frame-fullscreen)
 
 ;; --------------------------------------------------------------
 ;;                         Window Split

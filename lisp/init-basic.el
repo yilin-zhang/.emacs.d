@@ -137,7 +137,7 @@
 ;; https://segmentfault.com/q/1010000000125755
 ;; set english font
 (set-face-attribute
- 'default nil :font "Source Code Pro 13")
+ 'default nil :font "DejaVu Sans Mono 17")
 ;; set chinese font
 (dolist (charset '(kana han symbol cjk-misc bopomofo))
   (set-fontset-font (frame-parameter nil 'font)
@@ -152,35 +152,35 @@
 (use-package doom-themes
   :ensure t
   :config
-  (load-theme 'doom-molokai t)
+  (load-theme 'doom-tomorrow-night t)
   (doom-themes-neotree-config)
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
 
-(use-package telephone-line
-  :ensure t
-  :init
-  (setq telephone-line-primary-left-separator 'telephone-line-cubed-left
-        telephone-line-secondary-left-separator 'telephone-line-cubed-hollow-left
-        telephone-line-primary-right-separator 'telephone-line-cubed-right
-        telephone-line-secondary-right-separator 'telephone-line-cubed-hollow-right)
-  :config
-  (telephone-line-mode 1))
+;; (use-package telephone-line
+;;   :ensure t
+;;   :init
+;;   (setq telephone-line-primary-left-separator 'telephone-line-cubed-left
+;;         telephone-line-secondary-left-separator 'telephone-line-cubed-hollow-left
+;;         telephone-line-primary-right-separator 'telephone-line-cubed-right
+;;         telephone-line-secondary-right-separator 'telephone-line-cubed-hollow-right)
+;;   :config
+;;   (telephone-line-mode 1))
 
 ;; https://github.com/seagle0128/doom-modeline
-;; (use-package doom-modeline
-;;   :ensure t
-;;   :hook (after-init . doom-modeline-mode)
-;;   :config
-;;   (setq find-file-visit-truename t))
+(use-package doom-modeline
+  :ensure t
+  :hook (after-init . doom-modeline-mode)
+  :config
+  (setq find-file-visit-truename t))
 
-;; (use-package nyan-mode
-;;   :ensure t
-;;   :hook (after-init . nyan-mode)
-;;   :config
-;;   ;; WORKAROUND (setq nyan-animate-nyancat t) seems useless, I don't
-;;   ;; know why.
-;;   (nyan-start-animation))
+(use-package nyan-mode
+  :ensure t
+  :hook (after-init . nyan-mode)
+  :config
+  ;; WORKAROUND (setq nyan-animate-nyancat t) seems useless, I don't
+  ;; know why.
+  (nyan-start-animation))
 
 ;; --------------------------------------------------------------
 ;;                            Dashboard

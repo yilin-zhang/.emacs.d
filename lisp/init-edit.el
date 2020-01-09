@@ -6,6 +6,20 @@
 ;; Use M-l as backspace
 ;; (global-set-key (kbd "M-l") (kbd "<backspace>"))
 
+;; Key Modifiers
+(when (eq system-type 'darwin)
+  ;; Compatible with Emacs Mac port
+  (setq mac-option-modifier 'meta
+        mac-command-modifier 'super)
+  (bind-keys ([(super a)] . mark-whole-buffer)
+             ([(super c)] . kill-ring-save)
+             ([(super l)] . goto-line)
+             ([(super q)] . save-buffers-kill-emacs)
+             ([(super s)] . save-buffer)
+             ([(super v)] . yank)
+             ([(super w)] . delete-frame)
+             ([(super z)] . undo)))
+
 (use-package evil
   :ensure t
   :bind ("<f5>" . evil-mode)
@@ -17,11 +31,12 @@
     :config
     (global-evil-surround-mode 1)))
 
-(use-package fcitx
-  :ensure t
-  :config
-  (fcitx-aggressive-setup)
-  (setq fcitx-use-dbus t))
+(when (eq system-type 'gnu/linux)
+  (use-package fcitx
+    :ensure t
+    :config
+    (fcitx-aggressive-setup)
+    (setq fcitx-use-dbus t)))
 
 ;; --------------------------------------------------------------
 ;;                      Template and Spellchecker
@@ -147,25 +162,47 @@
 (use-package counsel
   :ensure t
   :diminish (counsel-mode)
-  :config
-  (counsel-mode t)
+  :hook ((after-init . ivy-mode)
+         (ivy-mode . counsel-mode))
+  :init
+  ;;(counsel-mode t)
   ;; Sort M-x commands by history
   (use-package amx
     :ensure t)
-  )
-
-(use-package ivy
-  :ensure t
-  :diminish
-  :config
-  (setq ivy-use-virtual-buffers t)
-  (global-set-key (kbd "C-c C-r") 'ivy-resume)
-  (ivy-mode t)
 
   (use-package ivy-rich
     :ensure t
+    :hook (ivy-mode . ivy-rich-mode)
+    :init
+    (defun ivy-rich-switch-buffer-icon (candidate)
+      (with-current-buffer
+          (get-buffer candidate)
+        (let ((icon (all-the-icons-icon-for-mode major-mode)))
+          (if (symbolp icon)
+              (all-the-icons-icon-for-mode 'fundamental-mode)
+            icon))))
     :config
-    (ivy-rich-mode 1)))
+    (setq ivy-rich--display-transformers-list
+          '(ivy-switch-buffer
+            (:columns
+             ((ivy-rich-switch-buffer-icon (:width 2))
+              (ivy-rich-candidate (:width 30))
+              (ivy-rich-switch-buffer-size (:width 7))
+              (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
+              (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
+              (ivy-rich-switch-buffer-project (:width 15 :face success))
+              (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
+             :predicate
+             (lambda (cand) (get-buffer cand))))))
+
+  (use-package ivy
+    :ensure t
+    :diminish
+    :config
+    (setq ivy-use-virtual-buffers t)
+    (global-set-key (kbd "C-c C-r") 'ivy-resume)
+    ;;(ivy-mode t)
+    ))
 
 (use-package swiper
   :ensure t

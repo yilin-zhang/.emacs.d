@@ -68,6 +68,7 @@
 ;; So just setting linum-mode as a prog-mode-hook is a reasonable solution.
 ;; copy from Centaur Emacs
 (use-package olivetti
+  :ensure t
   :diminish visual-line-mode olivetti-mode
   :bind ("<f7>" . olivetti-mode)
   :init (setq olivetti-body-width 0.618))

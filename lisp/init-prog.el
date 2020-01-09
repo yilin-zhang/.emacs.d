@@ -70,9 +70,9 @@
   :hook (python-mode . yapf-mode))
 
 ;; This package requires `lispy', which should be installed first
-(use-package lpy
-  :load-path "site-lisp/lpy"
-  :ensure nil)
+;; (use-package lpy
+;;   :load-path "site-lisp/lpy"
+;;   :ensure nil)
 
 ;; --------------------------------------------------------------
 ;;                     Ruby Mode Configurations

@@ -137,7 +137,7 @@
 ;; https://segmentfault.com/q/1010000000125755
 ;; set english font
 (set-face-attribute
- 'default nil :font "DejaVu Sans Mono 17")
+ 'default nil :font "Sarasa Mono SC 17")
 ;; set chinese font
 (dolist (charset '(kana han symbol cjk-misc bopomofo))
   (set-fontset-font (frame-parameter nil 'font)

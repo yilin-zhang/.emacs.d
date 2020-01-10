@@ -9,22 +9,22 @@
 (setq display-time-default-load-average nil)
 (setq display-time-24hr-format 1)
 
-(defvar my/frame-fullscreen nil
+(defvar yilin-frame-fullscreen nil
   "Indicates whether the frame is toggled fullscreen or not.")
 
-(defun my/toggle-frame-fullscreen ()
+(defun yilin-toggle-frame-fullscreen ()
   "toggle-frame-fullscreen plus display-time-mode."
   (interactive)
   (toggle-frame-fullscreen)
-  (if my/frame-fullscreen
-      (progn (setq my/frame-fullscreen nil)
+  (if yilin-frame-fullscreen
+      (progn (setq yilin-frame-fullscreen nil)
              (display-time-mode -1)
              (display-battery-mode -1))
-    (progn (setq my/frame-fullscreen t)
+    (progn (setq yilin-frame-fullscreen t)
            (display-time-mode 1)
            (display-battery-mode 1))))
 
-(global-set-key (kbd "<f12>") 'my/toggle-frame-fullscreen)
+(global-set-key (kbd "<f12>") 'yilin-toggle-frame-fullscreen)
 
 ;; --------------------------------------------------------------
 ;;                         Window Split
@@ -220,13 +220,6 @@
 (use-package try
   :ensure t)
 
-;; check weather information
-(use-package wttrin
-  :ensure t
-  :commands (wttrin)
-  :init
-  (setq wttrin-default-cities '("西安" "杭州")))
-
 ;; Youdao Dictionay
 (use-package youdao-dictionary
   :ensure t
@@ -237,6 +230,27 @@
   (setq url-automatic-caching t)
   ;; Enable Chinese word segmentation support (支持中文分词)
   (setq youdao-dictionary-use-chinese-word-segmentation t))
+
+;; --------------------------------------------------------------
+;;                          3rd Party
+;; --------------------------------------------------------------
+(defun xah-open-in-terminal ()
+  "Open the current dir in a new terminal window.
+URL `http://ergoemacs.org/emacs/emacs_dired_open_file_in_ext_apps.html'
+Version 2019-11-04"
+  (interactive)
+  (cond
+   ((string-equal system-type "windows-nt")
+    (let ((process-connection-type nil))
+      (start-process "" nil "powershell" "start-process" "powershell"  "-workingDirectory" default-directory)))
+   ((string-equal system-type "darwin")
+    (let ((process-connection-type nil))
+      (start-process "" nil "/Applications/iTerm.app/Contents/MacOS/iTerm2" default-directory)))
+   ((string-equal system-type "gnu/linux")
+    (let ((process-connection-type nil))
+      (start-process "" nil "x-terminal-emulator"
+                     (concat "--working-directory=" default-directory))))))
+(global-set-key (kbd "<f2>") 'xah-open-in-terminal)
 
 ;; --------------------------------------------------------------
 ;;                           Backup

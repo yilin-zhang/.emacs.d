@@ -51,8 +51,10 @@
 ;;                            Agenda
 ;; --------------------------------------------------------------
 ;; Set my org agenda file
-;; '(org-agenda-files (quote ("~/todolist.org")))
-(setq org-agenda-files '("~/agenda.org"))
+(setq org-agenda-files '("~/agenda.org"
+                         "~/inbox.org"))
+;; For now I prefer refile manually.
+;; (setq org-refile-targets '(("~/agenda.org" :maxlevel . 3)))
 
 ;; Set key binding for org agenda
 (global-set-key (kbd "C-c a") 'org-agenda)

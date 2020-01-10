@@ -11,7 +11,6 @@
 
 (defvar yilin-frame-fullscreen nil
   "Indicates whether the frame is toggled fullscreen or not.")
-
 (defun yilin-toggle-frame-fullscreen ()
   "toggle-frame-fullscreen plus display-time-mode."
   (interactive)
@@ -23,8 +22,8 @@
     (progn (setq yilin-frame-fullscreen t)
            (display-time-mode 1)
            (display-battery-mode 1))))
-
 (global-set-key (kbd "<f12>") 'yilin-toggle-frame-fullscreen)
+(yilin-toggle-frame-fullscreen)
 
 ;; --------------------------------------------------------------
 ;;                         Window Split
@@ -201,16 +200,19 @@
              " ")
           "Project: ")))
 
-;; awesome-tab requires projectile
-(use-package awesome-tab
-  :load-path "site-lisp"
-  :ensure nil
-  :after projectile
-  :bind ("<f6>" . awesome-tab-mode)
+(use-package centaur-tabs
+  :ensure t
+  :demand
   :config
-  (setq awesome-tab-style "box")
-  (setq awesome-tab-background-color "#242730")
-  (setq awesome-tab-display-sticky-function-name nil))
+  (setq centaur-tabs-style "bar")
+  (setq centaur-tabs-set-bar 'over)
+  (setq centaur-tabs-set-icons t)
+  (setq centaur-tabs-set-modified-marker t)
+  (setq centaur-tabs-modified-marker "●")
+  :bind
+  ("C-<prior>" . centaur-tabs-backward)
+  ("C-<next>" . centaur-tabs-forward)
+  ("<f6>" . centaur-tabs-mode))
 
 ;; --------------------------------------------------------------
 ;;                           Fancy Stuff

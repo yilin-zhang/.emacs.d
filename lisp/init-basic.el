@@ -16,6 +16,8 @@
 
 ;; change yes or no to y or n
 (fset 'yes-or-no-p 'y-or-n-p)
+(setq-default major-mode 'text-mode
+              fill-column 80)
 
 ;; --------------------------------------------------------------
 ;;                             Window
@@ -157,16 +159,6 @@
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
 
-;; (use-package telephone-line
-;;   :ensure t
-;;   :init
-;;   (setq telephone-line-primary-left-separator 'telephone-line-cubed-left
-;;         telephone-line-secondary-left-separator 'telephone-line-cubed-hollow-left
-;;         telephone-line-primary-right-separator 'telephone-line-cubed-right
-;;         telephone-line-secondary-right-separator 'telephone-line-cubed-hollow-right)
-;;   :config
-;;   (telephone-line-mode 1))
-
 ;; https://github.com/seagle0128/doom-modeline
 (use-package doom-modeline
   :ensure t
@@ -174,13 +166,13 @@
   :config
   (setq find-file-visit-truename t))
 
-(use-package nyan-mode
-  :ensure t
-  :hook (after-init . nyan-mode)
-  :config
-  ;; WORKAROUND (setq nyan-animate-nyancat t) seems useless, I don't
-  ;; know why.
-  (nyan-start-animation))
+;; (use-package nyan-mode
+;;   :ensure t
+;;   :hook (after-init . nyan-mode)
+;;   :config
+;;   ;; WORKAROUND (setq nyan-animate-nyancat t) seems useless, I don't
+;;   ;; know why.
+;;   (nyan-start-animation))
 
 ;; --------------------------------------------------------------
 ;;                            Dashboard

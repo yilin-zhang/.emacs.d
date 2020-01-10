@@ -18,8 +18,11 @@
   (toggle-frame-fullscreen)
   (if my/frame-fullscreen
       (progn (setq my/frame-fullscreen nil)
-             (display-time-mode -1))
-    (progn (setq my/frame-fullscreen t)(display-time-mode 1))))
+             (display-time-mode -1)
+             (display-battery-mode -1))
+    (progn (setq my/frame-fullscreen t)
+           (display-time-mode 1)
+           (display-battery-mode 1))))
 
 (global-set-key (kbd "<f12>") 'my/toggle-frame-fullscreen)
 

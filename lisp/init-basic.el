@@ -154,7 +154,7 @@
 (use-package doom-themes
   :ensure t
   :config
-  (load-theme 'doom-tomorrow-night t)
+  (load-theme 'doom-gruvbox t)
   (doom-themes-neotree-config)
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
@@ -182,17 +182,17 @@
   :ensure t
   :after all-the-icons projectile
   :diminish page-break-lines-mode
+  :bind ([f5] . dashboard-refresh-buffer)
   :hook
   (after-init . dashboard-setup-startup-hook)
   :config
-  (setq dashboard-banner-logo-title "Have a nice day! ❤")
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
   ;; Set the banner
   (setq dashboard-startup-banner 3)
-  (setq dashboard-items '((recents  . 5)
-                          (bookmarks . 5)
-                          (agenda . 5))))
+  (setq dashboard-items '((agenda  . 20)
+                          (bookmarks . 10)
+                          (projects . 5))))
 
 ;; --------------------------------------------------------------
 ;;                            Backup

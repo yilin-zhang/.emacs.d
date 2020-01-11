@@ -200,20 +200,6 @@
              " ")
           "Project: ")))
 
-(use-package centaur-tabs
-  :ensure t
-  :demand
-  :config
-  (setq centaur-tabs-style "bar")
-  (setq centaur-tabs-set-bar 'over)
-  (setq centaur-tabs-set-icons t)
-  (setq centaur-tabs-set-modified-marker t)
-  (setq centaur-tabs-modified-marker "●")
-  :bind
-  ("C-<prior>" . centaur-tabs-backward)
-  ("C-<next>" . centaur-tabs-forward)
-  ("<f6>" . centaur-tabs-mode))
-
 ;; --------------------------------------------------------------
 ;;                           Fancy Stuff
 ;; --------------------------------------------------------------
@@ -232,6 +218,10 @@
   (setq url-automatic-caching t)
   ;; Enable Chinese word segmentation support (支持中文分词)
   (setq youdao-dictionary-use-chinese-word-segmentation t))
+
+;; text web browser
+(use-package w3m
+  :ensure t)
 
 ;; --------------------------------------------------------------
 ;;                          3rd Party

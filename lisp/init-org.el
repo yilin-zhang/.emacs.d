@@ -71,6 +71,31 @@
 (global-set-key (kbd "C-c c") 'org-capture)
 (setq org-default-notes-file "~/inbox.org")
 
+;; --------------------------------------------------------------
+;;                            Customs
+;; --------------------------------------------------------------
+(defun yilin-org-insert-chinese-date-heading ()
+  "Insert a Chinese date heading based on the current date."
+  (interactive)
+  (org-insert-heading-respect-content)
+  (insert (format-time-string "%Y年"))
+  (let ((month (format-time-string "%m"))
+        (day (format-time-string "%d"))
+        (week (format-time-string "%a")))
+    (if (string-equal "0" (substring month 0 1))
+        (setq month (substring month 1)))
+    (if (string-equal "0" (substring day 0 1))
+        (setq month (substring day 1)))
+    (cond
+     ((string-equal week "Mon") (setq week "一"))
+     ((string-equal week "Tue") (setq week "二"))
+     ((string-equal week "Wed") (setq week "三"))
+     ((string-equal week "Thu") (setq week "四"))
+     ((string-equal week "Fri") (setq week "五"))
+     ((string-equal week "Sat") (setq week "六"))
+     ((string-equal week "Sun") (setq week "日")))
+    (insert (format "%s月%s日 %s" month day week))))
+
 (provide 'init-org)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

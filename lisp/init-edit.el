@@ -22,10 +22,19 @@
 
 (use-package evil
   :ensure t
-  :bind ("<f5>" . evil-mode)
   :init
+  (global-evil-leader-mode 1)
   (evil-mode 1)
   :config
+  (use-package evil-leader
+    :ensure t
+    :config
+    (evil-leader/set-leader "SPC")
+    (evil-leader/set-key
+      "f" 'find-file
+      "b" 'switch-to-buffer
+      "k" 'kill-buffer
+      "a" 'org-agenda))
   (use-package evil-surround
     :ensure t
     :config

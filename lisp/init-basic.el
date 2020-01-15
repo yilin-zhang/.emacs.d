@@ -129,22 +129,26 @@
 ;; support displaying emoji
 (use-package emojify
   :ensure t)
-  ;; only display emoji for org mode
-  ;; :hook (org-mode . emojify-mode))
+;; only display emoji for org mode
+;; :hook (org-mode . emojify-mode))
 
 ;; --------------------------------------------------------------
 ;;                              Fonts
 ;; --------------------------------------------------------------
-
-;; https://segmentfault.com/q/1010000000125755
-;; set english font
-(set-face-attribute
- 'default nil :font "Sarasa Mono SC 17")
-;; set chinese font
-(dolist (charset '(kana han symbol cjk-misc bopomofo))
-  (set-fontset-font (frame-parameter nil 'font)
-                    charset
-                    (font-spec :family "Microsoft Yahei")))
+(if (display-graphic-p)
+    ;; https://segmentfault.com/q/1010000000125755
+    ;; set english font
+    (progn
+      (set-face-attribute
+       'default nil :font "Sarasa Mono SC 18")
+      ;; set chinese font
+      (dolist (charset '(kana han symbol cjk-misc bopomofo))
+        (set-fontset-font (frame-parameter nil 'font)
+                          charset
+                          (font-spec :family
+                                     (if (eq system-type 'darwin)
+                                         "STHeiti"
+                                       "Microsoft Yahei"))))))
 
 ;; --------------------------------------------------------------
 ;;                        Theme and Modeline

@@ -59,7 +59,7 @@
  '(large-file-warning-threshold nil)
  '(package-selected-packages
    (quote
-    (dap-mode company-lsp lsp-ui lsp-mode w3m evil-leader doom-modeline flycheck rubocop racket-mode company-auctex evil-surround fcitx evil lispy pdf-tools hl-todo symbol-overlay shell-pop ivy-rich gnuplot-mode yapfify amx highlight-indent-guides ibuffer-projectile projectile youdao-dictionary wttrin magit dashboard diredfl doom-themes aggressive-indent ox-hugo popwin cdlatex auctex hungry-delete olivetti rainbow-delimiters expand-region emojify diff-hl pyvenv yasnippet markdown-mode org-bullets all-the-icons neotree swiper counsel company which-key try diminish use-package))))
+    (dap-mode company-lsp lsp-ui lsp-mode evil-leader doom-modeline flycheck rubocop racket-mode company-auctex evil-surround fcitx evil lispy hl-todo symbol-overlay shell-pop ivy-rich gnuplot-mode yapfify amx highlight-indent-guides ibuffer-projectile projectile youdao-dictionary wttrin magit dashboard diredfl doom-themes aggressive-indent ox-hugo popwin cdlatex auctex hungry-delete olivetti rainbow-delimiters expand-region emojify diff-hl pyvenv yasnippet markdown-mode org-bullets all-the-icons neotree swiper counsel company which-key try diminish use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

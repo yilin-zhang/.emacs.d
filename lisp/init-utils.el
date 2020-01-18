@@ -9,19 +9,18 @@
 (setq display-time-default-load-average nil)
 (setq display-time-24hr-format 1)
 
-(defvar yilin-frame-fullscreen nil
-  "Indicates whether the frame is toggled fullscreen or not.")
 (defun yilin-toggle-frame-fullscreen ()
   "toggle-frame-fullscreen plus display-time-mode."
   (interactive)
-  (toggle-frame-fullscreen)
-  (if yilin-frame-fullscreen
-      (progn (setq yilin-frame-fullscreen nil)
-             (display-time-mode -1)
-             (display-battery-mode -1))
-    (progn (setq yilin-frame-fullscreen t)
-           (display-time-mode 1)
-           (display-battery-mode 1))))
+  (if (equal 'fullboth (frame-parameter nil 'fullscreen))
+      (progn
+        (display-time-mode -1)
+        (display-battery-mode -1))
+    (progn
+      (display-time-mode 1)
+      (display-battery-mode 1)))
+  (toggle-frame-fullscreen))
+
 (global-set-key (kbd "<f12>") 'yilin-toggle-frame-fullscreen)
 (yilin-toggle-frame-fullscreen)
 

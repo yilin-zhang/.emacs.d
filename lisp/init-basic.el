@@ -139,8 +139,11 @@
     ;; https://segmentfault.com/q/1010000000125755
     ;; set english font
     (progn
-      (set-face-attribute
-       'default nil :font "Sarasa Mono SC 18")
+      (if (eq system-type 'darwin)
+          (set-face-attribute
+           'default nil :font "Sarasa Mono SC 18")
+        (set-face-attribute
+         'default nil :font "Sarasa Mono SC 13"))
       ;; set chinese font
       (dolist (charset '(kana han symbol cjk-misc bopomofo))
         (set-fontset-font (frame-parameter nil 'font)

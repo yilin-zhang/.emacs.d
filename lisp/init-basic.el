@@ -31,9 +31,6 @@
 ;; disable menu-bar-mode
 (menu-bar-mode -1)
 
-;; Maximized window on startup
-(toggle-frame-maximized)
-
 ;; disable welcome screen
 (setq inhibit-splash-screen 1)
 
@@ -136,22 +133,11 @@
 ;;                              Fonts
 ;; --------------------------------------------------------------
 (if (display-graphic-p)
-    ;; https://segmentfault.com/q/1010000000125755
-    ;; set english font
-    (progn
-      (if (eq system-type 'darwin)
-          (set-face-attribute
-           'default nil :font "Sarasa Mono SC 18")
+    (if (eq system-type 'darwin)
         (set-face-attribute
-         'default nil :font "Sarasa Mono SC 13"))
-      ;; set chinese font
-      (dolist (charset '(kana han symbol cjk-misc bopomofo))
-        (set-fontset-font (frame-parameter nil 'font)
-                          charset
-                          (font-spec :family
-                                     (if (eq system-type 'darwin)
-                                         "STHeiti"
-                                       "Microsoft Yahei"))))))
+         'default nil :font "Sarasa Mono SC 18")
+      (set-face-attribute
+       'default nil :font "Sarasa Mono SC 13")))
 
 ;; --------------------------------------------------------------
 ;;                        Theme and Modeline
@@ -161,7 +147,7 @@
 (use-package doom-themes
   :ensure t
   :config
-  (load-theme 'doom-gruvbox t)
+  (load-theme 'doom-spacegrey t)
   (doom-themes-neotree-config)
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))

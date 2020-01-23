@@ -34,7 +34,10 @@
       "f" 'find-file
       "b" 'switch-to-buffer
       "k" 'kill-buffer
-      "a" 'org-agenda))
+      "a" 'org-agenda
+      "i" 'org-clock-in
+      "o" 'org-clock-out
+      "d" 'dired))
   (use-package evil-surround
     :ensure t
     :config
@@ -116,7 +119,8 @@
   :config
   (setq whitespace-line-column fill-column ;; limit line length
         ;; automatically clean up bad whitespace
-        whitespace-action '(auto-cleanup)
+        ;; whitespace-action '(auto-cleanup)
+        whitespace-action nil
         ;; only show bad whitespace
         whitespace-style '(face
                            trailing space-before-tab
@@ -209,15 +213,18 @@
     :diminish
     :config
     (setq ivy-use-virtual-buffers t)
-    (global-set-key (kbd "C-c C-r") 'ivy-resume)
-    ;;(ivy-mode t)
-    ))
+    (global-set-key (kbd "C-c C-r") 'ivy-resume))
+
+  (use-package ivy-posframe
+    :ensure t
+    :config
+    (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-left)))
+    (ivy-posframe-mode 1)))
 
 (use-package swiper
   :ensure t
   :config
-  (global-set-key "\C-s" 'swiper)
-  )
+  (global-set-key "\C-s" 'swiper))
 
 ;; Highlight symbols
 (use-package symbol-overlay

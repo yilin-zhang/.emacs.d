@@ -26,7 +26,7 @@
   (diff-hl-flydiff-mode 1)
   ;; Set fringe style
   (setq diff-hl-draw-borders nil)
-  (setq fringes-outside-margins t)
+  (setq-default fringes-outside-margins t)
 
   (unless (display-graphic-p)
     ;; Fall back to the display margin since the fringe is unavailable in tty
@@ -34,7 +34,7 @@
     ;; Avoid restoring `diff-hl-margin-mode'
     (with-eval-after-load 'desktop
       (add-to-list 'desktop-minor-mode-table
-           '(diff-hl-margin-mode nil))))
+                   '(diff-hl-margin-mode nil))))
 
   ;; Integration with magit
   (with-eval-after-load 'magit

@@ -19,6 +19,8 @@
 (setq-default major-mode 'text-mode
               fill-column 80)
 
+(setq-default truncate-lines t)
+
 ;; --------------------------------------------------------------
 ;;                             Window
 ;; --------------------------------------------------------------

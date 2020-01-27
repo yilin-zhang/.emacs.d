@@ -37,7 +37,8 @@
       "a" 'org-agenda
       "i" 'org-clock-in
       "o" 'org-clock-out
-      "d" 'dired))
+      "g" 'magit-status
+      "d" 'dired-jump))
   (use-package evil-surround
     :ensure t
     :config
@@ -73,7 +74,7 @@
          ;; (prog-mode . flyspell-prog-mode)
          (flyspell-mode . (lambda ()
                             (dolist (key '("C-;" "C-," "C-."))
-                            (unbind-key key flyspell-mode-map)))))
+                              (unbind-key key flyspell-mode-map)))))
   :init
   (setq flyspell-issue-message-flag nil
         ispell-program-name "aspell"
@@ -83,7 +84,14 @@
 ;;                      Parentheses and Region
 ;; --------------------------------------------------------------
 ;; enable show-paren-mode for emacs-lisp-mode
-(show-paren-mode t)
+(use-package paren
+  :ensure nil
+  :init
+  (setq show-paren-style 'parenthesis)
+  :config
+  (show-paren-mode t)
+  (set-face-background 'show-paren-match (face-foreground 'warning))
+  (set-face-attribute 'show-paren-match nil :weight 'extra-bold))
 
 ;; Automatic parenthesis pairing
 (use-package elec-pair
@@ -160,6 +168,10 @@
   :diminish
   :hook (after-init . global-hungry-delete-mode)
   :config (setq-default hungry-delete-chars-to-skip " \t\f\v"))
+
+(use-package pangu-spacing
+  :ensure t
+  :hook (org-mode . pangu-spacing-mode))
 
 ;; --------------------------------------------------------------
 ;;                            Search

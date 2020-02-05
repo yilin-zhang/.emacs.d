@@ -40,6 +40,12 @@
   :config (setq markdown-command "multimarkdown"))
 
 ;; --------------------------------------------------------------
+;;                     Yaml Mode Configurations
+;; --------------------------------------------------------------
+(use-package yaml-mode
+  :ensure t)
+
+;; --------------------------------------------------------------
 ;;                    LilyPond Mode Configurations
 ;; --------------------------------------------------------------
 ;; This package is in the system directory: /usr/share/emacs/site-lisp

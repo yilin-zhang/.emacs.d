@@ -22,6 +22,9 @@
           (lambda()
             (setq truncate-lines nil)))
 
+;; auto-fill
+(add-hook 'org-mode-hook 'auto-fill-mode)
+
 (use-package org-bullets
   :ensure t
   :hook (org-mode . (lambda () (org-bullets-mode 1))))
@@ -85,7 +88,7 @@
     (if (string-equal "0" (substring month 0 1))
         (setq month (substring month 1)))
     (if (string-equal "0" (substring day 0 1))
-        (setq month (substring day 1)))
+        (setq day (substring day 1)))
     (cond
      ((string-equal week "Mon") (setq week "一"))
      ((string-equal week "Tue") (setq week "二"))

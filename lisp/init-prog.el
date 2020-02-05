@@ -108,6 +108,25 @@
   :hook (ruby-mode . rubocop-mode))
 
 ;; --------------------------------------------------------------
+;;                     JS2 Mode Configuration
+;; --------------------------------------------------------------
+(use-package web-mode
+  :ensure t
+  :init
+  (setq auto-mode-alist
+        (append
+         '(("\\.html\\'" . web-mode))
+         auto-mode-alist)))
+
+(use-package js2-mode
+  :ensure t
+  :init
+  (setq auto-mode-alist
+        (append
+         '(("\\.js\\'" . js2-mode))
+         auto-mode-alist)))
+
+;; --------------------------------------------------------------
 ;;                     Racket Mode Configurations
 ;; --------------------------------------------------------------
 (use-package racket-mode
@@ -116,11 +135,17 @@
 ;; --------------------------------------------------------------
 ;;                     SClang Configurations
 ;; --------------------------------------------------------------
-;; (add-to-list 'load-path "~/.emacs.d/site-lisp/scel/el")
-;; (use-package sclang
-;;   :init
-;;   (setenv "PATH" (concat (getenv "PATH") ":/Applications/SuperCollider.app/Contents/MacOS"))
-;;   (setq exec-path (append exec-path '("/Applications/SuperCollider.app/Contents/MacOS" ))))
+(add-to-list 'load-path "~/.emacs.d/site-lisp/scel/el")
+(use-package sclang
+  :init
+  (if (eq system-type 'darwin)
+      (progn
+        (setenv "PATH" (concat (getenv "PATH") ":/Applications/SuperCollider.app/Contents/MacOS"))
+        (setq exec-path (append exec-path '("/Applications/SuperCollider.app/Contents/MacOS" )))))
+  :config
+  ;; WORKAROUND add all the prog-mode hooks to sclang-mode
+  (dolist (hook prog-mode-hook)
+    (add-hook 'sclang-mode-hook hook)))
 
 ;; --------------------------------------------------------------
 ;;                         Common Lisp
@@ -129,8 +154,15 @@
   :ensure t)
 
 ;; --------------------------------------------------------------
-;;                            Backup
+;;                         Tidal
 ;; --------------------------------------------------------------
+(use-package tidal
+  :ensure t
+  :init
+  (setenv "PATH" (concat (getenv "PATH") (concat ":" (getenv "HOME") "/.ghcup/bin")))
+  (setenv "PATH" (concat (getenv "PATH") (concat ":" (getenv "HOME") "/.cabal/bin")))
+  (setq exec-path (append exec-path `(,(concat (getenv "HOME") "/.ghcup/bin/"))))
+  (setq exec-path (append exec-path `(,(concat (getenv "HOME") "/.cabal/bin/")))))
 
 ;; (use-package flymake
 ;;   :ensure t

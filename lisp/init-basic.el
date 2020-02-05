@@ -60,6 +60,16 @@
 ;; highlight the current line
 (global-hl-line-mode 1)
 
+;; Make the cursor have a tail, which is easier for
+;; users to locate the cursor.
+(use-package beacon
+  :ensure t
+  :diminish
+  :config
+  (beacon-mode 1)
+  (setq beacon-color 0.5)
+  (setq beacon-size 70))
+
 ;; move the cursor to the newly created window
 ;; makes people easier to close it (C-g)
 (use-package popwin
@@ -149,7 +159,7 @@
 (use-package doom-themes
   :ensure t
   :config
-  (load-theme 'doom-spacegrey t)
+  (load-theme 'doom-Iosvkem t)
   (doom-themes-neotree-config)
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))

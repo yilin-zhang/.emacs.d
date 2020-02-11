@@ -34,7 +34,8 @@
         lsp-keep-workspace-alive nil ; Auto-kill LSP server
         lsp-prefer-flymake nil
         lsp-enable-on-type-formatting nil
-        lsp-enable-indentation nil)       ; Use lsp-ui and flycheck
+        lsp-enable-indentation nil
+        lsp-enable-symbol-highlighting nil) ; disable the pop-up doc below the modeline
   :commands lsp
   :config
   (use-package lsp-ui
@@ -45,7 +46,7 @@
      :map lsp-ui-mode-map
      ("C-c C-d" . lsp-ui-peek-find-definitions)
      ("C-c C-f" . lsp-ui-peek-find-references)
-     ("C-c C-g" . lsp-ui-doc-glance))
+     ("s-j" . lsp-ui-doc-glance))
     :init
     (setq
      lsp-ui-doc-enable nil
@@ -64,6 +65,11 @@
     (add-to-list 'company-lsp-filter-candidates '(mspyls)))
   (use-package dap-mode
     :ensure t))
+;; --------------------------------------------------------------
+;;                     C/C++ Mode Configurations
+;; --------------------------------------------------------------
+(use-package cmake-mode
+  :ensure t)
 
 ;; --------------------------------------------------------------
 ;;                     Lisp Mode Configurations

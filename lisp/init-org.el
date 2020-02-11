@@ -11,6 +11,7 @@
       org-startup-indented t      ; indent at startup
       org-hide-emphasis-markers t ; hide emphasis markers
       org-pretty-entities t       ; makes special character format visible
+      org-ellipsis "⤵"
       )
 
 ;; set org-indent-mode
@@ -54,8 +55,8 @@
 ;;                            Agenda
 ;; --------------------------------------------------------------
 ;; Set my org agenda file
-(setq org-agenda-files '("~/agenda.org"
-                         "~/inbox.org"))
+(setq org-agenda-files '("~/agenda.org"))
+
 ;; For now I prefer refile manually.
 ;; (setq org-refile-targets '(("~/agenda.org" :maxlevel . 3)))
 
@@ -73,6 +74,11 @@
 ;; --------------------------------------------------------------
 (global-set-key (kbd "C-c c") 'org-capture)
 (setq org-default-notes-file "~/inbox.org")
+(setq org-capture-templates
+      '(("t" "Todo" entry (file+headline org-default-notes-file "Tasks")
+         "* TODO %?\n  %i\n  %a")
+        ("a" "Task for Today" checkitem (file+datetree org-default-notes-file)
+         "[ ] %?\nEntered on %U\n  %i\n")))
 
 ;; --------------------------------------------------------------
 ;;                            Customs

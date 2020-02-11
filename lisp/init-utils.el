@@ -60,19 +60,14 @@
 ;; --------------------------------------------------------------
 ;;                         Better Writting
 ;; --------------------------------------------------------------
-
-;; center the paragraphs
-;; A known bug: when linum-mode is enabled under org-mode, the screen margin
-;; can be abnormal in certain cases. It might be caused by a bug of Emacs
-;; before Emacs 26.1.
-;; ref: https://github.com/rnkn/olivetti
-;; So just setting linum-mode as a prog-mode-hook is a reasonable solution.
-;; copy from Centaur Emacs
-(use-package olivetti
+(use-package writeroom-mode
   :ensure t
-  :diminish visual-line-mode olivetti-mode
-  :bind ("<f7>" . olivetti-mode)
-  :init (setq olivetti-body-width 0.618))
+  :bind
+  ("<f6>" . global-writeroom-mode)
+  ("<f7>" . writeroom-mode)
+  :config
+  (add-to-list 'writeroom-major-modes 'org-mode)
+  (setq writeroom-width 90))
 
 ;; ;; --------------------------------------------------------------
 ;;                           File Tree
@@ -144,8 +139,8 @@
 ;; Youdao Dictionay
 (use-package youdao-dictionary
   :ensure t
-  :bind (("C-c y" . youdao-dictionary-search-at-point)
-         ("C-c Y" . youdao-dictionary-search-at-point-tooltip))
+  :bind (("C-c Y" . youdao-dictionary-search-at-point)
+         ("C-c y" . youdao-dictionary-search-at-point-tooltip))
   :config
   ;; Cache documents
   (setq url-automatic-caching t)
@@ -173,6 +168,15 @@ Version 2019-11-04"
                      (concat "--working-directory=" default-directory))))))
 (global-set-key (kbd "<f2>") 'xah-open-in-terminal)
 
+;; Copy from `https://www.emacswiki.org/emacs/UnfillParagraph'
+(defun unfill-paragraph (&optional region)
+  "Takes a multi-line paragraph and makes it into a single line of text."
+  (interactive (progn (barf-if-buffer-read-only) '(t)))
+  (let ((fill-column (point-max))
+        ;; This would override `fill-column' if it's an integer.
+        (emacs-lisp-docstring-fill-column t))
+    (fill-paragraph nil region)))
+(define-key global-map (kbd "M-Q") 'unfill-paragraph)
 ;; --------------------------------------------------------------
 ;;                           Backup
 ;; --------------------------------------------------------------

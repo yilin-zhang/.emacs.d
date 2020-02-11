@@ -23,6 +23,7 @@
 (use-package evil
   :ensure t
   :init
+  (setq evil-want-C-i-jump nil) ;; make sure TAB is working in terminal
   (global-evil-leader-mode 1)
   (evil-mode 1)
   :config

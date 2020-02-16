@@ -147,6 +147,16 @@
   ;; Enable Chinese word segmentation support (支持中文分词)
   (setq youdao-dictionary-use-chinese-word-segmentation t))
 
+;; epub reader
+(use-package nov
+  :ensure t
+  :init
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+  (defun my-nov-font-setup ()
+    (face-remap-add-relative 'variable-pitch :family "Noto Serif CJK SC"
+                             :height 1.0))
+  (add-hook 'nov-mode-hook 'my-nov-font-setup))
+
 ;; --------------------------------------------------------------
 ;;                          3rd Party
 ;; --------------------------------------------------------------
@@ -169,14 +179,51 @@ Version 2019-11-04"
 (global-set-key (kbd "<f2>") 'xah-open-in-terminal)
 
 ;; Copy from `https://www.emacswiki.org/emacs/UnfillParagraph'
-(defun unfill-paragraph (&optional region)
+(defun my-unfill-paragraph (&optional region)
   "Takes a multi-line paragraph and makes it into a single line of text."
   (interactive (progn (barf-if-buffer-read-only) '(t)))
   (let ((fill-column (point-max))
         ;; This would override `fill-column' if it's an integer.
         (emacs-lisp-docstring-fill-column t))
     (fill-paragraph nil region)))
-(define-key global-map (kbd "M-Q") 'unfill-paragraph)
+(define-key global-map (kbd "M-Q") 'my-unfill-paragraph)
+
+;; Narrow and widen
+;; Copy from `https://endlessparentheses.com/emacs-narrow-or-widen-dwim.html'
+(defun my-narrow-or-widen-dwim (p)
+  "Widen if buffer is narrowed, narrow-dwim otherwise.
+Dwim means: region, org-src-block, org-subtree, or
+defun, whichever applies first. Narrowing to
+org-src-block actually calls `org-edit-src-code'.
+
+With prefix P, don't widen, just narrow even if buffer
+is already narrowed."
+  (interactive "P")
+  (declare (interactive-only))
+  (cond ((and (buffer-narrowed-p) (not p)) (widen))
+        ((region-active-p)
+         (narrow-to-region (region-beginning)
+                           (region-end)))
+        ((derived-mode-p 'org-mode)
+         ;; `org-edit-src-code' is not a real narrowing
+         ;; command. Remove this first conditional if
+         ;; you don't want it.
+         (cond ((ignore-errors (org-edit-src-code) t)
+                (delete-other-windows))
+               ((ignore-errors (org-narrow-to-block) t))
+               (t (org-narrow-to-subtree))))
+        ((derived-mode-p 'latex-mode)
+         (LaTeX-narrow-to-environment))
+        (t (narrow-to-defun))))
+
+;; This line actually replaces Emacs' entire narrowing
+;; keymap, that's how much I like this command. Only
+;; copy it if that's what you want.
+(define-key ctl-x-map "n" #'my-narrow-or-widen-dwim)
+(add-hook 'LaTeX-mode-hook
+          (lambda ()
+            (define-key LaTeX-mode-map "\C-xn"
+              nil)))
 ;; --------------------------------------------------------------
 ;;                           Backup
 ;; --------------------------------------------------------------

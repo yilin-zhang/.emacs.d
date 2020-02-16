@@ -30,6 +30,9 @@
   :ensure t
   :hook (org-mode . (lambda () (org-bullets-mode 1))))
 
+(use-package htmlize
+  :ensure t)
+
 ;; --------------------------------------------------------------
 ;;                 Markdown, LaTeX and Export
 ;; --------------------------------------------------------------
@@ -83,27 +86,34 @@
 ;; --------------------------------------------------------------
 ;;                            Customs
 ;; --------------------------------------------------------------
-(defun yilin-org-insert-chinese-date-heading ()
-  "Insert a Chinese date heading based on the current date."
-  (interactive)
-  (org-insert-heading-respect-content)
-  (insert (format-time-string "%Y年"))
-  (let ((month (format-time-string "%m"))
-        (day (format-time-string "%d"))
-        (week (format-time-string "%a")))
-    (if (string-equal "0" (substring month 0 1))
-        (setq month (substring month 1)))
-    (if (string-equal "0" (substring day 0 1))
-        (setq day (substring day 1)))
-    (cond
-     ((string-equal week "Mon") (setq week "一"))
-     ((string-equal week "Tue") (setq week "二"))
-     ((string-equal week "Wed") (setq week "三"))
-     ((string-equal week "Thu") (setq week "四"))
-     ((string-equal week "Fri") (setq week "五"))
-     ((string-equal week "Sat") (setq week "六"))
-     ((string-equal week "Sun") (setq week "日")))
-    (insert (format "%s月%s日 %s" month day week))))
+;; Copy from `https://emacs-china.org/t/org-agenda/8679'
+(defun my-org-agenda-time-grid-spacing ()
+  "Set different line spacing w.r.t. time duration."
+  (save-excursion
+    (let* ((background (alist-get 'background-mode (frame-parameters)))
+           (background-dark-p (string= background "dark"))
+           (colors (if background-dark-p
+                       (list "#aa557f" "DarkGreen" "DarkSlateGray" "DarkSlateBlue")
+                     (list "#F6B1C3" "#FFFF9D" "#BEEB9F" "#ADD5F7")))
+           pos
+           duration)
+      (nconc colors colors)
+      (goto-char (point-min))
+      (while (setq pos (next-single-property-change (point) 'duration))
+        (goto-char pos)
+        (when (and (not (equal pos (point-at-eol)))
+                   (setq duration (org-get-at-bol 'duration)))
+          (let ((line-height (if (< duration 30) 1.0 (+ 0.5 (/ duration 60))))
+                (ov (make-overlay (point-at-bol) (1+ (point-at-eol)))))
+            (overlay-put ov 'face `(:background ,(car colors)
+                                                :foreground
+                                                ,(if background-dark-p "black" "white")))
+            (setq colors (cdr colors))
+            (overlay-put ov 'line-height line-height)
+            (overlay-put ov 'line-spacing (1- line-height))))))))
+
+(add-hook 'org-agenda-finalize-hook #'my-org-agenda-time-grid-spacing)
+
 
 (provide 'init-org)
 

@@ -37,6 +37,14 @@
 ;; (setq load-path (append (list (expand-file-name
 ;; "/usr/share/emacs/site-lisp")) load-path))
 
+(defun load-custom-post-file ()
+  "Load custom-post file."
+  (if (file-directory-p "~/.emacs.d/custom")
+      (progn
+        (push (expand-file-name "custom" user-emacs-directory) load-path)
+        (load "custom-post"))))
+(add-hook 'after-init-hook #'load-custom-post-file)
+
 (push (expand-file-name "lisp" user-emacs-directory) load-path)
 
 (require 'init-basic)
@@ -59,7 +67,7 @@
  '(large-file-warning-threshold nil)
  '(package-selected-packages
    (quote
-    (cmake-mode writeroom-mode whiteroom-mode yaml-mode web-mode js2-mode sonic-pi beacon tidal pangu-spacing flycheck sly dap-mode company-lsp lsp-ui ivy-posframe ccls evil-leader doom-modeline rubocop racket-mode company-auctex evil-surround fcitx evil lispy hl-todo symbol-overlay shell-pop ivy-rich gnuplot-mode yapfify amx highlight-indent-guides ibuffer-projectile projectile youdao-dictionary wttrin magit dashboard diredfl doom-themes aggressive-indent ox-hugo popwin cdlatex auctex hungry-delete rainbow-delimiters expand-region emojify diff-hl pyvenv yasnippet markdown-mode org-bullets all-the-icons neotree swiper counsel company which-key try diminish use-package))))
+    (all-the-icons-ivy-rich all-the-icons-ibuffer htmlize rust-mode nov cmake-mode writeroom-mode whiteroom-mode yaml-mode web-mode js2-mode sonic-pi beacon tidal pangu-spacing flycheck sly dap-mode company-lsp lsp-ui ivy-posframe ccls evil-leader doom-modeline rubocop racket-mode company-auctex evil-surround fcitx evil lispy hl-todo symbol-overlay shell-pop ivy-rich gnuplot-mode yapfify amx highlight-indent-guides ibuffer-projectile projectile youdao-dictionary wttrin magit dashboard diredfl doom-themes aggressive-indent ox-hugo popwin cdlatex auctex hungry-delete rainbow-delimiters expand-region emojify diff-hl pyvenv yasnippet markdown-mode org-bullets all-the-icons neotree swiper counsel company which-key try diminish use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

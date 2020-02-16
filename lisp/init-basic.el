@@ -128,6 +128,9 @@
 ;; --------------------------------------------------------------
 ;; use ibuffer instead of CRM buffer
 (global-set-key (kbd "C-x C-b") 'ibuffer)
+(use-package all-the-icons-ibuffer
+  :ensure t
+  :init (all-the-icons-ibuffer-mode 1))
 
 ;; --------------------------------------------------------------
 ;;                          Icons and Emoji
@@ -159,7 +162,7 @@
 (use-package doom-themes
   :ensure t
   :config
-  (load-theme 'doom-Iosvkem t)
+  (load-theme 'doom-gruvbox t)
   (doom-themes-neotree-config)
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))

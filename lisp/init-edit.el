@@ -196,37 +196,20 @@
   (use-package amx
     :ensure t)
 
-  (use-package ivy-rich
-    :ensure t
-    :hook (ivy-mode . ivy-rich-mode)
-    :init
-    (defun ivy-rich-switch-buffer-icon (candidate)
-      (with-current-buffer
-          (get-buffer candidate)
-        (let ((icon (all-the-icons-icon-for-mode major-mode)))
-          (if (symbolp icon)
-              (all-the-icons-icon-for-mode 'fundamental-mode)
-            icon))))
-    :config
-    (setq ivy-rich--display-transformers-list
-          '(ivy-switch-buffer
-            (:columns
-             ((ivy-rich-switch-buffer-icon (:width 2))
-              (ivy-rich-candidate (:width 30))
-              (ivy-rich-switch-buffer-size (:width 7))
-              (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
-              (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
-              (ivy-rich-switch-buffer-project (:width 15 :face success))
-              (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
-             :predicate
-             (lambda (cand) (get-buffer cand))))))
-
   (use-package ivy
     :ensure t
     :diminish
     :config
     (setq ivy-use-virtual-buffers t)
     (global-set-key (kbd "C-c C-r") 'ivy-resume))
+
+  (use-package ivy-rich
+    :ensure t
+    :hook (ivy-mode . ivy-rich-mode)
+    :init
+    (use-package all-the-icons-ivy-rich
+      :ensure t
+      :init (all-the-icons-ivy-rich-mode 1)))
 
   (use-package ivy-posframe
     :ensure t
@@ -287,6 +270,13 @@
          :map company-search-map
          ("C-p" . company-select-previous)
          ("C-n" . company-select-next))
+  ;; :init
+  ;; ;; show icons for company
+  ;; (when (version<= "26" emacs-version)
+  ;;   (use-package company-box
+  ;;     :ensure t
+  ;;     :diminish (company-box-mode)
+  ;;     :hook (company-mode . company-box-mode)))
   :config
   (setq company-tooltip-align-annotations t ; aligns annotation to the right
         company-tooltip-limit 12            ; bigger popup window
@@ -296,13 +286,6 @@
         company-require-match nil
         company-dabbrev-ignore-case nil
         company-dabbrev-downcase nil))
-
-;; show icons for company
-;; (when (version<= "26" emacs-version)
-;;   (use-package company-box
-;;     :ensure t
-;;     :diminish (company-box-mode)
-;;     :hook (company-mode . company-box-mode)))
 
 ;; --------------------------------------------------------------
 ;;                            Hightlight
@@ -342,44 +325,6 @@
     (cl-pushnew `(,keyword . ,(face-foreground 'error)) hl-todo-keyword-faces))
   (dolist (keyword '("WORKAROUND" "HACK" "TRICK"))
     (cl-pushnew `(,keyword . ,(face-foreground 'warning)) hl-todo-keyword-faces)))
-
-;; --------------------------------------------------------------
-;;                         Narrow or Widen
-;; --------------------------------------------------------------
-(defun narrow-or-widen-dwim (p)
-  "Widen if buffer is narrowed, narrow-dwim otherwise.
-Dwim means: region, org-src-block, org-subtree, or
-defun, whichever applies first. Narrowing to
-org-src-block actually calls `org-edit-src-code'.
-
-With prefix P, don't widen, just narrow even if buffer
-is already narrowed."
-  (interactive "P")
-  (declare (interactive-only))
-  (cond ((and (buffer-narrowed-p) (not p)) (widen))
-        ((region-active-p)
-         (narrow-to-region (region-beginning)
-                           (region-end)))
-        ((derived-mode-p 'org-mode)
-         ;; `org-edit-src-code' is not a real narrowing
-         ;; command. Remove this first conditional if
-         ;; you don't want it.
-         (cond ((ignore-errors (org-edit-src-code) t)
-                (delete-other-windows))
-               ((ignore-errors (org-narrow-to-block) t))
-               (t (org-narrow-to-subtree))))
-        ((derived-mode-p 'latex-mode)
-         (LaTeX-narrow-to-environment))
-        (t (narrow-to-defun))))
-
-;; This line actually replaces Emacs' entire narrowing
-;; keymap, that's how much I like this command. Only
-;; copy it if that's what you want.
-(define-key ctl-x-map "n" #'narrow-or-widen-dwim)
-(add-hook 'LaTeX-mode-hook
-          (lambda ()
-            (define-key LaTeX-mode-map "\C-xn"
-              nil)))
 
 (provide 'init-edit)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

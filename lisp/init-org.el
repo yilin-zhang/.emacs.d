@@ -81,7 +81,7 @@
       '(("t" "Todo" entry (file+headline org-default-notes-file "Tasks")
          "* TODO %?\n  %i\n  %a")
         ("a" "Task for Today" checkitem (file+datetree org-default-notes-file)
-         "[ ] %?\nEntered on %U\n  %i\n")))
+         "[ ] %?")))
 
 ;; --------------------------------------------------------------
 ;;                            Customs

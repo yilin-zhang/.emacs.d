@@ -22,7 +22,7 @@
   (toggle-frame-fullscreen))
 
 (global-set-key (kbd "<f12>") 'yilin-toggle-frame-fullscreen)
-(yilin-toggle-frame-fullscreen)
+;; (yilin-toggle-frame-fullscreen)
 
 ;; --------------------------------------------------------------
 ;;                         Window Split
@@ -160,24 +160,6 @@
 ;; --------------------------------------------------------------
 ;;                          3rd Party
 ;; --------------------------------------------------------------
-(defun xah-open-in-terminal ()
-  "Open the current dir in a new terminal window.
-URL `http://ergoemacs.org/emacs/emacs_dired_open_file_in_ext_apps.html'
-Version 2019-11-04"
-  (interactive)
-  (cond
-   ((string-equal system-type "windows-nt")
-    (let ((process-connection-type nil))
-      (start-process "" nil "powershell" "start-process" "powershell"  "-workingDirectory" default-directory)))
-   ((string-equal system-type "darwin")
-    (let ((process-connection-type nil))
-      (start-process "" nil "/Applications/iTerm.app/Contents/MacOS/iTerm2" default-directory)))
-   ((string-equal system-type "gnu/linux")
-    (let ((process-connection-type nil))
-      (start-process "" nil "x-terminal-emulator"
-                     (concat "--working-directory=" default-directory))))))
-(global-set-key (kbd "<f2>") 'xah-open-in-terminal)
-
 ;; Copy from `https://www.emacswiki.org/emacs/UnfillParagraph'
 (defun my-unfill-paragraph (&optional region)
   "Takes a multi-line paragraph and makes it into a single line of text."

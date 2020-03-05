@@ -20,21 +20,22 @@
 ;;                     LSP Configurations
 ;; --------------------------------------------------------------
 (use-package ccls
-  :ensure t
-  :hook ((c-mode c++-mode objc-mode cuda-mode) .
-         (lambda () (require 'ccls) (lsp))))
+  :ensure t)
+;; :hook ((c-mode c++-mode objc-mode cuda-mode) .
+;;        (lambda () (require 'ccls) (lsp))))
 
 (use-package lsp-mode
   :ensure t
-  :hook
-  (python-mode . lsp)
-  (ruby-mode . lsp)
+  ;; :hook
+  ;; (python-mode . lsp)
+  ;; (ruby-mode . lsp)
   :init
   (setq lsp-auto-guess-root t        ; Detect project root
         lsp-keep-workspace-alive nil ; Auto-kill LSP server
         lsp-prefer-flymake nil
         lsp-enable-on-type-formatting nil
         lsp-enable-indentation nil
+        lsp-signature-auto-activate nil
         lsp-enable-symbol-highlighting nil) ; disable the pop-up doc below the modeline
   :commands lsp
   :config
@@ -166,15 +167,24 @@
   :ensure t)
 
 ;; --------------------------------------------------------------
-;;                         Tidal
+;;                         Live Coding
 ;; --------------------------------------------------------------
 (use-package tidal
+  :ensure t)
+
+;; Only works when running the sonic pi server in the terminal
+;; TODO: Fix this package
+(use-package sonic-pi
   :ensure t
   :init
-  (setenv "PATH" (concat (getenv "PATH") (concat ":" (getenv "HOME") "/.ghcup/bin")))
-  (setenv "PATH" (concat (getenv "PATH") (concat ":" (getenv "HOME") "/.cabal/bin")))
-  (setq exec-path (append exec-path `(,(concat (getenv "HOME") "/.ghcup/bin/"))))
-  (setq exec-path (append exec-path `(,(concat (getenv "HOME") "/.cabal/bin/")))))
+  (setq sonic-pi-server-bin "app/server/ruby/bin/sonic-pi-server.rb")
+  (setq sonic-pi-path "/Applications/Sonic Pi.app/Contents/Resources/"))
+
+;; :init
+;; (setenv "PATH" (concat (getenv "PATH") (concat ":" (getenv "HOME") "/.ghcup/bin")))
+;; (setenv "PATH" (concat (getenv "PATH") (concat ":" (getenv "HOME") "/.cabal/bin")))
+;; (setq exec-path (append exec-path `(,(concat (getenv "HOME") "/.ghcup/bin/"))))
+;; (setq exec-path (append exec-path `(,(concat (getenv "HOME") "/.cabal/bin/")))))
 
 ;; (use-package flymake
 ;;   :ensure t

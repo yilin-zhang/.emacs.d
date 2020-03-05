@@ -35,6 +35,8 @@
       "f" 'find-file
       "b" 'switch-to-buffer
       "k" 'kill-buffer
+      "r" 'counsel-rg
+      "p" 'counsel-yank-pop
       "a" 'org-agenda
       "i" 'org-clock-in
       "o" 'org-clock-out
@@ -147,18 +149,18 @@
                             (aggressive-indent-mode -1)))))
   :config
   ;; Disable in some modes
-  (dolist (mode '(asm-mode web-mode html-mode css-mode robot-mode))
+  (dolist (mode '(asm-mode web-mode html-mode css-mode robot-mode python-mode c-mode c++-mode))
     (push mode aggressive-indent-excluded-modes))
 
   ;; Be slightly less aggressive in C/C++/C#/Java/Go/Swift
   (add-to-list
    'aggressive-indent-dont-indent-if
-   '(and (or (derived-mode-p 'c-mode)
-             (derived-mode-p 'c++-mode)
-             (derived-mode-p 'csharp-mode)
-             (derived-mode-p 'java-mode)
-             (derived-mode-p 'go-mode)
-             (derived-mode-p 'swift-mode))
+   '(and (or ;; (derived-mode-p 'c-mode)
+          ;; (derived-mode-p 'c++-mode)
+          (derived-mode-p 'csharp-mode)
+          (derived-mode-p 'java-mode)
+          (derived-mode-p 'go-mode)
+          (derived-mode-p 'swift-mode))
          (null (string-match "\\([;{}]\\|\\b\\(if\\|for\\|while\\)\\b\\)"
                              (thing-at-point 'line))))))
 
@@ -169,10 +171,6 @@
   :diminish
   :hook (after-init . global-hungry-delete-mode)
   :config (setq-default hungry-delete-chars-to-skip " \t\f\v"))
-
-(use-package pangu-spacing
-  :ensure t
-  :hook (org-mode . pangu-spacing-mode))
 
 ;; --------------------------------------------------------------
 ;;                            Search
@@ -209,13 +207,7 @@
     :init
     (use-package all-the-icons-ivy-rich
       :ensure t
-      :init (all-the-icons-ivy-rich-mode 1)))
-
-  (use-package ivy-posframe
-    :ensure t
-    :config
-    (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-left)))
-    (ivy-posframe-mode 1)))
+      :init (all-the-icons-ivy-rich-mode 1))))
 
 (use-package swiper
   :ensure t

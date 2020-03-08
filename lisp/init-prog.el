@@ -87,11 +87,6 @@
   :init
   (setenv "WORKON_HOME" "~/miniconda3/envs"))
 
-(use-package yapfify
-  :ensure t
-  :diminish yapf-mode
-  :hook (python-mode . yapf-mode))
-
 ;; This package requires `lispy', which should be installed first
 ;; (use-package lpy
 ;;   :load-path "site-lisp/lpy"

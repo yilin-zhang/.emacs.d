@@ -32,6 +32,7 @@
     :config
     (evil-leader/set-leader "SPC")
     (evil-leader/set-key
+      "x" 'counsel-M-x
       "f" 'find-file
       "b" 'switch-to-buffer
       "k" 'kill-buffer
@@ -108,10 +109,6 @@
   :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
 
-(use-package expand-region
-  :ensure t
-  :bind ("C-=" . er/expand-region))
-
 ;; --------------------------------------------------------------
 ;;               Whitespace, Indentation and Delete
 ;; --------------------------------------------------------------
@@ -119,8 +116,8 @@
 ;; Tab and Space
 ;; Permanently indent with spaces, never with TABs
 (setq-default c-basic-offset   4
-          tab-width        4
-          indent-tabs-mode nil)
+              tab-width        4
+              indent-tabs-mode nil)
 
 ;; Visualize TAB, (HARD) SPACE, NEWLINE
 (use-package whitespace

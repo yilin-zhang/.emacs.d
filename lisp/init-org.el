@@ -33,6 +33,11 @@
 (use-package htmlize
   :ensure t)
 
+;; literature management
+;; path variables can be set in custom/custom-post.el
+(use-package org-ref
+  :ensure t)
+
 ;; --------------------------------------------------------------
 ;;                 Markdown, LaTeX and Export
 ;; --------------------------------------------------------------

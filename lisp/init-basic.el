@@ -194,21 +194,21 @@
 ;;                            Dashboard
 ;; --------------------------------------------------------------
 
-;;(use-package dashboard
-;;  :ensure t
-;;  :after all-the-icons projectile
-;;  :diminish page-break-lines-mode
-;;  :bind ([f5] . dashboard-refresh-buffer)
-;;  :hook
-;;  (after-init . dashboard-setup-startup-hook)
-;;  :config
-;;  (setq dashboard-set-heading-icons t)
-;;  (setq dashboard-set-file-icons t)
-;;  ;; Set the banner
-;;  (setq dashboard-startup-banner 3)
-;;  (setq dashboard-items '((agenda  . 20)
-;;                          (bookmarks . 10)
-;;                          (projects . 10))))
+(use-package dashboard
+  :ensure t
+  :after all-the-icons projectile
+  :diminish page-break-lines-mode
+  :bind ([f5] . dashboard-refresh-buffer)
+  :hook
+  (after-init . dashboard-setup-startup-hook)
+  :config
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  ;; Set the banner
+  (setq dashboard-startup-banner 3)
+  (setq dashboard-items '((agenda  . 20)
+                          (bookmarks . 10)
+                          (projects . 10))))
 
 ;; --------------------------------------------------------------
 ;;                            Backup

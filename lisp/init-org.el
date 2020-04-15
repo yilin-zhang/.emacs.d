@@ -10,8 +10,9 @@
       org-src-fontify-natively t  ; fontify code in code blocks
       org-startup-indented t      ; indent at startup
       org-hide-emphasis-markers t ; hide emphasis markers
-      org-pretty-entities t       ; makes special character format visible
+      org-pretty-entities t       ; make special character format visible
       org-ellipsis "⤵"
+      org-image-actual-width nil  ; make org support image scaling
       )
 
 ;; set org-indent-mode
@@ -26,9 +27,9 @@
 ;; auto-fill
 (add-hook 'org-mode-hook 'auto-fill-mode)
 
-(use-package org-bullets
+(use-package org-superstar
   :ensure t
-  :hook (org-mode . (lambda () (org-bullets-mode 1))))
+  :hook (org-mode . org-superstar-mode))
 
 (use-package htmlize
   :ensure t)

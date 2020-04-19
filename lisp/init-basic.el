@@ -125,7 +125,7 @@
 ;; enable recentf-mode
 (use-package recentf
   :ensure nil
-  :bind ("\C-x\ \C-r" . recentf-open-files)
+  :bind ("C-x C-r" . recentf-open-files)
   :init
   (setq recentf-max-saved-items 50)
   :config
@@ -205,7 +205,10 @@
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
   ;; Set the banner
-  (setq dashboard-startup-banner 3)
+  (let ((banner-image-path "~/.emacs.d/custom/banner.png"))
+    (if (file-exists-p banner-image-path)
+        (setq dashboard-startup-banner banner-image-path)
+      (setq dashboard-startup-banner 3)))
   (setq dashboard-items '((agenda  . 20)
                           (bookmarks . 10)
                           (projects . 10))))

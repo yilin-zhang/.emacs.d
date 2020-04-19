@@ -90,10 +90,10 @@
 ;; enable show-paren-mode for emacs-lisp-mode
 (use-package paren
   :ensure nil
+  :hook (after-init . show-paren-mode)
   :init
   (setq show-paren-style 'parenthesis)
   :config
-  (show-paren-mode t)
   (set-face-background 'show-paren-match (face-foreground 'warning))
   (set-face-attribute 'show-paren-match nil :weight 'extra-bold))
 

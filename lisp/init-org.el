@@ -35,12 +35,9 @@
   :hook
   (org-mode . org-indent-mode)
   (org-mode . auto-fill-mode)
-  :init
-  (add-hook 'org-mode-hook '(lambda()(diminish 'org-indent-mode)))
-  (add-hook 'org-mode-hook
-            (lambda()
-              (setq truncate-lines nil)))
-  (add-hook 'org-agenda-finalize-hook #'my-org-agenda-time-grid-spacing)
+  (org-mode . (lambda()(diminish 'org-indent-mode)))
+  (org-mode . (lambda()(setq truncate-lines nil)))
+  (org-agenda-finalize . my-org-agenda-time-grid-spacing)
   :config
   (setq org-log-done 'time           ; add time stamp after an item is DONE
         org-src-fontify-natively t   ; fontify code in code blocks

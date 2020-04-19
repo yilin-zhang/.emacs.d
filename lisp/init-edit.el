@@ -45,8 +45,7 @@
       "d" 'dired-jump))
   (use-package evil-surround
     :ensure t
-    :config
-    (global-evil-surround-mode 1)))
+    :hook (after-init . global-evil-surround-mode)))
 
 (when (eq system-type 'gnu/linux)
   (use-package fcitx
@@ -62,8 +61,7 @@
 (use-package yasnippet
   :ensure t
   :diminish (yas-minor-mode)
-  :init
-  (yas-global-mode 1))
+  :hook (after-init . yas-global-mode))
 
 ;; On-the-fly spell checker
 (use-package flyspell
@@ -208,8 +206,8 @@
 
 (use-package swiper
   :ensure t
-  :config
-  (global-set-key "\C-s" 'swiper))
+  :bind
+  ("C-s" . swiper))
 
 ;; Highlight symbols
 (use-package symbol-overlay

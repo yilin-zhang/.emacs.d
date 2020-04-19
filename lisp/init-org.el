@@ -32,12 +32,14 @@
   :hook (org-mode . org-superstar-mode))
 
 (use-package htmlize
-  :ensure t)
+  :ensure t
+  :after org)
 
 ;; literature management
 ;; path variables can be set in custom/custom-post.el
 (use-package org-ref
-  :ensure t)
+  :ensure t
+  :after org)
 
 ;; --------------------------------------------------------------
 ;;                 Markdown, LaTeX and Export

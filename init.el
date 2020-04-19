@@ -29,11 +29,15 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
+;; Should set before loading `use-package'
+(setq use-package-always-defer t)
+(setq use-package-expand-minimally t)
+(setq use-package-enable-imenu-support t)
+
 (require 'use-package)
 
 ;; the key word ":diminish" only works when we have diminish
-(use-package diminish
-  :ensure t)
+(use-package diminish)
 
 ;; ===================== REQUIRE INIT FILES ====================================
 ;; (setq load-path (append (list (expand-file-name

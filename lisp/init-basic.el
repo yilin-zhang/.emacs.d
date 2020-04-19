@@ -169,7 +169,7 @@
 ;; ring-bell-function, or it will not work.
 (use-package doom-themes
   :ensure t
-  :config
+  :init
   (load-theme 'doom-gruvbox t)
   (doom-themes-neotree-config)
   (doom-themes-visual-bell-config)
@@ -196,7 +196,6 @@
 
 (use-package dashboard
   :ensure t
-  :after all-the-icons projectile
   :diminish page-break-lines-mode
   :bind ([f5] . dashboard-refresh-buffer)
   :hook

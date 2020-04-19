@@ -26,9 +26,10 @@
 
 (use-package lsp-mode
   :ensure t
-  ;; :hook
-  ;; (python-mode . lsp)
-  ;; (ruby-mode . lsp)
+  :hook
+  (python-mode . lsp)
+  (ruby-mode . lsp)
+  (c++-mode . lsp)
   :init
   (setq lsp-auto-guess-root t        ; Detect project root
         lsp-keep-workspace-alive nil ; Auto-kill LSP server

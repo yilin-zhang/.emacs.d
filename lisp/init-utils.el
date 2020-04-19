@@ -6,8 +6,10 @@
 
 ;; The setting of this variable must come before enable
 ;; display-time-mode, or it will not work.
-(setq display-time-default-load-average nil)
 (setq display-time-24hr-format 1)
+(setq display-time-string-forms
+      '((propertize (concat (all-the-icons-faicon "clock-o" :v-adjust 0.03) " " 24-hours ":" minutes " ")
+                    'face 'font-lock-constant-face)))
 
 (defun yilin-toggle-frame-fullscreen ()
   "toggle-frame-fullscreen plus display-time-mode."
@@ -75,6 +77,8 @@
 (use-package neotree
   :ensure t
   ;; override evil-mode key bindings
+  :bind
+  ("<f8>" . neotree-toggle)
   :hook (neotree-mode . (lambda ()
                           (define-key evil-normal-state-local-map (kbd "TAB") 'neotree-enter)
                           (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-quick-look)
@@ -86,7 +90,6 @@
                           (define-key evil-normal-state-local-map (kbd "A") 'neotree-stretch-toggle)
                           (define-key evil-normal-state-local-map (kbd "H") 'neotree-hidden-file-toggle)))
   :config
-  (global-set-key (kbd "<f8>") 'neotree-toggle)
   (setq neo-smart-open t)
   ;; requires all-the-icons
   (setq neo-theme (if (display-graphic-p) 'icons 'arrow)))

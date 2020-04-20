@@ -27,7 +27,7 @@
 ;; (yilin-toggle-frame-fullscreen)
 
 ;; --------------------------------------------------------------
-;;                         Window Split
+;;                         Window/Frame
 ;; --------------------------------------------------------------
 
 ;; Set key-binding for switching from a horizontal

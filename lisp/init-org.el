@@ -52,33 +52,44 @@
         org-format-latex-options (plist-put org-format-latex-options :scale 2.3)
         org-latex-compiler "xelatex") ; Set XeLaTeX as the default LaTeX compiler
   ;; Set my org agenda file
-  (setq org-agenda-files '("~/agenda.org")
+  (setq org-agenda-files '("~/agenda.org" "~/inbox.org")
         org-default-notes-file "~/inbox.org"
         org-capture-templates
-        '(("t" "Todo" entry (file+headline org-default-notes-file "Tasks")
-           "* TODO %?\n  %i\n  %a")
-          ("a" "Task for Today" checkitem (file+datetree org-default-notes-file)
-           "[ ] %?")))
+        '(("l" "👨 Life" entry (file+headline org-default-notes-file "Life")
+           "* TODO %?\n  %i\n")
+          ("w" "📖 Work" entry (file+headline org-default-notes-file "Work")
+           "* TODO %?\n %i\n %a")
+          ("i" "🌏 Info" entry (file+headline org-default-notes-file "Info")
+           "* %?")))
   ;; Set keywords properties
   (setq org-todo-keywords '((sequence "TODO(t)" "DOING(i)" "HANGUP(h)"
                                       "|" "DONE(d)" "CANCEL(c)"))
         org-todo-keyword-faces '(("HANGUP" . warning)))
-
-  (use-package org-superstar
-    :ensure t
-    :hook (org-mode . org-superstar-mode))
-  (use-package htmlize
-    :ensure t
-    :after org)
-  ;; literature management
-  ;; path variables can be set in custom/custom-post.el
-  (use-package org-ref
-    :ensure t
-    :after org)
-  (use-package ox-hugo
-    :ensure t
-    :after ox)
   )
+
+(use-package org-superstar
+  :ensure t
+  :hook (org-mode . org-superstar-mode))
+
+(use-package htmlize
+  :ensure t
+  :after org)
+
+;; literature management
+;; path variables can be set in custom/custom-post.el
+;; WORKAROUND: This package cannot be defered, otherwise the keybinding
+;; won't be loaded until you run the command
+(use-package org-ref
+  :ensure t
+  :after org
+  :init (require 'org-ref))
+
+;; WORKAROUND: The same issue as above. It doesn't load unless explicitly
+;; using `require' in `:init'
+(use-package ox-hugo
+  :ensure t
+  :after ox
+  :init (require 'ox-hugo))
 
 (provide 'init-org)
 

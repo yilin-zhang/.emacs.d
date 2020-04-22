@@ -21,14 +21,12 @@
              ([(super z)] . undo)))
 
 (use-package evil
-  :ensure t
   :init
   (setq evil-want-C-i-jump nil) ;; make sure TAB is working in terminal
   (global-evil-leader-mode 1)
   (evil-mode 1)
   :config
   (use-package evil-leader
-    :ensure t
     :config
     (evil-leader/set-leader "SPC")
     (evil-leader/set-key
@@ -44,12 +42,10 @@
       "g" 'magit-status
       "d" 'dired-jump))
   (use-package evil-surround
-    :ensure t
     :hook (after-init . global-evil-surround-mode)))
 
 (when (eq system-type 'gnu/linux)
   (use-package fcitx
-    :ensure t
     :config
     (fcitx-aggressive-setup)
     (setq fcitx-use-dbus t)))
@@ -59,7 +55,6 @@
 ;; --------------------------------------------------------------
 
 (use-package yasnippet
-  :ensure t
   :diminish (yas-minor-mode)
   :hook (after-init . yas-global-mode))
 
@@ -104,7 +99,6 @@
 
 ;; rainbow parentheses
 (use-package rainbow-delimiters
-  :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
 
 ;; --------------------------------------------------------------
@@ -134,7 +128,6 @@
 
 ;; Minor mode to aggressively keep your code always indented
 (use-package aggressive-indent
-  :ensure t
   :diminish
   :hook ((after-init . global-aggressive-indent-mode)
          ;; FIXME: Disable in big files due to the performance issues
@@ -162,7 +155,6 @@
 ;; Note that this package has conflict with smartparens.
 ;; The solution is written inside smartparens' configurations.
 (use-package hungry-delete
-  :ensure t
   :diminish
   :hook (after-init . global-hungry-delete-mode)
   :config (setq-default hungry-delete-chars-to-skip " \t\f\v"))
@@ -172,46 +164,38 @@
 ;; --------------------------------------------------------------
 
 (use-package which-key
-  :ensure t
   :diminish (which-key-mode)
   :config (which-key-mode))
 
 ;; Installing Counsel will bring in Ivy and Swiper as dependencies.
 ;; counsel, swiper and ivy come from the same repo.
 (use-package counsel
-  :ensure t
   :diminish (counsel-mode)
   :hook ((after-init . ivy-mode)
          (ivy-mode . counsel-mode))
   :init
   ;;(counsel-mode t)
   ;; Sort M-x commands by history
-  (use-package amx
-    :ensure t)
+  (use-package amx)
 
   (use-package ivy
-    :ensure t
     :diminish
     :config
     (setq ivy-use-virtual-buffers t)
     (global-set-key (kbd "C-c C-r") 'ivy-resume))
 
   (use-package ivy-rich
-    :ensure t
     :hook (ivy-mode . ivy-rich-mode)
     :init
     (use-package all-the-icons-ivy-rich
-      :ensure t
       :init (all-the-icons-ivy-rich-mode 1))))
 
 (use-package swiper
-  :ensure t
   :bind
   ("C-s" . swiper))
 
 ;; Highlight symbols
 (use-package symbol-overlay
-  :ensure t
   :diminish
   :defines iedit-mode
   :commands (symbol-overlay-get-symbol
@@ -235,7 +219,6 @@
 
 ;; company is a useful auto-complete tool
 (use-package company
-  :ensure t
   ;; `TODO' after setting init below, company is disabled under org mode, but
   ;; quickhelp is still working
   ;; :init (setq company-global-modes '(not org-mode))
@@ -261,7 +244,6 @@
   ;; ;; show icons for company
   ;; (when (version<= "26" emacs-version)
   ;;   (use-package company-box
-  ;;     :ensure t
   ;;     :diminish (company-box-mode)
   ;;     :hook (company-mode . company-box-mode)))
   :config
@@ -279,7 +261,6 @@
 ;; --------------------------------------------------------------
 ;; highlight indentations
 (use-package highlight-indent-guides
-  :ensure t
   :diminish
   :hook (prog-mode . highlight-indent-guides-mode)
   :config
@@ -299,7 +280,6 @@
 
 ;; Highlight TODO and similar keywords in comments and strings
 (use-package hl-todo
-  :ensure t
   :custom-face (hl-todo ((t (:box t :inherit))))
   :bind (:map hl-todo-mode-map
               ([C-f3] . hl-todo-occur)

@@ -23,7 +23,6 @@
 (require 'dired-x)
 
 (use-package diredfl
-  :ensure t
   :init (diredfl-global-mode 1))
 
 (provide 'init-dired)

@@ -63,7 +63,6 @@
 ;;                         Better Writting
 ;; --------------------------------------------------------------
 (use-package writeroom-mode
-  :ensure t
   :bind
   ("<f6>" . global-writeroom-mode)
   ("<f7>" . writeroom-mode)
@@ -75,7 +74,6 @@
 ;;                           File Tree
 ;; --------------------------------------------------------------
 (use-package neotree
-  :ensure t
   ;; override evil-mode key bindings
   :bind
   ("<f8>" . neotree-toggle)
@@ -98,7 +96,6 @@
 ;;                           Projectile
 ;; --------------------------------------------------------------
 (use-package projectile
-  :ensure t
   :diminish
   :bind (:map projectile-mode-map
               ("s-t" . projectile-find-file) ; `cmd-t' or `super-t'
@@ -114,7 +111,6 @@
 
 ;; Group ibuffer's list by project root
 (use-package ibuffer-projectile
-  :ensure t
   :functions all-the-icons-octicon
   :hook ((ibuffer . (lambda ()
                       (ibuffer-projectile-set-filter-groups)
@@ -135,7 +131,6 @@
 ;;                           Feed
 ;; --------------------------------------------------------------
 (use-package elfeed
-  :ensure t
   :bind ("C-x w" . elfeed)
   :config
   (setq elfeed-search-filter "")
@@ -146,12 +141,10 @@
 ;; --------------------------------------------------------------
 
 ;; try packages without actually install them
-(use-package try
-  :ensure t)
+(use-package try)
 
 ;; Youdao Dictionay
 (use-package youdao-dictionary
-  :ensure t
   :bind (("C-c Y" . youdao-dictionary-search-at-point)
          ("C-c y" . youdao-dictionary-search-at-point-tooltip))
   :config
@@ -162,7 +155,6 @@
 
 ;; epub reader
 (use-package nov
-  :ensure t
   :init
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
   (defun my-nov-font-setup ()
@@ -224,7 +216,6 @@ is already narrowed."
 ;; --------------------------------------------------------------
 
 ;; (use-package smartparens
-;; :ensure t
 ;; :diminish smartparens-mode
 ;; :hook
 ;; ((prog-mode text-mode outline-mode) . smartparens-mode)

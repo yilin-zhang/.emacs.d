@@ -4,7 +4,6 @@
 ;;                            Paths
 ;; --------------------------------------------------------------
 (use-package exec-path-from-shell
-  :ensure t
   :init
   (when (memq window-system '(mac ns x))
     (exec-path-from-shell-initialize)))
@@ -81,7 +80,6 @@
 ;; move the cursor to the newly created window
 ;; makes people easier to close it (C-g)
 (use-package popwin
-  :ensure t
   :config (popwin-mode 1))
 
 ;; --------------------------------------------------------------
@@ -106,7 +104,6 @@
 
 ;; Shell Pop
 (use-package shell-pop
-  :ensure t
   :bind ([f9] . shell-pop)
   :init
   (setq shell-pop-shell-type '("ansi-term" "*ansi-term*"
@@ -137,18 +134,15 @@
 ;; use ibuffer instead of CRM buffer
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (use-package all-the-icons-ibuffer
-  :ensure t
   :init (all-the-icons-ibuffer-mode 1))
 
 ;; --------------------------------------------------------------
 ;;                          Icons and Emoji
 ;; --------------------------------------------------------------
-(use-package all-the-icons
-  :ensure t)
+(use-package all-the-icons)
 
 ;; support displaying emoji
-(use-package emojify
-  :ensure t)
+(use-package emojify)
 ;; only display emoji for org mode
 ;; :hook (org-mode . emojify-mode))
 
@@ -168,7 +162,6 @@
 ;; doom-themes-visual-bell-config must be loaded after setting
 ;; ring-bell-function, or it will not work.
 (use-package doom-themes
-  :ensure t
   :init
   (load-theme 'doom-gruvbox t)
   (doom-themes-neotree-config)
@@ -177,13 +170,11 @@
 
 ;; https://github.com/seagle0128/doom-modeline
 (use-package doom-modeline
-  :ensure t
   :hook (after-init . doom-modeline-mode)
   :config
   (setq find-file-visit-truename t))
 
 ;; (use-package nyan-mode
-;;   :ensure t
 ;;   :hook (after-init . nyan-mode)
 ;;   :config
 ;;   ;; WORKAROUND (setq nyan-animate-nyancat t) seems useless, I don't
@@ -195,7 +186,6 @@
 ;; --------------------------------------------------------------
 
 (use-package dashboard
-  :ensure t
   :diminish page-break-lines-mode
   :bind ([f5] . dashboard-refresh-buffer)
   :hook

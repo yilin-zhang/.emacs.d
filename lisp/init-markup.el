@@ -23,7 +23,6 @@
 ;; management to be clear. Also, auctex is not bad, after all many people
 ;; consider it a better latex mode than the native latex mode.
 (use-package cdlatex
-  :ensure t
   :hook
   (LaTeX-mode . cdlatex-mode)
   (LaTeX-mode . auto-fill-mode))
@@ -33,7 +32,6 @@
 ;; --------------------------------------------------------------
 
 (use-package markdown-mode
-  :ensure t
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
@@ -42,8 +40,7 @@
 ;; --------------------------------------------------------------
 ;;                     Yaml Mode Configurations
 ;; --------------------------------------------------------------
-(use-package yaml-mode
-  :ensure t)
+(use-package yaml-mode)
 
 ;; --------------------------------------------------------------
 ;;                    LilyPond Mode Configurations
@@ -61,7 +58,6 @@
 ;;                     Gnuplot Mode Configurations
 ;; --------------------------------------------------------------
 (use-package gnuplot-mode
-  :ensure t
   :mode ("\\.\\(gp\\|gnuplot\\)$" . gnuplot-mode))
 ;; specify the gnuplot executable (if other than /usr/bin/gnuplot)
 ;; (setq gnuplot-program "/sw/bin/gnuplot")

@@ -4,7 +4,6 @@
 ;;                     Checker Configuration
 ;; --------------------------------------------------------------
 (use-package flycheck
-  :ensure t
   :diminish flycheck-mode
   :hook (after-init . global-flycheck-mode)
   :config
@@ -19,13 +18,11 @@
 ;; --------------------------------------------------------------
 ;;                     LSP Configurations
 ;; --------------------------------------------------------------
-(use-package ccls
-  :ensure t)
+(use-package ccls)
 ;; :hook ((c-mode c++-mode objc-mode cuda-mode) .
 ;;        (lambda () (require 'ccls) (lsp))))
 
 (use-package lsp-mode
-  :ensure t
   :hook
   (python-mode . lsp)
   (ruby-mode . lsp)
@@ -41,7 +38,6 @@
   :commands lsp
   :config
   (use-package lsp-ui
-    :ensure t
     :commands lsp-ui-mode
     :bind
     (("C-c u" . lsp-ui-imenu)
@@ -57,7 +53,6 @@
      lsp-ui-doc-position 'top
      lsp-ui-doc-border (face-foreground 'default)))
   (use-package company-lsp
-    :ensure t
     :init (setq company-lsp-cache-candidates 'auto)
     :commands company-lsp
     :config
@@ -65,26 +60,22 @@
     ;; when a candidate is fulfilled
     ;; @see https://github.com/emacs-lsp/lsp-python-ms/issues/79
     (add-to-list 'company-lsp-filter-candidates '(mspyls)))
-  (use-package dap-mode
-    :ensure t))
+  (use-package dap-mode))
 ;; --------------------------------------------------------------
 ;;                     C/C++ Mode Configurations
 ;; --------------------------------------------------------------
-(use-package cmake-mode
-  :ensure t)
+(use-package cmake-mode)
 
 ;; --------------------------------------------------------------
 ;;                     Lisp Mode Configurations
 ;; --------------------------------------------------------------
-(use-package lispy
-  :ensure t)
+(use-package lispy)
 
 ;; --------------------------------------------------------------
 ;;                     Python Mode Configurations
 ;; --------------------------------------------------------------
 
 (use-package pyvenv
-  :ensure t
   :init
   (setenv "WORKON_HOME" "~/miniconda3/envs"))
 
@@ -107,14 +98,12 @@
   (global-rbenv-mode 1))
 
 (use-package rubocop
-  :ensure t
   :hook (ruby-mode . rubocop-mode))
 
 ;; --------------------------------------------------------------
 ;;                     JS2 Mode Configuration
 ;; --------------------------------------------------------------
 (use-package web-mode
-  :ensure t
   :init
   (setq auto-mode-alist
         (append
@@ -130,7 +119,6 @@
          auto-mode-alist)))
 
 (use-package tide
-  :ensure t
   :after (typescript-mode company flycheck)
   :hook ((typescript-mode . tide-setup)
          (typescript-mode . tide-hl-identifier-mode)
@@ -138,20 +126,19 @@
 ;; --------------------------------------------------------------
 ;;                     Racket Mode Configurations
 ;; --------------------------------------------------------------
-(use-package racket-mode
-  :ensure t)
+(use-package racket-mode)
 
 ;; --------------------------------------------------------------
 ;;                     Rust Mode Configurations
 ;; --------------------------------------------------------------
-(use-package rust-mode
-  :ensure t)
+(use-package rust-mode)
 
 ;; --------------------------------------------------------------
 ;;                     SClang Configurations
 ;; --------------------------------------------------------------
-(add-to-list 'load-path "~/.emacs.d/site-lisp/scel/el")
 (use-package sclang
+  :ensure nil
+  :load-path "site-lisp/scel/el"
   :init
   (if (eq system-type 'darwin)
       (progn
@@ -165,25 +152,21 @@
 ;; --------------------------------------------------------------
 ;;                         Statistics
 ;; --------------------------------------------------------------
-(use-package ess
-  :ensure t)
+(use-package ess)
 
 ;; --------------------------------------------------------------
 ;;                         Common Lisp
 ;; --------------------------------------------------------------
-(use-package sly
-  :ensure t)
+(use-package sly)
 
 ;; --------------------------------------------------------------
 ;;                         Live Coding
 ;; --------------------------------------------------------------
-(use-package tidal
-  :ensure t)
+(use-package tidal)
 
 ;; Only works when running the sonic pi server in the terminal
 ;; TODO: Fix this package
 (use-package sonic-pi
-  :ensure t
   :init
   (setq sonic-pi-server-bin "app/server/ruby/bin/sonic-pi-server.rb")
   (setq sonic-pi-path "/Applications/Sonic Pi.app/Contents/Resources/"))

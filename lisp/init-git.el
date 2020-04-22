@@ -2,7 +2,6 @@
 
 ;; Magit
 (use-package magit
-  :ensure t
   :commands transient-insert-suffix
   :bind (("C-x g" . magit-status)
          ("C-x M-g" . magit-dispatch-popup)
@@ -10,7 +9,6 @@
 
 ;; Highlight uncommitted changes
 (use-package diff-hl
-  :ensure t
   :defines desktop-minor-mode-table
   :commands diff-hl-magit-post-refresh
   :custom-face

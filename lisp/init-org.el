@@ -68,11 +68,9 @@
   )
 
 (use-package org-superstar
-  :ensure t
   :hook (org-mode . org-superstar-mode))
 
 (use-package htmlize
-  :ensure t
   :after org)
 
 ;; literature management
@@ -80,16 +78,18 @@
 ;; WORKAROUND: This package cannot be defered, otherwise the keybinding
 ;; won't be loaded until you run the command
 (use-package org-ref
-  :ensure t
   :after org
   :init (require 'org-ref))
 
 ;; WORKAROUND: The same issue as above. It doesn't load unless explicitly
 ;; using `require' in `:init'
 (use-package ox-hugo
-  :ensure t
   :after ox
   :init (require 'ox-hugo))
+
+(use-package ox-jekyll-md
+  :after ox
+  :init (require 'ox-jekyll-md))
 
 (provide 'init-org)
 

@@ -140,14 +140,15 @@
   :ensure nil
   :load-path "site-lisp/scel/el"
   :init
+  (require 'sclang)
+  (setq auto-mode-alist
+        (append
+         '(("\\.scd\\'" . sclang-mode) ("\\.sc\\'" . sclang-mode))
+         auto-mode-alist))
   (if (eq system-type 'darwin)
       (progn
         (setenv "PATH" (concat (getenv "PATH") ":/Applications/SuperCollider.app/Contents/MacOS"))
-        (setq exec-path (append exec-path '("/Applications/SuperCollider.app/Contents/MacOS" )))))
-  :config
-  ;; WORKAROUND add all the prog-mode hooks to sclang-mode
-  (dolist (hook prog-mode-hook)
-    (add-hook 'sclang-mode-hook hook)))
+        (setq exec-path (append exec-path '("/Applications/SuperCollider.app/Contents/MacOS" ))))))
 
 ;; --------------------------------------------------------------
 ;;                         Statistics

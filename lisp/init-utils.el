@@ -133,7 +133,7 @@
 (use-package elfeed
   :bind ("C-x w" . elfeed)
   :config
-  (setq elfeed-search-filter "")
+  (setq elfeed-search-filter "@6-months-ago")
   (evil-set-initial-state 'elfeed-search-mode 'emacs))
 
 ;; --------------------------------------------------------------

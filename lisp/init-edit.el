@@ -56,7 +56,9 @@
 
 (use-package yasnippet
   :diminish (yas-minor-mode)
-  :hook (after-init . yas-global-mode))
+  :hook (after-init . yas-global-mode)
+  :config
+  (use-package yasnippet-snippets))
 
 ;; On-the-fly spell checker
 (use-package flyspell
@@ -129,28 +131,12 @@
 ;; Minor mode to aggressively keep your code always indented
 (use-package aggressive-indent
   :diminish
-  :hook ((after-init . global-aggressive-indent-mode)
+  :hook ((lisp-mode . aggressive-indent-mode)
          ;; FIXME: Disable in big files due to the performance issues
          ;; https://github.com/Malabarba/aggressive-indent-mode/issues/73
          (find-file . (lambda ()
                         (if (> (buffer-size) (* 3000 80))
-                            (aggressive-indent-mode -1)))))
-  :config
-  ;; Disable in some modes
-  (dolist (mode '(asm-mode web-mode html-mode css-mode robot-mode python-mode c-mode c++-mode))
-    (push mode aggressive-indent-excluded-modes))
-
-  ;; Be slightly less aggressive in C/C++/C#/Java/Go/Swift
-  (add-to-list
-   'aggressive-indent-dont-indent-if
-   '(and (or ;; (derived-mode-p 'c-mode)
-          ;; (derived-mode-p 'c++-mode)
-          (derived-mode-p 'csharp-mode)
-          (derived-mode-p 'java-mode)
-          (derived-mode-p 'go-mode)
-          (derived-mode-p 'swift-mode))
-         (null (string-match "\\([;{}]\\|\\b\\(if\\|for\\|while\\)\\b\\)"
-                             (thing-at-point 'line))))))
+                            (aggressive-indent-mode -1))))))
 
 ;; Note that this package has conflict with smartparens.
 ;; The solution is written inside smartparens' configurations.

@@ -1,3 +1,6 @@
 [submodule "site-lisp/scel"]
 	path = site-lisp/scel
 	url = https://github.com/yilin-zhang/scel.git
+[submodule "site-lisp/sclang-helper"]
+	path = site-lisp/sclang-helper
+	url = https://github.com/yilin-zhang/sclang-helper.git

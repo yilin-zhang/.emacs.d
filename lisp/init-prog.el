@@ -150,6 +150,11 @@
         (setenv "PATH" (concat (getenv "PATH") ":/Applications/SuperCollider.app/Contents/MacOS"))
         (setq exec-path (append exec-path '("/Applications/SuperCollider.app/Contents/MacOS" ))))))
 
+(use-package sclang-helper
+  :ensure nil
+  :load-path "site-lisp/sclang-helper"
+  :hook (sclang-mode . sclang-helper-mode))
+
 ;; --------------------------------------------------------------
 ;;                         Statistics
 ;; --------------------------------------------------------------

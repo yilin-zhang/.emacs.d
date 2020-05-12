@@ -60,7 +60,7 @@
           ("w" "📖 Work" entry (file+headline org-default-notes-file "Work")
            "* TODO %?\n %i\n %a")
           ("i" "🌏 Info" entry (file+headline org-default-notes-file "Info")
-           "* %?")))
+           "* %?\n%t\n")))
   ;; Set keywords properties
   (setq org-todo-keywords '((sequence "TODO(t)" "DOING(i)" "HANGUP(h)"
                                       "|" "DONE(d)" "CANCEL(c)"))

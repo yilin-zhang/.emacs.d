@@ -162,6 +162,9 @@
                              :height 1.0))
   (add-hook 'nov-mode-hook 'my-nov-font-setup))
 
+(use-package eyebrowse
+  :hook (after-init . eyebrowse-mode))
+
 ;; --------------------------------------------------------------
 ;;                          3rd Party
 ;; --------------------------------------------------------------

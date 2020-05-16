@@ -170,7 +170,7 @@
 
 ;; https://github.com/seagle0128/doom-modeline
 (use-package doom-modeline
-  :hook (after-init . doom-modeline-mode)
+  :init (doom-modeline-mode 1)
   :config
   (setq find-file-visit-truename t))
 

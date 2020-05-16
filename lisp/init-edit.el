@@ -46,8 +46,9 @@
 
 (when (eq system-type 'gnu/linux)
   (use-package fcitx
-    :config
+    :init
     (fcitx-aggressive-setup)
+    :config
     (setq fcitx-use-dbus t)))
 
 ;; --------------------------------------------------------------
@@ -132,6 +133,7 @@
 (use-package aggressive-indent
   :diminish
   :hook ((lisp-mode . aggressive-indent-mode)
+         (emacs-lisp-mode . aggressive-indent-mode)
          ;; FIXME: Disable in big files due to the performance issues
          ;; https://github.com/Malabarba/aggressive-indent-mode/issues/73
          (find-file . (lambda ()

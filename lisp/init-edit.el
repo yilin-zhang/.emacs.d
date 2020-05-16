@@ -51,6 +51,15 @@
     :config
     (setq fcitx-use-dbus t)))
 
+(when (eq system-type 'darwin)
+  (use-package rime
+    :custom
+    (default-input-method "rime")
+    :config
+    (setq rime-librime-root "~/.emacs.d/librime/dist")
+    (setq rime-show-candidate 'posframe)
+    (setq rime-cursor "˰")))
+
 ;; --------------------------------------------------------------
 ;;                      Template and Spellchecker
 ;; --------------------------------------------------------------

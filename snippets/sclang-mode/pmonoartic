@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: pmonoartic
+# key: pma
+# --
+
+p = PmonoArtic(
+	\\${1:name},
+	\dur, 0.2,
+	\freq, Pwhite(1,8) * 100,
+	\legato, Pwrand(#[0.5, 1.0], #[0.1, 0.9], inf)
+).play;

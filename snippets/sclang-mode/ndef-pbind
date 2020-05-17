@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# name: ndef-pbind
+# key: ndb
+# --
+
+Ndef(\\${1:name}, Pbind(
+	\instrument, \\${2:inst_name},
+	\degree, Pseq([$3], inf),
+	\dur, Pseq([$4], inf),$0
+	\amp, 0.5
+));
+Ndef(\\$1).quant_(4*4);
+Ndef(\\$1).fadeTime_(30);
+Ndef(\\$1).play;
+Ndef(\\$1).stop(fadeTime: 10);

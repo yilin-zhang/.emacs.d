@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: midi-cc
+# key: midicc
+# --
+
+MIDIdef.cc(\\${1:name}, { |val, num, chan|
+    $0
+}, ${2:cc_channel});

@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: oscdef
+# key: oscdef
+# --
+
+OSCdef(\\${1:name}, {
+	arg msg, time, addr, port;
+	var val = msg[1].asFloat;$0
+}, '${2:address}');

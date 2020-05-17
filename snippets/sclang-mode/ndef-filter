@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: ndef-filter
+# key: ndf
+# --
+
+Ndef(\\${1:name})[$2] = \filter -> {arg sig; $0};

@@ -3,3 +3,4 @@
 !init.el
 !/lisp/*.el
 !/site-lisp
+!/snippets

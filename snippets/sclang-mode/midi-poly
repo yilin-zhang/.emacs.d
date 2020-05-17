@@ -1,0 +1,16 @@
+# -*- mode: snippet -*-
+# name: midi-poly
+# key: midipoly
+# --
+
+a = Array.fill(127, { nil });
+MIDIdef.noteOn(\\${1:name}, { |vel, key, channel, device|
+	a[key].release;
+	a[key] = Synth(\\${2:synth_name}, [\freq, key.midicps, \amp, vel/127$0]);
+	[key, vel].postln;
+});
+
+MIDIdef.noteOff(\\$1, { |vel, key, channel, device|
+	a[key].release;
+	a[key] = nil;
+});

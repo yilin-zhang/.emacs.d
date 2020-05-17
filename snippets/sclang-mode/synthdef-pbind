@@ -1,0 +1,19 @@
+# -*- mode: snippet -*-
+# name: synthdef-pbind
+# key: sdpb
+# --
+
+SynthDef(\\${1:name}, {
+	arg freq=440, amp=0.5, gate=1, pan=0, out=0;
+	var sig;
+	sig = Saw.ar(freq);
+	sig = sig * EnvGen.kr(Env.perc, gate, doneAction: 2);
+	sig = Pan2.ar(sig, pan);
+	sig = sig * amp;
+	sig = Out.ar(out, sig);
+}).add;
+
+Pbind(
+	\instrument, \\$1,
+	\degree, Pseq([0, 1, 2, 3, 4, 5, 6, 7], inf);
+).play

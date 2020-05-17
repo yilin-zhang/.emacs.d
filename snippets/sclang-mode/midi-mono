@@ -1,0 +1,33 @@
+# -*- mode: snippet -*-
+# name: midi-mono
+# key: midimono
+# --
+
+~note_list = [];
+~synth = nil;
+
+MIDIdef.noteOn(\note_on, { |vel, key, channel, device|
+	// Check if note list is empty
+	if (~note_list.isEmpty,
+		// if it's empty, create a new synth
+        {~synth = Synth(\\${2:synth_name}, [\freq, key.midicps, \amp, vel/127$0])},
+		// if it's not empty, set the freq and amp
+		{~synth.set(\freq, key.midicps, \amp, vel/127)}
+	);
+	// add the new note into note list
+	~note_list.add(key);
+	"note_list in note_on: ".post; ~note_list.postln;
+});
+
+MIDIdef.noteOff(\note_off, { |vel, key, channel, device|
+	// remove the note from the note list
+	~note_list = ~note_list.select {|item, idx| item != key};
+	// check if the note list is empty
+	if (~note_list.isEmpty,
+		// if it's empty, release the synth
+		{~synth.release},
+		// if it's not empty, set the freq to the first note in the list
+		{~synth.set(\freq, ~note_list[0].midicps)}
+	);
+	"note_list in note_off: ".post; ~note_list.postln;
+});

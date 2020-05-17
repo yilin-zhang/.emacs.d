@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: midi-init
+# key: midiinit
+# --
+
+MIDIClient.init; // optional
+MIDIIn.connectAll;
+MIDIFunc.trace(true);

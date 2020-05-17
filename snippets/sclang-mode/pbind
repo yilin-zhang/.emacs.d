@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: pbind
+# key: pb
+# --
+
+Pbind(
+	\instrument, \\${1:name},
+	\degree, Pseq([$0], inf);
+).play

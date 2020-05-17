@@ -203,6 +203,65 @@
                           (projects . 10))))
 
 ;; --------------------------------------------------------------
+;;                            Custom
+;; --------------------------------------------------------------
+
+;; Full Screen with Mode Line Time Display
+
+;; The setting of this variable must come before enable
+;; display-time-mode, or it will not work.
+(setq display-time-24hr-format 1)
+(setq display-time-string-forms
+      '((propertize (concat (all-the-icons-faicon "clock-o" :v-adjust 0.03) " " 24-hours ":" minutes " ")
+                    'face 'font-lock-constant-face)))
+
+(defun yilin-toggle-frame-fullscreen ()
+  "toggle-frame-fullscreen plus display-time-mode."
+  (interactive)
+  (if (equal 'fullboth (frame-parameter nil 'fullscreen))
+      (progn
+        (display-time-mode -1)
+        (display-battery-mode -1))
+    (progn
+      (display-time-mode 1)
+      (display-battery-mode 1)))
+  (toggle-frame-fullscreen))
+
+(global-set-key (kbd "<f12>") 'yilin-toggle-frame-fullscreen)
+;; (yilin-toggle-frame-fullscreen)
+
+;; Window/Frame
+
+;; Set key-binding for switching from a horizontal
+;; split to a vertical split and vice versa.
+(defun toggle-window-split ()
+  (interactive)
+  (if (= (count-windows) 2)
+      (let* ((this-win-buffer (window-buffer))
+             (next-win-buffer (window-buffer (next-window)))
+             (this-win-edges (window-edges (selected-window)))
+             (next-win-edges (window-edges (next-window)))
+             (this-win-2nd (not (and (<= (car this-win-edges)
+                                         (car next-win-edges))
+                                     (<= (cadr this-win-edges)
+                                         (cadr next-win-edges)))))
+             (splitter
+              (if (= (car this-win-edges)
+                     (car (window-edges (next-window))))
+                  'split-window-horizontally
+                'split-window-vertically)))
+        (delete-other-windows)
+        (let ((first-win (selected-window)))
+          (funcall splitter)
+          (if this-win-2nd (other-window 1))
+          (set-window-buffer (selected-window) this-win-buffer)
+          (set-window-buffer (next-window) next-win-buffer)
+          (select-window first-win)
+          (if this-win-2nd (other-window 1))))))
+
+(global-set-key (kbd "C-x |") 'toggle-window-split)
+
+;; --------------------------------------------------------------
 ;;                            Backup
 ;; --------------------------------------------------------------
 ;; inhibit the start message

@@ -27,6 +27,7 @@
   (python-mode . lsp)
   (ruby-mode . lsp)
   (c++-mode . lsp)
+  (rust-mode . lsp)
   :init
   (setq lsp-auto-guess-root t        ; Detect project root
         lsp-keep-workspace-alive nil ; Auto-kill LSP server
@@ -61,6 +62,7 @@
     ;; @see https://github.com/emacs-lsp/lsp-python-ms/issues/79
     (add-to-list 'company-lsp-filter-candidates '(mspyls)))
   (use-package dap-mode))
+
 ;; --------------------------------------------------------------
 ;;                     C/C++ Mode Configurations
 ;; --------------------------------------------------------------

@@ -106,6 +106,29 @@
 (use-package eyebrowse
   :hook (after-init . eyebrowse-mode))
 
+(use-package kana
+  :quelpa
+  (kana :repo "chenyanming/kana" :fetcher github)
+  :init (require 'kana)
+  :config (evil-set-initial-state 'kana-mode 'emacs))
+
+(use-package auto-save
+  :load-path "site-lisp/auto-save"
+  :ensure nil
+  :init
+  (require 'auto-save)
+  (auto-save-enable)
+  :config
+  (setq auto-save-silent t)             ; quietly save
+  (setq auto-save-delete-trailing-whitespace t) ; automatically delete spaces at the end of the line when saving
+  (setq auto-save-disable-predicates
+        '((lambda ()
+            (string-suffix-p
+             "gpg"
+             (file-name-extension (buffer-name)) t)))))
+;; (setq auto-save-all-buffers nil)
+;; (setq auto-save-directories '("~/Documents/notebooks")))
+
 ;; --------------------------------------------------------------
 ;;                           Backup
 ;; --------------------------------------------------------------

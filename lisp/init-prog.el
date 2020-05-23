@@ -30,10 +30,10 @@
   (rust-mode . lsp)
   :init
   (setq lsp-auto-guess-root t        ; Detect project root
-        lsp-keep-workspace-alive nil ; Auto-kill LSP server
-        lsp-prefer-flymake nil
-        lsp-enable-on-type-formatting nil
-        lsp-enable-indentation nil
+        ;; lsp-keep-workspace-alive nil ; Auto-kill LSP server
+        ;; lsp-prefer-flymake nil
+        ;; lsp-enable-on-type-formatting nil
+        ;; lsp-enable-indentation nil
         lsp-signature-auto-activate nil
         lsp-enable-symbol-highlighting nil) ; disable the pop-up doc below the modeline
   :commands lsp
@@ -71,7 +71,15 @@
 ;; --------------------------------------------------------------
 ;;                     Lisp Mode Configurations
 ;; --------------------------------------------------------------
-(use-package lispy)
+(use-package lispy
+  :hook (emacs-lisp-mode . lispy-mode)
+  :config
+  (evil-set-initial-state 'emacs-lisp-mode 'emacs))
+
+(use-package elispfl
+  :quelpa
+  (elispfl :repo "cireu/elispfl" :fetcher github)
+  :hook (emacs-lisp-mode . elispfl-mode))
 
 ;; --------------------------------------------------------------
 ;;                     Python Mode Configurations
@@ -156,6 +164,12 @@
   :ensure nil
   :load-path "site-lisp/sclang-helper"
   :hook (sclang-mode . sclang-helper-mode))
+
+;; (use-package musical
+;; :ensure nil
+;; :load-path "site-lisp/musical"
+;; :init
+;; (require 'musical))
 
 ;; --------------------------------------------------------------
 ;;                         Statistics

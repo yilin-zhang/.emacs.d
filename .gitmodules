@@ -4,3 +4,9 @@
 [submodule "site-lisp/sclang-helper"]
 	path = site-lisp/sclang-helper
 	url = https://github.com/yilin-zhang/sclang-helper.git
+[submodule "site-lisp/auto-save"]
+	path = site-lisp/auto-save
+	url = https://github.com/manateelazycat/auto-save.git
+[submodule "site-lisp/elispfl"]
+	path = site-lisp/elispfl
+	url = https://github.com/cireu/elispfl.git

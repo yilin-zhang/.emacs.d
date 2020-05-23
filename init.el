@@ -37,6 +37,8 @@
 
 (require 'use-package)
 
+(use-package quelpa-use-package
+  :init (require 'quelpa-use-package))
 ;; the key word ":diminish" only works when we have diminish
 (use-package diminish)
 
@@ -73,7 +75,7 @@
  '(gud-gdb-command-name "gdb --annotate=1")
  '(large-file-warning-threshold nil)
  '(package-selected-packages
-   '(rime eyebrowse yasnippet-snippets ox-jekyll-md elfeed ess org-superstar org-ref tide exec-path-from-shell all-the-icons-ivy-rich all-the-icons-ibuffer htmlize rust-mode nov cmake-mode writeroom-mode whiteroom-mode yaml-mode web-mode js2-mode sonic-pi beacon tidal flycheck sly dap-mode company-lsp lsp-ui ccls evil-leader doom-modeline rubocop racket-mode company-auctex evil-surround fcitx evil lispy hl-todo symbol-overlay shell-pop ivy-rich gnuplot-mode amx highlight-indent-guides ibuffer-projectile projectile youdao-dictionary magit dashboard diredfl doom-themes aggressive-indent ox-hugo popwin cdlatex auctex hungry-delete rainbow-delimiters emojify diff-hl pyvenv yasnippet markdown-mode all-the-icons neotree swiper counsel company which-key try diminish use-package)))
+   '(elispfl kana quelpa-use-package rime eyebrowse yasnippet-snippets ox-jekyll-md elfeed ess org-superstar org-ref tide exec-path-from-shell all-the-icons-ivy-rich all-the-icons-ibuffer htmlize rust-mode nov cmake-mode writeroom-mode whiteroom-mode yaml-mode web-mode js2-mode sonic-pi beacon tidal flycheck sly dap-mode company-lsp lsp-ui ccls evil-leader doom-modeline rubocop racket-mode company-auctex evil-surround fcitx evil lispy hl-todo symbol-overlay shell-pop ivy-rich gnuplot-mode amx highlight-indent-guides ibuffer-projectile projectile youdao-dictionary magit dashboard diredfl doom-themes aggressive-indent ox-hugo popwin cdlatex auctex hungry-delete rainbow-delimiters emojify diff-hl pyvenv yasnippet markdown-mode all-the-icons neotree swiper counsel company which-key try diminish use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

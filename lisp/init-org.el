@@ -3,6 +3,32 @@
 (use-package org
   :ensure nil
   :preface
+  ;; Copy from spacemacs
+  (defface org-kbd
+    '((t (:background "LemonChiffon1" :foreground "black" :box
+                      (:line-width 2 :color nil :style released-button))))
+    "Face for displaying key bindings in Spacemacs documents."
+    :group 'org-faces)
+  (defun my-prettify-org-buffer ()
+    "Apply visual enchantments to the current buffer.
+The buffer's major mode should be `org-mode'."
+    (interactive)
+    (unless (derived-mode-p 'org-mode)
+      (user-error "org-mode should be enabled in the current buffer."))
+
+    ;; Make ~SPC ,~ work, reference:
+    ;; http://stackoverflow.com/questions/24169333/how-can-i-emphasize-or-verbatim-quote-a-comma-in-org-mode
+    (setcar (nthcdr 2 org-emphasis-regexp-components) " \t\n")
+    (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
+    (setq-local org-emphasis-alist '(("*" bold)
+                                     ("/" italic)
+                                     ("_" underline)
+                                     ("=" org-verbatim verbatim)
+                                     ("~" org-kbd)
+                                     ("+"
+                                      (:strike-through t))))
+    (when (require 'space-doc nil t)
+      (space-doc-mode)))
   ;; Copy from `https://emacs-china.org/t/org-agenda/8679'
   (defun my-org-agenda-time-grid-spacing ()
     "Set different line spacing w.r.t. time duration."
@@ -37,15 +63,16 @@
   (org-mode . auto-fill-mode)
   (org-mode . (lambda()(diminish 'org-indent-mode)))
   (org-mode . (lambda()(setq truncate-lines nil)))
+  (org-mode . my-prettify-org-buffer)
   (org-agenda-finalize . my-org-agenda-time-grid-spacing)
   :config
-  (setq org-log-done 'time           ; add time stamp after an item is DONE
-        org-src-fontify-natively t   ; fontify code in code blocks
-        org-startup-indented t       ; indent at startup
-        org-hide-emphasis-markers t  ; hide emphasis markers
-        org-pretty-entities t        ; make special character format visible
+  (setq org-log-done 'time              ; add time stamp after an item is DONE
+        org-src-fontify-natively t      ; fontify code in code blocks
+        org-startup-indented t          ; indent at startup
+        org-hide-emphasis-markers t     ; hide emphasis markers
+        org-pretty-entities t           ; make special character format visible
         org-ellipsis "⤵"
-        org-image-actual-width nil   ; make org support image scaling
+        org-image-actual-width nil      ; make org support image scaling
         )
   ;; Latex preview scale
   (setq org-export-backends '(ascii html icalendar latex md)

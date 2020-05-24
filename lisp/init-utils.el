@@ -109,15 +109,20 @@
 (use-package kana
   :quelpa
   (kana :repo "chenyanming/kana" :fetcher github)
-  :init (require 'kana)
+  :init
+  (defun my-kana-hook ()
+    (require 'kana))
+  (add-hook 'after-init-hook 'my-kana-hook)
   :config (evil-set-initial-state 'kana-mode 'emacs))
 
 (use-package auto-save
-  :load-path "site-lisp/auto-save"
-  :ensure nil
+  :quelpa
+  (auto-save :repo "manateelazycat/auto-save" :fetcher github)
   :init
-  (require 'auto-save)
-  (auto-save-enable)
+  (defun my-auto-save-hook ()
+    (require 'auto-save)
+    (auto-save-enable))
+  (add-hook 'after-init-hook 'my-auto-save-hook)
   :config
   (setq auto-save-silent t)             ; quietly save
   (setq auto-save-delete-trailing-whitespace t) ; automatically delete spaces at the end of the line when saving
@@ -126,6 +131,7 @@
             (string-suffix-p
              "gpg"
              (file-name-extension (buffer-name)) t)))))
+
 ;; (setq auto-save-all-buffers nil)
 ;; (setq auto-save-directories '("~/Documents/notebooks")))
 

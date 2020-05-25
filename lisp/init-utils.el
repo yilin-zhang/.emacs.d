@@ -135,6 +135,8 @@
 ;; (setq auto-save-all-buffers nil)
 ;; (setq auto-save-directories '("~/Documents/notebooks")))
 
+(use-package literate-calc-mode)
+
 ;; --------------------------------------------------------------
 ;;                           Backup
 ;; --------------------------------------------------------------

@@ -80,7 +80,9 @@ The buffer's major mode should be `org-mode'."
         org-latex-compiler "xelatex") ; Set XeLaTeX as the default LaTeX compiler
   ;; Set my org agenda file
   (setq org-agenda-files '("~/agenda.org" "~/inbox.org")
-        org-default-notes-file "~/inbox.org"
+        org-agenda-log-mode-items '(closed clock state)) ; show when things get done in the log mode
+  ;; Set org capture
+  (setq org-default-notes-file "~/inbox.org"
         org-capture-templates
         '(("l" "👨 Life" entry (file+headline org-default-notes-file "Life")
            "* TODO %?\n  %i\n")
@@ -91,8 +93,7 @@ The buffer's major mode should be `org-mode'."
   ;; Set keywords properties
   (setq org-todo-keywords '((sequence "TODO(t)" "DOING(i)" "HANGUP(h)"
                                       "|" "DONE(d)" "CANCEL(c)"))
-        org-todo-keyword-faces '(("HANGUP" . warning)))
-  )
+        org-todo-keyword-faces '(("HANGUP" . warning))))
 
 (use-package org-superstar
   :hook (org-mode . org-superstar-mode))

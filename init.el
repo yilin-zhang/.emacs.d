@@ -75,16 +75,13 @@
  '(gud-gdb-command-name "gdb --annotate=1")
  '(large-file-warning-threshold nil)
  '(package-selected-packages
-   '(kanji-mode literate-calc-mode auto-save elispfl kana quelpa-use-package rime eyebrowse yasnippet-snippets ox-jekyll-md elfeed ess org-superstar org-ref tide exec-path-from-shell all-the-icons-ivy-rich all-the-icons-ibuffer htmlize rust-mode nov cmake-mode writeroom-mode whiteroom-mode yaml-mode web-mode js2-mode sonic-pi beacon tidal flycheck sly dap-mode company-lsp lsp-ui ccls evil-leader doom-modeline rubocop racket-mode company-auctex evil-surround fcitx evil lispy hl-todo symbol-overlay shell-pop ivy-rich gnuplot-mode amx highlight-indent-guides ibuffer-projectile projectile youdao-dictionary magit dashboard diredfl doom-themes aggressive-indent ox-hugo popwin cdlatex auctex hungry-delete rainbow-delimiters emojify diff-hl pyvenv yasnippet markdown-mode all-the-icons neotree swiper counsel company which-key try diminish use-package)))
+   '(sml-mode kanji-mode literate-calc-mode auto-save elispfl kana quelpa-use-package rime eyebrowse yasnippet-snippets ox-jekyll-md elfeed ess org-superstar org-ref tide exec-path-from-shell all-the-icons-ivy-rich all-the-icons-ibuffer htmlize rust-mode nov cmake-mode writeroom-mode whiteroom-mode yaml-mode web-mode js2-mode sonic-pi beacon tidal flycheck sly dap-mode company-lsp lsp-ui ccls evil-leader doom-modeline rubocop racket-mode company-auctex evil-surround fcitx evil lispy hl-todo symbol-overlay shell-pop ivy-rich gnuplot-mode amx highlight-indent-guides ibuffer-projectile projectile youdao-dictionary magit dashboard diredfl doom-themes aggressive-indent ox-hugo popwin cdlatex auctex hungry-delete rainbow-delimiters emojify diff-hl pyvenv yasnippet markdown-mode all-the-icons neotree swiper counsel company which-key try diminish use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(diff-hl-change ((t (:foreground "#fabd2f" :background nil))))
- '(diff-hl-delete ((t (:background nil))))
- '(diff-hl-insert ((t (:background nil))))
- '(hl-todo ((t (:box t :inherit)))))
+ )
 
 (provide 'init)
 ;;; init.el ends here

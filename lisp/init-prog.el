@@ -189,7 +189,9 @@
 ;; --------------------------------------------------------------
 ;;                         Live Coding
 ;; --------------------------------------------------------------
-(use-package tidal)
+(use-package tidal
+  :config
+  (setq tidal-boot-script-path "~/.cabal/packages/hackage.haskell.org/tidal/1.5.2/tidal-1.5.2/BootTidal.hs"))
 
 ;; Only works when running the sonic pi server in the terminal
 ;; TODO: Fix this package

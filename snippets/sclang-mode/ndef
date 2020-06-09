@@ -3,6 +3,4 @@
 # key: nd
 # --
 
-Ndef(\\${1:name}, {
-$0
-});
+Ndef(\\${1:name})$0

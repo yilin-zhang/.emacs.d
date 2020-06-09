@@ -10,7 +10,7 @@ MIDIdef.noteOn(\\${1:name}, { |vel, key, channel, device|
 	[key, vel].postln;
 });
 
-MIDIdef.noteOff(\\$1, { |vel, key, channel, device|
+MIDIdef.noteOff(\\${3:name}, { |vel, key, channel, device|
 	a[key].release;
 	a[key] = nil;
 });

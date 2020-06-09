@@ -100,6 +100,7 @@
   :bind (("C-c Y" . youdao-dictionary-search-at-point)
          ("C-c y" . youdao-dictionary-search-at-point-tooltip))
   :config
+  (evil-set-initial-state 'youdao-dictionary-mode 'emacs)
   ;; Cache documents
   (setq url-automatic-caching t)
   ;; Enable Chinese word segmentation support (支持中文分词)

@@ -25,6 +25,14 @@
   (setq evil-want-C-i-jump nil) ;; make sure TAB is working in terminal
   (global-evil-leader-mode 1)
   (evil-mode 1)
+  :bind
+  ;; some Emacs bindings in insert state
+  (:map evil-insert-state-map
+        ("C-p" . previous-line)
+        ("C-n" . next-line)
+        ("C-a" . beginning-of-line)
+        ("C-e" . end-of-line)
+        ("C-k" . kill-line))
   :config
   (use-package evil-leader
     :config

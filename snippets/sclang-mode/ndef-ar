@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: ndef-ar
+# key: nda
+# --
+
+Ndef.ar(\\${1:name})$0

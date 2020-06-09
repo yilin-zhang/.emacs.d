@@ -12,4 +12,3 @@ SynthDef(\\${1:name}, {
 	sig = sig * amp;
 	sig = Out.ar(out, sig);
 }).add;
-

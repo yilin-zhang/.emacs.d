@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: pdef
+# key: pd
+# --
+
+Pdef(\\${1:name})$0

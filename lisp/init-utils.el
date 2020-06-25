@@ -118,15 +118,6 @@
 (use-package eyebrowse
   :hook (after-init . eyebrowse-mode))
 
-(use-package kana
-  :quelpa
-  (kana :repo "chenyanming/kana" :fetcher github)
-  :init
-  (defun my-kana-hook ()
-    (require 'kana))
-  (add-hook 'after-init-hook 'my-kana-hook)
-  :config (evil-set-initial-state 'kana-mode 'emacs))
-
 (use-package auto-save
   :quelpa
   (auto-save :repo "manateelazycat/auto-save" :fetcher github)

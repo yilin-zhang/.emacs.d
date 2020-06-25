@@ -66,6 +66,7 @@ The buffer's major mode should be `org-mode'."
   (org-mode . my-prettify-org-buffer)
   (org-agenda-finalize . my-org-agenda-time-grid-spacing)
   :config
+  (setq system-time-locale "C")         ; make sure the time stamps are in English
   (setq org-log-done 'time              ; add time stamp after an item is DONE
         org-src-fontify-natively t      ; fontify code in code blocks
         org-startup-indented t          ; indent at startup

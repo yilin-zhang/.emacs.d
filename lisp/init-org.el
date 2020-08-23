@@ -66,12 +66,12 @@ The buffer's major mode should be `org-mode'."
   (org-mode . my-prettify-org-buffer)
   (org-agenda-finalize . my-org-agenda-time-grid-spacing)
   :config
-  (setq system-time-locale "C")         ; make sure the time stamps are in English
-  (setq org-log-done 'time              ; add time stamp after an item is DONE
-        org-src-fontify-natively t      ; fontify code in code blocks
-        org-startup-indented t          ; indent at startup
-        org-hide-emphasis-markers t     ; hide emphasis markers
-        org-pretty-entities t           ; make special character format visible
+  (setq system-time-locale "C")       ; make sure the time stamps are in English
+  (setq org-log-done 'time            ; add time stamp after an item is DONE
+        org-src-fontify-natively t    ; fontify code in code blocks
+        org-startup-indented t        ; indent at startup
+        org-hide-emphasis-markers t   ; hide emphasis markers
+        org-pretty-entities t         ; make special character format visible
         org-ellipsis "⤵"
         org-image-actual-width nil      ; make org support image scaling
         )
@@ -94,13 +94,24 @@ The buffer's major mode should be `org-mode'."
   ;; Set keywords properties
   (setq org-todo-keywords '((sequence "TODO(t)" "DOING(i)" "HANGUP(h)"
                                       "|" "DONE(d)" "CANCEL(c)"))
-        org-todo-keyword-faces '(("HANGUP" . warning))))
+        org-todo-keyword-faces '(("HANGUP" . warning)))
+  ;; Calendar
+  (setq calendar-chinese-all-holidays-flag t))
+
 
 (use-package org-superstar
   :hook (org-mode . org-superstar-mode))
 
 (use-package htmlize
   :after org)
+
+(use-package calfw
+  :config
+  (use-package calfw-org)
+  :bind
+  ("C-c A" . 'cfw:open-org-calendar)
+  :init
+  (require 'calfw-org))
 
 ;; literature management
 ;; path variables can be set in custom/custom-post.el

@@ -193,6 +193,9 @@
   :config
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
+  ;; Set the footer
+  (setq dashboard-banner-logo-title
+        "Be kind to yourself, don't compare, don't expect too fast, and don't worry.")
   ;; Set the banner
   (let ((banner-image-path "~/.emacs.d/custom/banner.png"))
     (if (file-exists-p banner-image-path)

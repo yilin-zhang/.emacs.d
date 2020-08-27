@@ -105,9 +105,8 @@ The buffer's major mode should be `org-mode'."
 (use-package htmlize
   :after org)
 
+(use-package calfw-org)
 (use-package calfw
-  :config
-  (use-package calfw-org)
   :bind
   ("C-c A" . 'cfw:open-org-calendar)
   :init

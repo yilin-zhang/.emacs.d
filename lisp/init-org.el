@@ -100,7 +100,14 @@ The buffer's major mode should be `org-mode'."
 
 
 (use-package org-superstar
-  :hook (org-mode . org-superstar-mode))
+  :hook (org-mode . org-superstar-mode)
+  :config
+  (setq org-superstar-headline-bullets-list
+        '("✱" "◉" "○" "▷"))
+  (setq org-superstar-item-bullet-alist
+        '((?+ . ?•)
+          (?* . ?➤)
+          (?- . ?–))))
 
 (use-package htmlize
   :after org)

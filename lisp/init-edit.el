@@ -208,6 +208,8 @@
   :diminish (counsel-mode)
   :hook ((after-init . ivy-mode)
          (ivy-mode . counsel-mode))
+  :bind
+  ("C-x c i" . counsel-imenu)           ; override the binding of  `helm-imenu'
   :init
   ;;(counsel-mode t)
   ;; Sort M-x commands by history
@@ -228,6 +230,17 @@
 (use-package swiper
   :bind
   ("C-s" . swiper))
+
+(use-package imenu-list
+  :bind
+  ("C-'" . imenu-list-smart-toggle)
+  (:map imenu-list-major-mode-map
+        ("j" . next-line)
+        ("k" . previous-line)
+        ("h" . backward-char)
+        ("l" . forward-char))
+  :config
+  (evil-set-initial-state 'imenu-list-major-mode 'emacs))
 
 ;; Highlight symbols
 (use-package symbol-overlay
@@ -327,6 +340,9 @@
     (cl-pushnew `(,keyword . ,(face-foreground 'error)) hl-todo-keyword-faces))
   (dolist (keyword '("WORKAROUND" "HACK" "TRICK"))
     (cl-pushnew `(,keyword . ,(face-foreground 'warning)) hl-todo-keyword-faces)))
+
+(use-package beacon
+  :config (beacon-mode 1))
 
 ;; --------------------------------------------------------------
 ;;                            Custom

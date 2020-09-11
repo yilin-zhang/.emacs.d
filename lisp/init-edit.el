@@ -240,7 +240,9 @@
         ("h" . backward-char)
         ("l" . forward-char))
   :config
-  (evil-set-initial-state 'imenu-list-major-mode 'emacs))
+  (evil-set-initial-state 'imenu-list-major-mode 'emacs)
+  (setq imenu-list-focus-after-activation t)
+  (setq imenu-list-auto-resize t))
 
 ;; Highlight symbols
 (use-package symbol-overlay

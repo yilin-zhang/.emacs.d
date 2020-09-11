@@ -18,9 +18,9 @@
 ;; --------------------------------------------------------------
 ;;                     LSP Configurations
 ;; --------------------------------------------------------------
-(use-package ccls)
+;; (use-package ccls
 ;; :hook ((c-mode c++-mode objc-mode cuda-mode) .
-;;        (lambda () (require 'ccls) (lsp))))
+;; (lambda () (require 'ccls) (lsp))))
 
 (use-package lsp-mode
   :hook
@@ -29,7 +29,7 @@
   (c++-mode . lsp)
   (rust-mode . lsp)
   :init
-  (setq lsp-auto-guess-root t        ; Detect project root
+  (setq lsp-auto-guess-root t         ; Detect project root
         ;; lsp-keep-workspace-alive nil ; Auto-kill LSP server
         ;; lsp-prefer-flymake nil
         ;; lsp-enable-on-type-formatting nil

@@ -82,14 +82,43 @@ The buffer's major mode should be `org-mode'."
   ;; Set my org agenda file
   (setq org-agenda-files '("~/agenda.org" "~/inbox.org")
         org-agenda-log-mode-items '(closed clock state)) ; show when things get done in the log mode
+  ;; Custom agenda views
+  (setq org-agenda-custom-commands
+        '(("g" "Daily review"
+           ((todo "DOING"
+                  ((org-agenda-skip-function '(org-agenda-skip-if nil '(notscheduled)))
+                   (org-agenda-skip-function '(org-agenda-skip-if nil '(notdeadline)))
+                   (org-agenda-overriding-header "On-going Tasks\n")))
+            (agenda ""
+                    ((org-agenda-span 'day)
+                     (org-agenda-entry-types '(:scheduled))
+                     (org-agenda-format-date "")
+                     (org-agenda-skip-function
+                      '(org-agenda-skip-entry-if 'nottodo '("TODO" "NEXT")))
+                     (org-agenda-overriding-header "Scheduled Todo Tasks")))
+            (agenda ""
+                    ((org-agenda-span 'day)
+                     (org-agenda-entry-types '(:deadline))
+                     (org-agenda-format-date "")
+                     ;; (org-deadline-warning-days 7)
+                     (org-agenda-skip-function
+                      '(org-agenda-skip-entry-if 'regexp "\\* DONE"))
+                     (org-agenda-overriding-header "Deadlines")))
+            (tags "CLOSED>=\"<today>\""
+                  ((org-agenda-overriding-header "Completed Today\n")))))
+          ("l" "Low priority tasks"
+           ((alltodo ""
+                     ((org-agenda-skip-function
+                       '(org-agenda-skip-if nil '(scheduled deadline)))
+                      (org-agenda-overriding-header "Low Priority Tasks\n")))))))
   ;; Set org capture
   (setq org-default-notes-file "~/inbox.org"
         org-capture-templates
-        '(("l" "👨 Life" entry (file+headline org-default-notes-file "Life")
-           "* TODO %?\n  %i\n")
-          ("w" "📖 Work" entry (file+headline org-default-notes-file "Work")
-           "* TODO %?\n %i\n %a")
-          ("i" "🌏 Info" entry (file+headline org-default-notes-file "Info")
+        '(("l" "Life" entry (file+headline org-default-notes-file "Life")
+           "* TODO %?\n")
+          ("w" "Work" entry (file+headline org-default-notes-file "Work")
+           "* TODO %?\n%a")
+          ("i" "Info" entry (file+headline org-default-notes-file "Info")
            "* %?\n%t\n")))
   ;; Set keywords properties
   (setq org-todo-keywords '((sequence "TODO(t)" "DOING(i)" "HANGUP(h)"
@@ -97,6 +126,7 @@ The buffer's major mode should be `org-mode'."
         org-todo-keyword-faces '(("HANGUP" . warning)))
   ;; Calendar
   (setq calendar-chinese-all-holidays-flag t))
+
 
 
 (use-package org-superstar
@@ -141,7 +171,7 @@ The buffer's major mode should be `org-mode'."
 ;;                            Custom
 ;; --------------------------------------------------------------
 
-(defun yilin-org-insert-chinese-date-heading ()
+(defun yilin/org-insert-chinese-date-heading ()
   "Insert a Chinese date heading based on the current date."
   (interactive)
   (org-insert-heading-respect-content)

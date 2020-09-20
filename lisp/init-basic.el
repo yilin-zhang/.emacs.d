@@ -72,8 +72,8 @@
 (use-package beacon
   :ensure t
   :diminish
+  :hook (after-init . beacon-mode)
   :config
-  (beacon-mode 1)
   (setq beacon-color 0.5)
   (setq beacon-size 70))
 
@@ -218,7 +218,7 @@
       '((propertize (concat (all-the-icons-faicon "clock-o" :v-adjust 0.03) " " 24-hours ":" minutes " ")
                     'face 'font-lock-constant-face)))
 
-(defun yilin-toggle-frame-fullscreen ()
+(defun yilin/toggle-frame-fullscreen ()
   "toggle-frame-fullscreen plus display-time-mode."
   (interactive)
   (if (equal 'fullboth (frame-parameter nil 'fullscreen))
@@ -230,7 +230,7 @@
       (display-battery-mode 1)))
   (toggle-frame-fullscreen))
 
-(global-set-key (kbd "<f12>") 'yilin-toggle-frame-fullscreen)
+(global-set-key (kbd "<f12>") 'yilin/toggle-frame-fullscreen)
 ;; (yilin-toggle-frame-fullscreen)
 
 ;; Window/Frame

@@ -163,7 +163,7 @@
 ;; ring-bell-function, or it will not work.
 (use-package doom-themes
   :init
-  (load-theme 'doom-miramare t)
+  (load-theme 'doom-nord t)
   (doom-themes-neotree-config)
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))

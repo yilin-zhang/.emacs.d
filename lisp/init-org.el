@@ -83,34 +83,36 @@ The buffer's major mode should be `org-mode'."
   (setq org-agenda-files '("~/agenda.org" "~/inbox.org")
         org-agenda-log-mode-items '(closed clock state)) ; show when things get done in the log mode
   ;; Custom agenda views
+  (setq org-agenda-block-separator nil)
   (setq org-agenda-custom-commands
         '(("g" "Daily review"
            ((todo "DOING"
-                  ((org-agenda-skip-function '(org-agenda-skip-if nil '(notscheduled)))
-                   (org-agenda-skip-function '(org-agenda-skip-if nil '(notdeadline)))
+                  ((org-agenda-skip-function
+                    '(org-agenda-skip-if nil '(nottimestamp)))
                    (org-agenda-overriding-header "On-going Tasks\n")))
             (agenda ""
                     ((org-agenda-span 'day)
-                     (org-agenda-entry-types '(:scheduled))
+                     (org-agenda-entry-types '(:scheduled :timestamp))
                      (org-agenda-format-date "")
                      (org-agenda-skip-function
-                      '(org-agenda-skip-entry-if 'nottodo '("TODO" "NEXT")))
-                     (org-agenda-overriding-header "Scheduled Todo Tasks")))
+                      '(org-agenda-skip-entry-if 'todo '("DOING" "DONE")))
+                     (org-agenda-overriding-header "\nScheduled Todo Tasks")))
             (agenda ""
                     ((org-agenda-span 'day)
                      (org-agenda-entry-types '(:deadline))
                      (org-agenda-format-date "")
                      ;; (org-deadline-warning-days 7)
                      (org-agenda-skip-function
-                      '(org-agenda-skip-entry-if 'regexp "\\* DONE"))
-                     (org-agenda-overriding-header "Deadlines")))
+                      '(org-agenda-skip-entry-if 'todo 'done))
+                     (org-agenda-overriding-header "\nDeadlines")))
             (tags "CLOSED>=\"<today>\""
-                  ((org-agenda-overriding-header "Completed Today\n")))))
+                  ((org-agenda-overriding-header "\nCompleted Today\n")))))
           ("l" "Low priority tasks"
            ((alltodo ""
                      ((org-agenda-skip-function
                        '(org-agenda-skip-if nil '(scheduled deadline)))
-                      (org-agenda-overriding-header "Low Priority Tasks\n")))))))
+                      (org-agenda-overriding-header "\nLow Priority Tasks\n")))))))
+
   ;; Set org capture
   (setq org-default-notes-file "~/inbox.org"
         org-capture-templates

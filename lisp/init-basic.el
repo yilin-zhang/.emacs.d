@@ -152,7 +152,7 @@
 (if (display-graphic-p)
     (if (eq system-type 'darwin)
         (set-face-attribute
-         'default nil :font "Sarasa Mono SC 18")
+         'default nil :font "Sarasa Mono SC 16")
       (set-face-attribute
        'default nil :font "Sarasa Mono SC 13")))
 
@@ -163,7 +163,7 @@
 ;; ring-bell-function, or it will not work.
 (use-package doom-themes
   :init
-  (load-theme 'doom-nord t)
+  (load-theme 'doom-miramare t)
   (doom-themes-neotree-config)
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))

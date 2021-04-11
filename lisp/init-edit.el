@@ -122,7 +122,7 @@
   :hook (prog-mode . rainbow-delimiters-mode))
 
 ;; --------------------------------------------------------------
-;;               Whitespace, Indentation and Delete
+;;         Whitespace, Indentation, Delete and Folding
 ;; --------------------------------------------------------------
 
 ;; Tab and Space
@@ -193,6 +193,12 @@
   :diminish
   :hook (after-init . global-hungry-delete-mode)
   :config (setq-default hungry-delete-chars-to-skip " \t\f\v"))
+
+(use-package bicycle
+  :after outline
+  :bind (:map outline-minor-mode-map
+              ([C-tab] . bicycle-cycle)
+              ([S-tab] . bicycle-cycle-global)))
 
 ;; --------------------------------------------------------------
 ;;                            Search

@@ -25,7 +25,8 @@
 (use-package cdlatex
   :hook
   (LaTeX-mode . cdlatex-mode)
-  (LaTeX-mode . auto-fill-mode))
+  (LaTeX-mode . auto-fill-mode)
+  (LaTeX-mode . outline-minor-mode))
 
 ;; --------------------------------------------------------------
 ;;                     Markdown Mode Configurations

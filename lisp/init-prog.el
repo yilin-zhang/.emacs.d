@@ -1,5 +1,12 @@
 ;; init-prog.el --- Configurations for programming languages. -*- lexical-binding: t -*-
 
+;; outline-minor-mode and hs-minor-mode must be enabled in order to use bicycle 
+(use-package prog-mode
+  :ensure nil
+  :hook
+  (prog-mode . outline-minor-mode)
+  (prog-mode . hs-minor-mode))
+
 ;; --------------------------------------------------------------
 ;;                     Checker Configuration
 ;; --------------------------------------------------------------

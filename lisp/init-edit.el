@@ -23,7 +23,6 @@
 (use-package evil
   :init
   (setq evil-want-C-i-jump nil) ;; make sure TAB is working in terminal
-  (global-evil-leader-mode 1)
   (evil-mode 1)
   :bind
   ;; some Emacs bindings in insert state
@@ -48,7 +47,8 @@
       "i" 'org-clock-in
       "o" 'org-clock-out
       "g" 'magit-status
-      "d" 'dired-jump))
+      "d" 'dired-jump)
+    (global-evil-leader-mode 1))
   (use-package evil-surround
     :hook (after-init . global-evil-surround-mode)))
 

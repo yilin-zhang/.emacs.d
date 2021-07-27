@@ -1,6 +1,6 @@
 ;; init-prog.el --- Configurations for programming languages. -*- lexical-binding: t -*-
 
-;; outline-minor-mode and hs-minor-mode must be enabled in order to use bicycle 
+;; outline-minor-mode and hs-minor-mode must be enabled in order to use bicycle
 (use-package prog-mode
   :ensure nil
   :hook
@@ -156,6 +156,11 @@
 ;;                     Rust Mode Configurations
 ;; --------------------------------------------------------------
 (use-package rust-mode)
+
+;; --------------------------------------------------------------
+;;                     Lua Mode Configurations
+;; --------------------------------------------------------------
+(use-package lua-mode)
 
 ;; --------------------------------------------------------------
 ;;                     SClang Configurations

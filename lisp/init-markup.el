@@ -39,9 +39,10 @@
   :config (setq markdown-command "multimarkdown"))
 
 ;; --------------------------------------------------------------
-;;                     Yaml Mode Configurations
+;;                     Serialization
 ;; --------------------------------------------------------------
 (use-package yaml-mode)
+(use-package json-mode)
 
 ;; --------------------------------------------------------------
 ;;                    LilyPond Mode Configurations

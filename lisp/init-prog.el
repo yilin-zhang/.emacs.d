@@ -163,34 +163,6 @@
 (use-package lua-mode)
 
 ;; --------------------------------------------------------------
-;;                     SClang Configurations
-;; --------------------------------------------------------------
-(use-package sclang
-  :ensure nil
-  :load-path "site-lisp/scel/el"
-  :init
-  (require 'sclang)
-  (setq auto-mode-alist
-        (append
-         '(("\\.scd\\'" . sclang-mode) ("\\.sc\\'" . sclang-mode))
-         auto-mode-alist))
-  (if (eq system-type 'darwin)
-      (progn
-        (setenv "PATH" (concat (getenv "PATH") ":/Applications/SuperCollider.app/Contents/MacOS"))
-        (setq exec-path (append exec-path '("/Applications/SuperCollider.app/Contents/MacOS" ))))))
-
-(use-package sclang-helper
-  :ensure nil
-  :load-path "site-lisp/sclang-helper"
-  :hook (sclang-mode . sclang-helper-mode))
-
-;; (use-package musical
-;; :ensure nil
-;; :load-path "site-lisp/musical"
-;; :init
-;; (require 'musical))
-
-;; --------------------------------------------------------------
 ;;                         Statistics
 ;; --------------------------------------------------------------
 (use-package ess)
@@ -203,22 +175,12 @@
 ;; --------------------------------------------------------------
 ;;                         Live Coding
 ;; --------------------------------------------------------------
-(use-package tidal
-  :config
-  (setq tidal-boot-script-path "~/.cabal/packages/hackage.haskell.org/tidal/1.5.2/tidal-1.5.2/BootTidal.hs"))
 
 ;; (defvar foxdot-cli-path "~/.emacs.d/site-lisp/")
 ;; (use-package foxdot-mode
 ;; :load-path "site-lisp"
 ;; :init (require 'foxdot-mode)
 ;; :ensure nil)
-
-;; Only works when running the sonic pi server in the terminal
-;; TODO: Fix this package
-(use-package sonic-pi
-  :init
-  (setq sonic-pi-server-bin "app/server/ruby/bin/sonic-pi-server.rb")
-  (setq sonic-pi-path "/Applications/Sonic Pi.app/Contents/Resources/"))
 
 ;; :init
 ;; (setenv "PATH" (concat (getenv "PATH") (concat ":" (getenv "HOME") "/.ghcup/bin")))

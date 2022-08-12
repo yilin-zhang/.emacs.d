@@ -169,7 +169,7 @@
    whitespace-style
    '(face                               ; visualize things below:
      empty                              ; empty lines at beginning/end of buffer
-     lines-tail                         ; lines go beyond `fill-column'
+     ;; lines-tail                         ; lines go beyond `fill-column'
      space-before-tab                   ; spaces before tab
      trailing                           ; trailing blanks
      tabs                               ; tabs (show by face)
@@ -189,10 +189,10 @@
 
 ;; Note that this package has conflict with smartparens.
 ;; The solution is written inside smartparens' configurations.
-(use-package hungry-delete
-  :diminish
-  :hook (after-init . global-hungry-delete-mode)
-  :config (setq-default hungry-delete-chars-to-skip " \t\f\v"))
+;; (use-package hungry-delete
+;;   :diminish
+;;   :hook (after-init . global-hungry-delete-mode)
+;;   :config (setq-default hungry-delete-chars-to-skip " \t\f\v"))
 
 (use-package bicycle
   :after outline

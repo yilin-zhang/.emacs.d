@@ -10,14 +10,14 @@
 ;; --------------------------------------------------------------
 ;;                     Checker Configuration
 ;; --------------------------------------------------------------
-(use-package flycheck
-  :diminish flycheck-mode
-  :hook (after-init . global-flycheck-mode)
-  :config
-  (setq flycheck-indication-mode 'right-fringe)
-  (setq flycheck-emacs-lisp-load-path 'inherit)
-  ;; Only check while saving and opening files
-  (setq flycheck-check-syntax-automatically '(save mode-enabled)))
+;; (use-package flycheck
+;;   :diminish flycheck-mode
+;;   :hook (after-init . global-flycheck-mode)
+;;   :config
+;;   (setq flycheck-indication-mode 'right-fringe)
+;;   (setq flycheck-emacs-lisp-load-path 'inherit)
+;;   ;; Only check while saving and opening files
+;;   (setq flycheck-check-syntax-automatically '(save mode-enabled)))
 
 ;; ;; :config (add-to-list 'flycheck-posframe-inhibit-functions
 ;;                      #'(lambda () (bound-and-true-p company-backend)))))
@@ -29,46 +29,62 @@
 ;; :hook ((c-mode c++-mode objc-mode cuda-mode) .
 ;; (lambda () (require 'ccls) (lsp))))
 
-(use-package lsp-mode
-  :hook
-  (python-mode . lsp)
-  (ruby-mode . lsp)
-  (c++-mode . lsp)
-  (rust-mode . lsp)
+;; (use-package lsp-mode
+;;   :hook
+;;   (python-mode . lsp)
+;;   (ruby-mode . lsp)
+;;   (c++-mode . lsp)
+;;   (rust-mode . lsp)
+;;   :init
+;;   (setq lsp-auto-guess-root t         ; Detect project root
+;;         ;; lsp-keep-workspace-alive nil ; Auto-kill LSP server
+;;         ;; lsp-prefer-flymake nil
+;;         ;; lsp-enable-on-type-formatting nil
+;;         ;; lsp-enable-indentation nil
+;;         lsp-signature-auto-activate nil
+;;         lsp-enable-symbol-highlighting nil) ; disable the pop-up doc below the modeline
+;;   :commands lsp
+;;   :config
+;;   (use-package lsp-ui
+;;     :commands lsp-ui-mode
+;;     :bind
+;;     (("C-c u" . lsp-ui-imenu)
+;;      :map lsp-ui-mode-map
+;;      ("C-c C-d" . lsp-ui-peek-find-definitions)
+;;      ("C-c C-f" . lsp-ui-peek-find-references)
+;;      ("s-j" . lsp-ui-doc-glance))
+;;     :init
+;;     (setq
+;;      lsp-ui-doc-enable nil
+;;      lsp-ui-doc-header t
+;;      lsp-ui-doc-include-signature t
+;;      lsp-ui-doc-position 'top
+;;      lsp-ui-doc-border (face-foreground 'default)))
+;;   (use-package company-lsp
+;;     :init (setq company-lsp-cache-candidates 'auto)
+;;     :commands company-lsp
+;;     :config
+;;     ;; WORKAROUND:Fix tons of unrelated completion candidates shown
+;;     ;; when a candidate is fulfilled
+;;     ;; @see https://github.com/emacs-lsp/lsp-python-ms/issues/79
+;;     (add-to-list 'company-lsp-filter-candidates '(mspyls)))
+;;   (use-package dap-mode))
+
+(use-package eglot
+  :hook ((prog-mode . (lambda ()
+                        (unless (derived-mode-p 'emacs-lisp-mode 'lisp-mode 'makefile-mode)
+                          (eglot-ensure))))
+         ((markdown-mode yaml-mode) . eglot-ensure))
+  :bind
+  ("s-b" . xref-find-definitions)
+  ("s-r" . xref-find-references)
   :init
-  (setq lsp-auto-guess-root t         ; Detect project root
-        ;; lsp-keep-workspace-alive nil ; Auto-kill LSP server
-        ;; lsp-prefer-flymake nil
-        ;; lsp-enable-on-type-formatting nil
-        ;; lsp-enable-indentation nil
-        lsp-signature-auto-activate nil
-        lsp-enable-symbol-highlighting nil) ; disable the pop-up doc below the modeline
-  :commands lsp
-  :config
-  (use-package lsp-ui
-    :commands lsp-ui-mode
-    :bind
-    (("C-c u" . lsp-ui-imenu)
-     :map lsp-ui-mode-map
-     ("C-c C-d" . lsp-ui-peek-find-definitions)
-     ("C-c C-f" . lsp-ui-peek-find-references)
-     ("s-j" . lsp-ui-doc-glance))
-    :init
-    (setq
-     lsp-ui-doc-enable nil
-     lsp-ui-doc-header t
-     lsp-ui-doc-include-signature t
-     lsp-ui-doc-position 'top
-     lsp-ui-doc-border (face-foreground 'default)))
-  (use-package company-lsp
-    :init (setq company-lsp-cache-candidates 'auto)
-    :commands company-lsp
-    :config
-    ;; WORKAROUND:Fix tons of unrelated completion candidates shown
-    ;; when a candidate is fulfilled
-    ;; @see https://github.com/emacs-lsp/lsp-python-ms/issues/79
-    (add-to-list 'company-lsp-filter-candidates '(mspyls)))
-  (use-package dap-mode))
+  (setq-default eglot-workspace-configuration
+                '((pylsp
+                   (plugins
+                    (pycodestyle (enable . nil))
+                    (pyflakes (enable . t))
+                    (flake8 (enable . nil)))))))
 
 ;; --------------------------------------------------------------
 ;;                     C/C++ Mode Configurations

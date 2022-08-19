@@ -33,6 +33,7 @@
         ("C-e" . end-of-line)
         ("C-k" . kill-line))
   :config
+  (evil-set-initial-state 'special-mode 'emacs)
   (use-package evil-leader
     :config
     (evil-leader/set-leader "SPC")
@@ -246,7 +247,6 @@
         ("h" . backward-char)
         ("l" . forward-char))
   :config
-  (evil-set-initial-state 'imenu-list-major-mode 'emacs)
   (setq imenu-list-focus-after-activation t)
   (setq imenu-list-auto-resize t))
 

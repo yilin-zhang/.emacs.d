@@ -80,11 +80,11 @@
   ("s-r" . xref-find-references)
   :init
   (setq-default eglot-workspace-configuration
-                '((pylsp
+                '((pyls
                    (plugins
-                    (pycodestyle (enable . nil))
-                    (pyflakes (enable . t))
-                    (flake8 (enable . nil)))))))
+                    (pycodestyle (enabled . nil))
+                    (pyflakes (enabled . t))
+                    (flake8 (enabled . nil)))))))
 
 ;; --------------------------------------------------------------
 ;;                     C/C++ Mode Configurations

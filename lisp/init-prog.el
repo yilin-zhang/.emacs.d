@@ -84,6 +84,11 @@
                    (plugins
                     (pycodestyle (enabled . nil))
                     (pyflakes (enabled . t))
+                    (flake8 (enabled . nil))))
+                  (pylsp
+                   (plugins
+                    (pycodestyle (enabled . nil))
+                    (pyflakes (enabled . t))
                     (flake8 (enabled . nil)))))))
 
 ;; --------------------------------------------------------------

@@ -94,10 +94,6 @@
 ;; --------------------------------------------------------------
 ;;                     Lisp Mode Configurations
 ;; --------------------------------------------------------------
-(use-package lispy
-  :hook (emacs-lisp-mode . lispy-mode)
-  :config
-  (evil-set-initial-state 'emacs-lisp-mode 'emacs))
 
 (use-package elispfl
   :quelpa

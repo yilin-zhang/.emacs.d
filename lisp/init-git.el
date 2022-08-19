@@ -7,6 +7,10 @@
          ("C-x M-g" . magit-dispatch-popup)
          ("C-c M-g" . magit-file-popup)))
 
+(defun diff-hl-dired-mode-unless-remote ()
+  (unless (file-remote-p default-directory)
+    (diff-hl-dired-mode)))
+
 ;; Highlight uncommitted changes
 (use-package diff-hl
   :defines desktop-minor-mode-table
@@ -18,7 +22,7 @@
   :bind (:map diff-hl-command-map
               ("SPC" . diff-hl-mark-hunk))
   :hook ((after-init . global-diff-hl-mode)
-         (dired-mode . diff-hl-dired-mode))
+         (dired-mode . diff-hl-dired-mode-unless-remote))
   :init (setq diff-hl-draw-borders nil)
   :config
   ;; Highlight on-the-fly

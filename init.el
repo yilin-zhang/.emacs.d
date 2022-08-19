@@ -38,7 +38,10 @@
 (require 'use-package)
 
 (use-package quelpa-use-package
-  :init (require 'quelpa-use-package))
+  :init
+  (require 'quelpa-use-package)
+  (setq quelpa-update-melpa-p nil))
+
 ;; the key word ":diminish" only works when we have diminish
 (use-package diminish)
 
@@ -73,7 +76,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(eglot json-mode company-web-html lua-mode bicycle ein anki-editor imenu-list calfw-org calfw sml-mode kanji-mode literate-calc-mode auto-save elispfl quelpa-use-package rime eyebrowse yasnippet-snippets ox-jekyll-md elfeed ess org-superstar org-ref tide exec-path-from-shell all-the-icons-ivy-rich all-the-icons-ibuffer htmlize rust-mode nov cmake-mode writeroom-mode whiteroom-mode yaml-mode web-mode js2-mode beacon flycheck sly evil-leader doom-modeline rubocop racket-mode company-auctex evil-surround fcitx evil lispy hl-todo symbol-overlay shell-pop ivy-rich gnuplot-mode amx highlight-indent-guides ibuffer-projectile projectile youdao-dictionary magit dashboard diredfl doom-themes aggressive-indent ox-hugo popwin cdlatex auctex rainbow-delimiters emojify diff-hl pyvenv yasnippet markdown-mode all-the-icons neotree swiper counsel company which-key try diminish use-package)))
+   '(eglot json-mode company-web-html lua-mode bicycle ein anki-editor imenu-list calfw-org calfw sml-mode kanji-mode literate-calc-mode auto-save elispfl quelpa-use-package rime eyebrowse yasnippet-snippets ox-jekyll-md elfeed ess org-superstar org-ref tide exec-path-from-shell all-the-icons-ivy-rich all-the-icons-ibuffer htmlize rust-mode nov cmake-mode writeroom-mode whiteroom-mode yaml-mode web-mode js2-mode beacon flycheck sly evil-leader doom-modeline rubocop racket-mode company-auctex evil-surround fcitx evil hl-todo symbol-overlay shell-pop ivy-rich gnuplot-mode amx highlight-indent-guides ibuffer-projectile projectile youdao-dictionary magit dashboard diredfl doom-themes aggressive-indent ox-hugo popwin cdlatex auctex rainbow-delimiters emojify diff-hl pyvenv yasnippet markdown-mode all-the-icons neotree swiper counsel company which-key try diminish use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

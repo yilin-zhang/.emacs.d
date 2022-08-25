@@ -118,24 +118,6 @@
 ;;   :load-path "site-lisp/lpy"
 ;;   :ensure nil)
 
-(use-package ein)
-
-;; --------------------------------------------------------------
-;;                     Ruby Mode Configurations
-;; --------------------------------------------------------------
-;; Install rubocop and ruby-lint gems.
-
-;;https://github.com/senny/rbenv.el
-(use-package rbenv
-  :load-path "site-lisp"
-  :ensure nil
-  :config
-  (setq rbenv-show-active-ruby-in-modeline nil)
-  (global-rbenv-mode 1))
-
-(use-package rubocop
-  :hook (ruby-mode . rubocop-mode))
-
 ;; --------------------------------------------------------------
 ;;                     JS2 Mode Configuration
 ;; --------------------------------------------------------------
@@ -153,41 +135,6 @@
         (append
          '(("\\.js\\'" . js2-mode))
          auto-mode-alist)))
-
-(use-package tide
-  :after (typescript-mode company flycheck)
-  :hook ((typescript-mode . tide-setup)
-         (typescript-mode . tide-hl-identifier-mode)
-         (before-save . tide-format-before-save)))
-;; --------------------------------------------------------------
-;;                     Racket Mode Configurations
-;; --------------------------------------------------------------
-(use-package racket-mode)
-
-;; --------------------------------------------------------------
-;;                     SML Mode Configurations
-;; --------------------------------------------------------------
-(use-package sml-mode)
-
-;; --------------------------------------------------------------
-;;                     Rust Mode Configurations
-;; --------------------------------------------------------------
-(use-package rust-mode)
-
-;; --------------------------------------------------------------
-;;                     Lua Mode Configurations
-;; --------------------------------------------------------------
-(use-package lua-mode)
-
-;; --------------------------------------------------------------
-;;                         Statistics
-;; --------------------------------------------------------------
-(use-package ess)
-
-;; --------------------------------------------------------------
-;;                         Common Lisp
-;; --------------------------------------------------------------
-(use-package sly)
 
 ;; --------------------------------------------------------------
 ;;                         Live Coding

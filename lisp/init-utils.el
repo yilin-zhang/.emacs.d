@@ -106,15 +106,6 @@
   ;; Enable Chinese word segmentation support (支持中文分词)
   (setq youdao-dictionary-use-chinese-word-segmentation t))
 
-;; epub reader
-(use-package nov
-  :init
-  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-  (defun my-nov-font-setup ()
-    (face-remap-add-relative 'variable-pitch :family "Noto Serif CJK SC"
-                             :height 1.0))
-  (add-hook 'nov-mode-hook 'my-nov-font-setup))
-
 (use-package eyebrowse
   :hook (after-init . eyebrowse-mode))
 
@@ -137,10 +128,6 @@
 
 ;; (setq auto-save-all-buffers nil)
 ;; (setq auto-save-directories '("~/Documents/notebooks")))
-
-(use-package literate-calc-mode)
-
-(use-package anki-editor)
 
 ;; --------------------------------------------------------------
 ;;                           Backup

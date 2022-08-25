@@ -34,39 +34,16 @@
   (setq neo-theme (if (display-graphic-p) 'icons 'arrow)))
 
 ;; --------------------------------------------------------------
-;;                           Projectile
+;;                           Project
 ;; --------------------------------------------------------------
-(use-package projectile
-  :diminish
-  :bind (:map projectile-mode-map
-              ("s-t" . projectile-find-file) ; `cmd-t' or `super-t'
-              ("C-c p" . projectile-command-map))
-  :hook (after-init . projectile-mode)
-  :init
-  (setq projectile-mode-line-prefix "")
-  (setq projectile-sort-order 'recentf)
-  (setq projectile-use-git-grep t)
-  :config
-  (projectile-update-mode-line)
-  (setq projectile-completion-system 'ivy))
+(defun yilin/ibuffer-project-hook ()
+  (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
+  (unless (eq ibuffer-sorting-mode 'project-file-relative)
+    (ibuffer-do-sort-by-project-file-relative)))
 
-;; Group ibuffer's list by project root
-(use-package ibuffer-projectile
-  :functions all-the-icons-octicon
-  :hook ((ibuffer . (lambda ()
-                      (ibuffer-projectile-set-filter-groups)
-                      (unless (eq ibuffer-sorting-mode 'alphabetic)
-                        (ibuffer-do-sort-by-alphabetic)))))
-  :config
-  (setq ibuffer-projectile-prefix
-        (if (display-graphic-p)
-            (concat
-             (all-the-icons-octicon "file-directory"
-                                    :face ibuffer-filter-group-name-face
-                                    :v-adjust -0.04
-                                    :height 1.1)
-             " ")
-          "Project: ")))
+(use-package ibuffer-project
+  :hook (ibuffer . yilin/ibuffer-project-hook))
+
 
 ;; --------------------------------------------------------------
 ;;                           Feed

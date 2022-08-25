@@ -19,6 +19,10 @@
 ;; display file sizes in “human-readable” format
 (setq dired-listing-switches "-alh")
 
+;; support --dired
+(setq ls-lisp-use-insert-directory-program nil)
+(require 'ls-lisp)
+
 ;; use C-x C-j to open the current dir
 (require 'dired-x)
 

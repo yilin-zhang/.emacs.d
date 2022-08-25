@@ -35,6 +35,8 @@
   :config
   (evil-set-initial-state 'special-mode 'emacs)
   (use-package evil-leader
+    :hook
+    (after-init . global-evil-leader-mode)
     :config
     (evil-leader/set-leader "SPC")
     (evil-leader/set-key
@@ -48,8 +50,7 @@
       "i" 'org-clock-in
       "o" 'org-clock-out
       "g" 'magit-status
-      "d" 'dired-jump)
-    (global-evil-leader-mode 1))
+      "d" 'dired-jump))
   (use-package evil-surround
     :hook (after-init . global-evil-surround-mode)))
 

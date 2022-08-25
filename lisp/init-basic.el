@@ -182,30 +182,6 @@
 ;;   (nyan-start-animation))
 
 ;; --------------------------------------------------------------
-;;                            Dashboard
-;; --------------------------------------------------------------
-
-(use-package dashboard
-  :diminish page-break-lines-mode
-  :bind ([f5] . dashboard-refresh-buffer)
-  :hook
-  (after-init . dashboard-setup-startup-hook)
-  :config
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  ;; Set the footer
-  (setq dashboard-banner-logo-title
-        "Be kind to yourself, don't compare, don't expect too fast, and don't worry.")
-  ;; Set the banner
-  (let ((banner-image-path "~/.emacs.d/custom/banner.png"))
-    (if (file-exists-p banner-image-path)
-        (setq dashboard-startup-banner banner-image-path)
-      (setq dashboard-startup-banner 3)))
-  (setq dashboard-items '((agenda  . 20)
-                          (bookmarks . 10)
-                          (projects . 10))))
-
-;; --------------------------------------------------------------
 ;;                            Custom
 ;; --------------------------------------------------------------
 

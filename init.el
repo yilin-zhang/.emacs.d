@@ -4,6 +4,7 @@
 
 (require 'package)
 (setq package-enable-at-startup nil)
+(setq package-native-compile t)
 
 ;; Configure package sources
 

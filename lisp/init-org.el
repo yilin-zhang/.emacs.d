@@ -144,13 +144,6 @@ The buffer's major mode should be `org-mode'."
 (use-package htmlize
   :after org)
 
-(use-package calfw-org)
-(use-package calfw
-  :bind
-  ("C-c A" . 'cfw:open-org-calendar)
-  :init
-  (require 'calfw-org))
-
 ;; literature management
 ;; path variables can be set in custom/custom-post.el
 ;; WORKAROUND: This package cannot be defered, otherwise the keybinding

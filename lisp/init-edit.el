@@ -208,7 +208,7 @@
 
 (use-package which-key
   :diminish (which-key-mode)
-  :config (which-key-mode))
+  :hook (after-init . which-key-mode))
 
 ;; Installing Counsel will bring in Ivy and Swiper as dependencies.
 ;; counsel, swiper and ivy come from the same repo.

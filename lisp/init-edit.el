@@ -231,6 +231,7 @@
 
   (use-package ivy-rich
     :hook (ivy-mode . ivy-rich-mode)
+    :config (ivy-rich-project-root-cache-mode 1)
     :init
     (use-package all-the-icons-ivy-rich
       :init (all-the-icons-ivy-rich-mode 1))))

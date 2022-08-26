@@ -8,6 +8,15 @@
   (prog-mode . hs-minor-mode))
 
 ;; --------------------------------------------------------------
+;;                     Tree Sitter
+;; --------------------------------------------------------------
+(use-package tree-sitter
+  :init (global-tree-sitter-mode t))
+
+(use-package tree-sitter-langs
+  :hook (tree-sitter-after-on . tree-sitter-hl-mode))
+
+;; --------------------------------------------------------------
 ;;                     Checker Configuration
 ;; --------------------------------------------------------------
 ;; (use-package flycheck

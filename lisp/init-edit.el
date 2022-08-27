@@ -137,8 +137,9 @@
 ;; `https://github.com/condy0919/emacs-newbie/blob/master/introduction-to-builtin-modes.md'
 (use-package whitespace
   :ensure nil
-  :hook (after-init . global-whitespace-mode) ;; 注意，这里是全局打开
-  ;;   :hook ((prog-mode outline-mode conf-mode) . whitespace-mode)
+  ;; :hook (after-init . global-whitespace-mode) ;; 注意，这里是全局打开
+  ;; :hook ((prog-mode outline-mode conf-mode) . whitespace-mode)
+  :hook (prog-mode . whitespace-mode)
   :config
   ;; Don't use different background for tabs.
   (face-spec-set 'whitespace-tab

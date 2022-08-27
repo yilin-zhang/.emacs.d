@@ -77,16 +77,13 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(tree-sitter-langs tree-sitter ibuffer-project eglot json-mode company-web-html bicycle imenu-list kanji-mode auto-save elispfl quelpa-use-package rime eyebrowse yasnippet-snippets ox-jekyll-md elfeed org-superstar org-ref exec-path-from-shell all-the-icons-ivy-rich all-the-icons-ibuffer htmlize cmake-mode writeroom-mode whiteroom-mode yaml-mode web-mode js2-mode beacon flycheck evil-leader doom-modeline company-auctex evil-surround fcitx evil hl-todo symbol-overlay shell-pop ivy-rich gnuplot-mode amx highlight-indent-guides youdao-dictionary magit diredfl doom-themes aggressive-indent ox-hugo popwin cdlatex auctex rainbow-delimiters emojify diff-hl pyvenv yasnippet markdown-mode all-the-icons neotree swiper counsel company which-key try diminish use-package)))
+   '(centaur-tabs tree-sitter-langs tree-sitter ibuffer-project eglot json-mode company-web-html imenu-list kanji-mode auto-save elispfl quelpa-use-package rime eyebrowse yasnippet-snippets ox-jekyll-md elfeed org-superstar org-ref exec-path-from-shell all-the-icons-ivy-rich all-the-icons-ibuffer htmlize cmake-mode writeroom-mode whiteroom-mode yaml-mode web-mode js2-mode beacon flycheck evil-leader doom-modeline company-auctex evil-surround fcitx evil hl-todo symbol-overlay shell-pop ivy-rich gnuplot-mode amx highlight-indent-guides youdao-dictionary magit diredfl doom-themes aggressive-indent ox-hugo popwin cdlatex auctex rainbow-delimiters emojify diff-hl pyvenv yasnippet markdown-mode all-the-icons neotree swiper counsel company which-key try diminish use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(diff-hl-change ((t (:foreground "#fc20bb" :background nil))))
- '(diff-hl-delete ((t (:background nil))))
- '(diff-hl-insert ((t (:background nil))))
- '(hl-todo ((t (:box t :inherit)))))
+ )
 
 (provide 'init)
 ;;; init.el ends here

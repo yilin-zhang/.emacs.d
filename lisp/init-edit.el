@@ -34,6 +34,7 @@
         ("C-k" . kill-line))
   :config
   (evil-set-initial-state 'special-mode 'emacs)
+  (evil-set-initial-state 'eshell-mode 'emacs)
   (use-package evil-leader
     :hook
     (after-init . global-evil-leader-mode)

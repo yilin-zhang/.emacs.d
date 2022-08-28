@@ -191,6 +191,7 @@
   :demand
   :bind
   ("C-<tab>" . centaur-tabs-forward)
+  ("s-t" . centaur-tabs--create-new-tab)
   :config
   (setq centaur-tabs-style "bar"
         centaur-tabs-set-bar 'over

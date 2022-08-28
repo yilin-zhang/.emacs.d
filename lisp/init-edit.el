@@ -17,7 +17,7 @@
              ([(super q)] . save-buffers-kill-emacs)
              ([(super s)] . save-buffer)
              ([(super v)] . yank)
-             ([(super w)] . delete-frame)
+             ([(super w)] . kill-current-buffer)
              ([(super z)] . undo)))
 
 (use-package evil

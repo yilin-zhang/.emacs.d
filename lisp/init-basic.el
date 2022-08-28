@@ -173,10 +173,11 @@
 
 ;; https://github.com/seagle0128/doom-modeline
 (use-package doom-modeline
-  :init (doom-modeline-mode 1)
+  :init
+  (setq doom-modeline-support-imenu t)
+  (doom-modeline-mode 1)
   :config
   (setq find-file-visit-truename t
-        doom-modeline-support-imenu t
         doom-modeline-hud t
         doom-modeline-modal-icon nil))
 

@@ -175,7 +175,10 @@
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
   :config
-  (setq find-file-visit-truename t))
+  (setq find-file-visit-truename t
+        doom-modeline-support-imenu t
+        doom-modeline-hud t
+        doom-modeline-modal-icon nil))
 
 ;; (use-package nyan-mode
 ;;   :hook (after-init . nyan-mode)
@@ -210,8 +213,9 @@
 ;; The setting of this variable must come before enable
 ;; display-time-mode, or it will not work.
 (setq display-time-24hr-format 1)
+
 (setq display-time-string-forms
-      '((propertize (concat (all-the-icons-faicon "clock-o" :v-adjust 0.03) " " 24-hours ":" minutes " ")
+      '((propertize (concat 24-hours ":" minutes " ")
                     'face 'font-lock-constant-face)))
 
 (defun yilin/toggle-frame-fullscreen ()

@@ -98,7 +98,10 @@
                    (plugins
                     (pycodestyle (enabled . nil))
                     (pyflakes (enabled . t))
-                    (flake8 (enabled . nil)))))))
+                    (flake8 (enabled . nil))))))
+  :config
+  (add-to-list 'eglot-server-programs
+               '(json-mode . ("vscode-json-languageserver" "--stdio"))))
 
 ;; --------------------------------------------------------------
 ;;                     C/C++ Mode Configurations
@@ -137,13 +140,13 @@
          '(("\\.html\\'" . web-mode))
          auto-mode-alist)))
 
-(use-package js2-mode
-  :ensure t
-  :init
-  (setq auto-mode-alist
-        (append
-         '(("\\.js\\'" . js2-mode))
-         auto-mode-alist)))
+;; set indentation for json-mode
+;; make it a local variable so that it doesn't conflict with the indentation in js mode
+(use-package json-mode
+  :ensure nil
+  :hook (json-mode . (lambda ()
+                       (make-local-variable 'js-indent-level)
+                       (setq js-indent-level 2))))
 
 ;; --------------------------------------------------------------
 ;;                         Live Coding

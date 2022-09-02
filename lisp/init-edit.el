@@ -51,7 +51,8 @@
       "i" 'org-clock-in
       "o" 'org-clock-out
       "g" 'magit-status
-      "d" 'dired-jump))
+      "d" 'dired-jump
+      "s" 'outline-cycle))
   (use-package evil-surround
     :hook (after-init . global-evil-surround-mode)))
 

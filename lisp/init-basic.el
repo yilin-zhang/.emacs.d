@@ -3,7 +3,9 @@
 ;; --------------------------------------------------------------
 ;;                            Process
 ;; --------------------------------------------------------------
-(setq read-process-output-max (* 3 1024 1024))  ; speed up lsp
+;; https://emacs-lsp.github.io/lsp-mode/page/performance/
+(setq read-process-output-max (* 3 1024 1024))
+(setq gc-cons-threshold 100000000)
 
 ;; --------------------------------------------------------------
 ;;                            Paths

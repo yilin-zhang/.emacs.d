@@ -90,7 +90,7 @@
 ;; move the cursor to the newly created window
 ;; makes people easier to close it (C-g)
 (use-package popwin
-  :config (popwin-mode 1))
+  :init (popwin-mode 1))
 
 ;; --------------------------------------------------------------
 ;;                             Line Numbers
@@ -106,18 +106,6 @@
       (add-hook 'prog-mode-hook 'display-line-numbers-mode)
       )
   (add-hook 'prog-mode-hook 'linum-mode))
-
-;; --------------------------------------------------------------
-;;                             Terminal
-;; --------------------------------------------------------------
-;; (global-set-key (kbd "<f9>") 'ansi-term)
-
-;; Shell Pop
-(use-package shell-pop
-  :bind ([f9] . shell-pop)
-  :init
-  (setq shell-pop-shell-type '("ansi-term" "*ansi-term*"
-                               (lambda () (ansi-term shell-pop-term-shell)))))
 
 ;; --------------------------------------------------------------
 ;;                              Files
@@ -139,22 +127,17 @@
   (recentf-mode 1))
 
 ;; --------------------------------------------------------------
+;;                          Icons and Emoji
+;; --------------------------------------------------------------
+(use-package all-the-icons)
+
+;; --------------------------------------------------------------
 ;;                             Buffer
 ;; --------------------------------------------------------------
 ;; use ibuffer instead of CRM buffer
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (use-package all-the-icons-ibuffer
   :init (all-the-icons-ibuffer-mode 1))
-
-;; --------------------------------------------------------------
-;;                          Icons and Emoji
-;; --------------------------------------------------------------
-(use-package all-the-icons)
-
-;; support displaying emoji
-(use-package emojify)
-;; only display emoji for org mode
-;; :hook (org-mode . emojify-mode))
 
 ;; --------------------------------------------------------------
 ;;                              Fonts
@@ -187,13 +170,6 @@
   (setq find-file-visit-truename t
         doom-modeline-hud t
         doom-modeline-modal-icon nil))
-
-;; (use-package nyan-mode
-;;   :hook (after-init . nyan-mode)
-;;   :config
-;;   ;; WORKAROUND (setq nyan-animate-nyancat t) seems useless, I don't
-;;   ;; know why.
-;;   (nyan-start-animation))
 
 ;; --------------------------------------------------------------
 ;;                            Tabs

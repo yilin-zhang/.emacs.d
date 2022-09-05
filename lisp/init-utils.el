@@ -69,9 +69,6 @@
 ;;                           Fancy Stuff
 ;; --------------------------------------------------------------
 
-;; try packages without actually install them
-(use-package try)
-
 ;; Youdao Dictionay
 (use-package youdao-dictionary
   :bind (("C-c Y" . youdao-dictionary-search-at-point)
@@ -102,30 +99,6 @@
             (string-suffix-p
              "gpg"
              (file-name-extension (buffer-name)) t)))))
-
-;; (setq auto-save-all-buffers nil)
-;; (setq auto-save-directories '("~/Documents/notebooks")))
-
-;; --------------------------------------------------------------
-;;                           Backup
-;; --------------------------------------------------------------
-
-;; (use-package smartparens
-;; :diminish smartparens-mode
-;; :hook
-;; ((prog-mode text-mode outline-mode) . smartparens-mode)
-;; :config
-;; do not add another single quote under emacs-lisp-mode
-;; (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
-;; auto indent inside curly braces, and make the right brace be down below
-;; (sp-pair "{" nil :post-handlers '(("||\n[i]" "RET")))
-;; Solve the confliction between smartparens and hungry delete
-;; Specifically, delete pair doesn't work when hungry delete is on.
-;; The solution is found here:
-;; https://github.com/syl20bnr/spacemacs/issues/6584
-;; (defadvice hungry-delete-backward (before sp-delete-pair-advice activate)
-;; (save-match-data (sp-delete-pair (ad-get-arg 0))))
-;; )
 
 (provide 'init-utils)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

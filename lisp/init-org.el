@@ -129,8 +129,6 @@ The buffer's major mode should be `org-mode'."
   ;; Calendar
   (setq calendar-chinese-all-holidays-flag t))
 
-
-
 (use-package org-superstar
   :hook (org-mode . org-superstar-mode)
   :config
@@ -140,6 +138,9 @@ The buffer's major mode should be `org-mode'."
         '((?+ . ?•)
           (?* . ?➤)
           (?- . ?–))))
+
+(use-package org-appear
+  :hook (org-mode . org-appear-mode))
 
 (use-package htmlize
   :after org)
@@ -151,16 +152,6 @@ The buffer's major mode should be `org-mode'."
 (use-package org-ref
   :after org
   :init (require 'org-ref))
-
-;; WORKAROUND: The same issue as above. It doesn't load unless explicitly
-;; using `require' in `:init'
-(use-package ox-hugo
-  :after ox
-  :init (require 'ox-hugo))
-
-(use-package ox-jekyll-md
-  :after ox
-  :init (require 'ox-jekyll-md))
 
 ;; --------------------------------------------------------------
 ;;                            Custom

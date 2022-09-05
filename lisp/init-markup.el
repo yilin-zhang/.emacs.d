@@ -56,14 +56,6 @@
   :config
   (setq LilyPond-pdf-command "atril"))
 
-;; --------------------------------------------------------------
-;;                     Gnuplot Mode Configurations
-;; --------------------------------------------------------------
-(use-package gnuplot-mode
-  :mode ("\\.\\(gp\\|gnuplot\\)$" . gnuplot-mode))
-;; specify the gnuplot executable (if other than /usr/bin/gnuplot)
-;; (setq gnuplot-program "/sw/bin/gnuplot")
-
 (provide 'init-markup)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-markup.el ends here

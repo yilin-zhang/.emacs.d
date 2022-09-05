@@ -76,8 +76,82 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(centaur-tabs tree-sitter-langs tree-sitter ibuffer-project eglot json-mode company-web-html imenu-list kanji-mode auto-save elispfl quelpa-use-package rime eyebrowse yasnippet-snippets ox-jekyll-md elfeed org-superstar org-ref exec-path-from-shell all-the-icons-ivy-rich all-the-icons-ibuffer htmlize cmake-mode writeroom-mode whiteroom-mode yaml-mode web-mode beacon flycheck evil-leader doom-modeline company-auctex evil-surround fcitx evil hl-todo symbol-overlay shell-pop ivy-rich gnuplot-mode amx highlight-indent-guides youdao-dictionary magit diredfl doom-themes aggressive-indent ox-hugo popwin cdlatex auctex rainbow-delimiters emojify diff-hl pyvenv yasnippet markdown-mode all-the-icons neotree swiper counsel company which-key try diminish use-package)))
+ '(package-selected-packages '(
+                               ;; init
+                               diminish
+                               use-package
+
+                               ;; basic
+                               centaur-tabs
+                               exec-path-from-shell
+                               doom-themes
+                               doom-modeline
+                               beacon
+                               fcitx
+                               popwin
+                               all-the-icons
+
+                               ;; edit
+                               imenu-list
+                               yasnippet-snippets
+                               ivy-rich
+                               all-the-icons-ivy-rich
+                               hl-todo
+                               symbol-overlay
+                               aggressive-indent
+                               amx
+                               swiper
+                               counsel
+                               company
+                               which-key
+                               evil
+                               evil-leader
+                               evil-surround
+                               yasnippet
+                               highlight-indent-guides
+                               rainbow-delimiters
+
+                               ;; org
+                               org-superstar
+                               org-ref
+                               htmlize
+                               org-appear
+
+                               ;; dired
+                               diredfl
+
+                               ;; markup
+                               markdown-mode
+                               cdlatex
+                               auctex
+
+                               ;; prog
+                               tree-sitter
+                               tree-sitter-langs
+                               eglot
+                               json-mode
+                               cmake-mode
+                               yaml-mode
+                               web-mode
+                               elispfl
+                               pyvenv
+
+                               ;; git
+                               magit
+                               diff-hl
+
+                               ;; utils
+                               ibuffer-project
+                               auto-save
+                               quelpa-use-package
+                               rime
+                               eyebrowse
+                               writeroom-mode
+                               elfeed
+                               all-the-icons-ibuffer
+                               youdao-dictionary
+                               neotree
+                               )))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

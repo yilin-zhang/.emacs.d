@@ -295,12 +295,6 @@
          :map company-search-map
          ("C-p" . company-select-previous)
          ("C-n" . company-select-next))
-  ;; :init
-  ;; ;; show icons for company
-  ;; (when (version<= "26" emacs-version)
-  ;;   (use-package company-box
-  ;;     :diminish (company-box-mode)
-  ;;     :hook (company-mode . company-box-mode)))
   :config
   (setq company-tooltip-align-annotations t ; aligns annotation to the right
         company-tooltip-limit 12            ; bigger popup window

@@ -19,7 +19,10 @@
 ;; --------------------------------------------------------------
 (use-package eglot
   :hook ((prog-mode . (lambda ()
-                        (unless (derived-mode-p 'emacs-lisp-mode 'lisp-mode 'makefile-mode)
+                        (unless (derived-mode-p 'emacs-lisp-mode
+                                                'lisp-mode
+                                                'makefile-mode
+                                                'web-mode)
                           (eglot-ensure))))
          ((markdown-mode yaml-mode) . eglot-ensure))
   :bind

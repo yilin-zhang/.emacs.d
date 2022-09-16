@@ -61,7 +61,7 @@
    ;; `citre-mode' is automatically enabled.  If you only want this to work for
    ;; certain modes (like `prog-mode'), set it like this.
    ;; citre-auto-enable-citre-mode-modes '(prog-mode))
-  )
+   ))
 
 ;; --------------------------------------------------------------
 ;;                     C/C++ Mode Configurations

@@ -129,6 +129,7 @@
                                tree-sitter
                                tree-sitter-langs
                                eglot
+                               citre
                                json-mode
                                cmake-mode
                                yaml-mode

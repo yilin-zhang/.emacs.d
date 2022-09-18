@@ -29,6 +29,16 @@
   (LaTeX-mode . outline-minor-mode))
 
 ;; --------------------------------------------------------------
+;;                     Web Configuration
+;; --------------------------------------------------------------
+(use-package web-mode
+  :init
+  (setq auto-mode-alist
+        (append
+         '(("\\.html\\'" . web-mode))
+         auto-mode-alist)))
+
+;; --------------------------------------------------------------
 ;;                     Markdown Mode Configurations
 ;; --------------------------------------------------------------
 
@@ -42,7 +52,16 @@
 ;;                     Serialization
 ;; --------------------------------------------------------------
 (use-package yaml-mode)
-(use-package json-mode)
+
+;; set indentation for json-mode
+;; make it a local variable so that it doesn't conflict with the indentation in js mode
+(use-package json-mode
+  :ensure nil
+  :hook (json-mode . (lambda ()
+                       (make-local-variable 'js-indent-level)
+                       (setq js-indent-level 2))))
+
+(use-package csv-mode)
 
 ;; --------------------------------------------------------------
 ;;                    LilyPond Mode Configurations

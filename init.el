@@ -124,16 +124,17 @@
                                markdown-mode
                                cdlatex
                                auctex
+                               yaml-mode
+                               web-mode
+                               json-mode
+                               csv-mode
 
                                ;; prog
                                tree-sitter
                                tree-sitter-langs
                                eglot
                                citre
-                               json-mode
                                cmake-mode
-                               yaml-mode
-                               web-mode
                                elispfl
                                pyvenv
 

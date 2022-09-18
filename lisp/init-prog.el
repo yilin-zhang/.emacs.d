@@ -84,24 +84,6 @@
   :init
   (setenv "WORKON_HOME" "~/miniconda3/envs"))
 
-;; --------------------------------------------------------------
-;;                     Web Configuration
-;; --------------------------------------------------------------
-(use-package web-mode
-  :init
-  (setq auto-mode-alist
-        (append
-         '(("\\.html\\'" . web-mode))
-         auto-mode-alist)))
-
-;; set indentation for json-mode
-;; make it a local variable so that it doesn't conflict with the indentation in js mode
-(use-package json-mode
-  :ensure nil
-  :hook (json-mode . (lambda ()
-                       (make-local-variable 'js-indent-level)
-                       (setq js-indent-level 2))))
-
 
 (provide 'init-prog)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

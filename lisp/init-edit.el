@@ -272,38 +272,33 @@
 ;;                           Completion
 ;; --------------------------------------------------------------
 
-;; company is a useful auto-complete tool
-(use-package company
-  ;; `TODO' after setting init below, company is disabled under org mode, but
-  ;; quickhelp is still working
-  ;; :init (setq company-global-modes '(not org-mode))
-  :diminish
-  ;; `TODO' it seems like the hook is useless and company mode will always start
-  ;; :hook (after-init . global-company-mode)
-  ;; :hook (org-mode . (lambda () (company-mode -1)))
-  :hook
-  (prog-mode . company-mode)
-  (LaTeX-mode . company-mode)
-  :bind (("M-/" . company-complete)
-         ("<backtab>" . company-yasnippet)
-         :map company-active-map
-         ("C-p" . company-select-previous)
-         ("C-n" . company-select-next)
-         ("<tab>" . company-complete-common-or-cycle)
-         ("<backtab>" . my-company-yasnippet)
-         ;; ("C-c C-y" . my-company-yasnippet)
-         :map company-search-map
-         ("C-p" . company-select-previous)
-         ("C-n" . company-select-next))
-  :config
-  (setq company-tooltip-align-annotations t ; aligns annotation to the right
-        company-tooltip-limit 12            ; bigger popup window
-        company-idle-delay 0.3              ; decrease delay before autocompletion popup shows
-        company-echo-delay 0                ; remove annoying blinking
-        company-minimum-prefix-length 2
-        company-require-match nil
-        company-dabbrev-ignore-case nil
-        company-dabbrev-downcase nil))
+(use-package corfu
+  ;; Optional customizations
+  :custom
+  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  (corfu-auto t)                 ;; Enable auto completion
+  ;; (corfu-separator ?\s)          ;; Orderless field separator
+  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
+  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
+  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+  (corfu-auto-delay 0)
+
+  ;; Enable Corfu only for certain modes.
+  :hook ((prog-mode . corfu-mode)
+         (shell-mode . corfu-mode)
+         (eshell-mode . corfu-mode))
+
+  ;; Recommended: Enable Corfu globally.
+  ;; This is recommended since Dabbrev can be used globally (M-/).
+  ;; See also `corfu-excluded-modes'.
+  :init
+  (global-corfu-mode)
+  )
+
 
 ;; --------------------------------------------------------------
 ;;                            Hightlight

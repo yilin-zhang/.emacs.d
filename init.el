@@ -102,7 +102,7 @@
                                amx
                                swiper
                                counsel
-                               company
+                               corfu
                                which-key
                                evil
                                evil-leader

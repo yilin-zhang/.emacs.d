@@ -457,6 +457,15 @@
   (global-corfu-mode)
   )
 
+(use-package kind-all-the-icons
+  :ensure nil
+  :load-path "~/.emacs.d/site-lisp/"
+  :demand
+  :config
+  (add-to-list 'corfu-margin-formatters
+               #'kind-all-the-icons-margin-formatter))
+
+
 ;; --------------------------------------------------------------
 ;;                            Hightlight
 ;; --------------------------------------------------------------

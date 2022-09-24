@@ -423,6 +423,9 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
+(use-package all-the-icons-completion
+  :init (all-the-icons-completion-mode))
+
 ;; --------------------------------------------------------------
 ;;                           Completion
 ;; --------------------------------------------------------------

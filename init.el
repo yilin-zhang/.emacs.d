@@ -148,7 +148,6 @@
                                ibuffer-project
                                auto-save
                                quelpa-use-package
-                               rime
                                eyebrowse
                                writeroom-mode
                                elfeed

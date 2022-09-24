@@ -90,20 +90,19 @@
                                fcitx
                                popwin
                                all-the-icons
+                               all-the-icons-ibuffer
 
                                ;; edit
-                               imenu-list
                                yasnippet-snippets
-                               ivy-rich
-                               all-the-icons-ivy-rich
                                hl-todo
                                symbol-overlay
                                aggressive-indent
-                               amx
-                               swiper
-                               counsel
-                               corfu
                                which-key
+                               corfu
+                               vertico
+                               orderless
+                               marginalia
+                               consult
                                evil
                                evil-leader
                                evil-surround
@@ -150,7 +149,6 @@
                                eyebrowse
                                writeroom-mode
                                elfeed
-                               all-the-icons-ibuffer
                                youdao-dictionary
                                neotree
                                )))

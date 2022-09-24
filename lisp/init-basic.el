@@ -137,7 +137,7 @@
 ;; use ibuffer instead of CRM buffer
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (use-package all-the-icons-ibuffer
-  :init (all-the-icons-ibuffer-mode 1))
+  :hook (ibuffer-mode . all-the-icons-ibuffer-mode))
 
 ;; --------------------------------------------------------------
 ;;                              Fonts

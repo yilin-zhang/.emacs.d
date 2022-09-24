@@ -102,6 +102,8 @@
                                orderless
                                marginalia
                                consult
+                               embark
+                               embark-consult
                                evil
                                evil-leader
                                evil-surround

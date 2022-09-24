@@ -104,7 +104,6 @@
                                consult
                                embark
                                embark-consult
-                               all-the-icons-completion
                                evil
                                evil-leader
                                evil-surround

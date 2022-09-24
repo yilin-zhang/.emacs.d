@@ -415,7 +415,10 @@
   (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package all-the-icons-completion
-  :init (all-the-icons-completion-mode))
+  :ensure nil
+  :load-path "~/.emacs.d/site-lisp/all-the-icons-completion"
+  :demand
+  :config (all-the-icons-completion-mode))
 
 ;; --------------------------------------------------------------
 ;;                           Completion

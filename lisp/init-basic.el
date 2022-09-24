@@ -172,23 +172,6 @@
         doom-modeline-modal-icon nil))
 
 ;; --------------------------------------------------------------
-;;                            Tabs
-;; --------------------------------------------------------------
-(use-package centaur-tabs
-  :demand
-  :bind
-  ("C-<tab>" . centaur-tabs-forward)
-  ("s-t" . centaur-tabs--create-new-tab)
-  :config
-  (setq centaur-tabs-style "bar"
-        centaur-tabs-set-bar 'over
-        centaur-tabs-set-icons t
-        centaur-tabs-plain-icons t
-        centaur-tabs-gray-out-icons 'buffer
-        centaur-tabs-cycle-scope 'tabs)
-  (centaur-tabs-mode t))
-
-;; --------------------------------------------------------------
 ;;                            Custom
 ;; --------------------------------------------------------------
 

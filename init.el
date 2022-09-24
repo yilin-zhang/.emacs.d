@@ -82,7 +82,6 @@
                                use-package
 
                                ;; basic
-                               centaur-tabs
                                exec-path-from-shell
                                doom-themes
                                doom-modeline

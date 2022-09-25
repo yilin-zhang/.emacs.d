@@ -41,12 +41,11 @@
     :config
     (evil-leader/set-leader "SPC")
     (evil-leader/set-key
-      "x" 'counsel-M-x
       "f" 'find-file
       "b" 'switch-to-buffer
       "k" 'kill-buffer
-      "r" 'counsel-rg
-      "p" 'counsel-yank-pop
+      "r" 'consult-ripgrep
+      "p" 'consult-yank-pop
       "a" 'org-agenda
       "i" 'org-clock-in
       "o" 'org-clock-out

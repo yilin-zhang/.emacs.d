@@ -153,6 +153,8 @@ The buffer's major mode should be `org-mode'."
   :after org
   :init (require 'org-ref))
 
+(use-package denote)
+
 ;; --------------------------------------------------------------
 ;;                            Custom
 ;; --------------------------------------------------------------

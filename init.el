@@ -116,6 +116,7 @@
                                org-ref
                                htmlize
                                org-appear
+                               denote
 
                                ;; dired
                                diredfl

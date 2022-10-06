@@ -147,7 +147,7 @@
 (if (display-graphic-p)
     (if (eq system-type 'darwin)
         (set-face-attribute
-         'default nil :font "Sarasa Mono SC 16")
+         'default nil :font "Sarasa Mono SC 15")
       (set-face-attribute
        'default nil :font "Sarasa Mono SC 13")))
 

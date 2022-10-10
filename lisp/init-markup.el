@@ -38,6 +38,11 @@
          '(("\\.html\\'" . web-mode))
          auto-mode-alist)))
 
+(use-package rainbow-mode
+  :hook
+  (css-mode . rainbow-mode)
+  (js-mode . rainbow-mode))
+
 ;; --------------------------------------------------------------
 ;;                     Markdown Mode Configurations
 ;; --------------------------------------------------------------

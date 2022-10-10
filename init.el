@@ -128,6 +128,7 @@
                                auctex
                                yaml-mode
                                web-mode
+                               rainbow-mode
                                json-mode
                                csv-mode
 

@@ -5,6 +5,11 @@
   :hook
   (prog-mode . outline-minor-mode))
 
+(use-package code-cells
+  :hook
+  (python-mode . code-cells-mode-maybe)
+  )
+
 ;; --------------------------------------------------------------
 ;;                     Tree Sitter
 ;; --------------------------------------------------------------

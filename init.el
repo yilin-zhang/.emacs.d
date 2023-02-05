@@ -133,6 +133,7 @@
                                csv-mode
 
                                ;; prog
+                               code-cells
                                tree-sitter
                                tree-sitter-langs
                                lsp-mode

@@ -125,8 +125,8 @@
   :bind ("C-x C-r" . recentf-open-files)
   :init
   (setq recentf-max-saved-items 50)
-  :config
-  (recentf-mode 1))
+  :hook
+  (after-init . recentf-mode))
 
 ;; --------------------------------------------------------------
 ;;                          Icons and Emoji

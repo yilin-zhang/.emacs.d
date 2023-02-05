@@ -48,6 +48,9 @@
          (lsp-mode . lsp-enable-which-key-integration)
          )
   :commands lsp
+  :bind
+  ("s-b" . lsp-find-definition)
+  ("s-r" . lsp-find-references)
   :config
   (setq lsp-modeline-diagnostics-enable nil)
   )

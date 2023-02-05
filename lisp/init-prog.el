@@ -53,6 +53,7 @@
   ("s-r" . lsp-find-references)
   :config
   (setq lsp-modeline-diagnostics-enable nil)
+  (setq lsp-eldoc-render-all t)
   )
 
 (use-package lsp-pyright

@@ -17,21 +17,46 @@
 ;; --------------------------------------------------------------
 ;;                     LSP / ctags Configurations
 ;; --------------------------------------------------------------
-(use-package eglot
-  :hook ((prog-mode . (lambda ()
+;; (use-package eglot
+;;   :hook ((prog-mode . (lambda ()
+;;                         (unless (derived-mode-p 'emacs-lisp-mode
+;;                                                 'lisp-mode
+;;                                                 'makefile-mode
+;;                                                 'web-mode)
+;;                           (eglot-ensure))))
+;;          ((markdown-mode yaml-mode) . eglot-ensure))
+;;   :bind
+;;   ("s-b" . xref-find-definitions)
+;;   ("s-r" . xref-find-references)
+;;   :config
+;;   (setq eglot-events-buffer-size 0)
+;;   (add-to-list 'eglot-server-programs
+;;                '(json-mode . ("vscode-json-languageserver" "--stdio"))))
+
+(use-package lsp-mode
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (prog-mode . (lambda ()
                         (unless (derived-mode-p 'emacs-lisp-mode
                                                 'lisp-mode
                                                 'makefile-mode
                                                 'web-mode)
-                          (eglot-ensure))))
-         ((markdown-mode yaml-mode) . eglot-ensure))
-  :bind
-  ("s-b" . xref-find-definitions)
-  ("s-r" . xref-find-references)
+                          (lsp))))
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration)
+         )
+  :commands lsp
   :config
-  (setq eglot-events-buffer-size 0)
-  (add-to-list 'eglot-server-programs
-               '(json-mode . ("vscode-json-languageserver" "--stdio"))))
+  (setq lsp-modeline-diagnostics-enable nil)
+  )
+
+(use-package lsp-pyright
+  :ensure t
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-pyright)
+                         (lsp))))  ; or lsp-deferred
 
 (use-package citre
   :defer t

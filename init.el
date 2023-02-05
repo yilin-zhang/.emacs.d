@@ -135,7 +135,8 @@
                                ;; prog
                                tree-sitter
                                tree-sitter-langs
-                               eglot
+                               lsp-mode
+                               lsp-pyright
                                citre
                                cmake-mode
                                elispfl

@@ -59,6 +59,7 @@
   :config
   (setq lsp-modeline-diagnostics-enable nil)
   (setq lsp-eldoc-render-all t)
+  (setq lsp-log-io nil)
   )
 
 (use-package lsp-pyright

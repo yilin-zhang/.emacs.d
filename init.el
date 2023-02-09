@@ -136,8 +136,7 @@
                                code-cells
                                tree-sitter
                                tree-sitter-langs
-                               lsp-mode
-                               lsp-pyright
+                               eglot
                                citre
                                cmake-mode
                                elispfl

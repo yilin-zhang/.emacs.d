@@ -419,6 +419,13 @@
   :demand
   :config (all-the-icons-completion-mode))
 
+(use-package color-rg
+  :ensure nil
+  :load-path "~/.emacs.d/site-lisp/color-rg"
+  :demand
+  :config
+  (evil-set-initial-state 'color-rg-mode 'emacs))
+
 ;; --------------------------------------------------------------
 ;;                           Completion
 ;; --------------------------------------------------------------

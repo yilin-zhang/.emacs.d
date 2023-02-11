@@ -1,3 +1,6 @@
 [submodule "site-lisp/all-the-icons-completion"]
 	path = site-lisp/all-the-icons-completion
 	url = https://github.com/yilin-zhang/all-the-icons-completion.git
+[submodule "site-lisp/color-rg"]
+	path = site-lisp/color-rg
+	url = https://github.com/manateelazycat/color-rg.git

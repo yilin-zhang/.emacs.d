@@ -75,6 +75,9 @@ The buffer's major mode should be `org-mode'."
         org-ellipsis "⤵"
         org-image-actual-width nil      ; make org support image scaling
         )
+  (setq org-priority-faces `((?A . (:foreground ,(face-foreground 'error)))
+                             (?B . (:foreground ,(face-foreground 'warning)))
+                             (?C . (:foreground ,(face-foreground 'success)))))
   ;; Latex preview scale
   (setq org-export-backends '(ascii html icalendar latex md)
         org-format-latex-options (plist-put org-format-latex-options :scale 2.3)

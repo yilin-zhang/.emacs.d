@@ -206,7 +206,7 @@
   :custom
   (vertico-count 10)                    ; Number of candidates to display
   (vertico-resize nil)
-  (vertico-cycle nil) ; Go from last to first candidate and first to last (cycle)?
+  (vertico-cycle t) ; Go from last to first candidate and first to last (cycle)?
   :bind
   (:map vertico-map
         ("<tab>" . vertico-insert)  ; Insert selected candidate into text area

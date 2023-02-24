@@ -61,7 +61,7 @@
 ;; set indentation for json-mode
 ;; make it a local variable so that it doesn't conflict with the indentation in js mode
 (use-package json-mode
-  :ensure nil
+  :ensure t
   :hook (json-mode . (lambda ()
                        (make-local-variable 'js-indent-level)
                        (setq js-indent-level 2))))

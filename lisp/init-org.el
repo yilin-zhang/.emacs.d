@@ -74,6 +74,7 @@ The buffer's major mode should be `org-mode'."
         org-pretty-entities t         ; make special character format visible
         org-ellipsis "⤵"
         org-image-actual-width nil      ; make org support image scaling
+        org-edit-src-content-indentation 0
         )
   (setq org-priority-faces `((?A . (:foreground ,(face-foreground 'error)))
                              (?B . (:foreground ,(face-foreground 'warning)))

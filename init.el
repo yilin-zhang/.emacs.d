@@ -141,6 +141,7 @@
                                cmake-mode
                                elispfl
                                pyvenv
+                               dockerfile-mode
 
                                ;; git
                                magit

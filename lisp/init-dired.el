@@ -15,14 +15,18 @@
   (dired-listing-switches "-alh")
   )
 
+(use-package async
+  :init
+  ;; Do not update mode line
+  (setq dired-async-message-function
+        (lambda (text face &rest args)))
+  :hook (dired-mode . dired-async-mode))
+
 ;; support --dired
 (use-package ls-lisp
   :ensure nil
+  :demand
   :custom (ls-lisp-use-insert-directory-program nil))
-
-;; use C-x C-j to open the current dir
-(use-package dired-x
-  :ensure nil)
 
 (use-package diredfl
   :init (diredfl-global-mode 1))

@@ -121,6 +121,7 @@
                                ;; dired
                                diredfl
                                all-the-icons-dired
+                               async
 
                                ;; markup
                                markdown-mode

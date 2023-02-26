@@ -159,7 +159,9 @@
   :init
   (load-theme 'doom-gruvbox t)
   (doom-themes-neotree-config)
-  (doom-themes-visual-bell-config)
+  ;; Disable visual bell because it causes buffer selecting error
+  ;; when it works with dired-async
+  ;; (doom-themes-visual-bell-config)
   (doom-themes-org-config))
 
 ;; https://github.com/seagle0128/doom-modeline

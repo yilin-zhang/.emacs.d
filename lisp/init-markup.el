@@ -35,9 +35,7 @@
   :mode ("\\.html\\'" . web-mode))
 
 (use-package rainbow-mode
-  :hook
-  (css-mode . rainbow-mode)
-  (js-mode . rainbow-mode))
+  :hook (css-mode js-mode))
 
 ;; --------------------------------------------------------------
 ;;                     Markdown Mode Configurations

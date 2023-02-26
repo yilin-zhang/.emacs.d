@@ -98,8 +98,8 @@
 (use-package paren
   :ensure nil
   :hook (after-init . show-paren-mode)
-  :init
-  (setq show-paren-style 'parenthesis)
+  :custom
+  (show-paren-style 'mixed)
   :custom-face
   (show-paren-match ((t (:background ,(face-foreground 'warning))))))
 
@@ -107,8 +107,8 @@
 (use-package elec-pair
   :ensure nil
   :hook (after-init . electric-pair-mode)
-  :init
-  (setq electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit))
+  :custom
+  (electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit))
 
 ;; rainbow parentheses
 (use-package rainbow-delimiters
@@ -191,14 +191,14 @@
 
 (use-package which-key
   :diminish (which-key-mode)
-  :hook (after-init . which-key-mode))
+  :hook after-init)
+
+(use-package savehist
+  :ensure nil
+  :init (savehist-mode 1))
 
 (use-package vertico
-  :init
-  (vertico-mode)
-  (use-package savehist
-    :ensure nil
-    :init (savehist-mode))
+  :hook after-init
   :custom
   (vertico-count 10)                    ; Number of candidates to display
   (vertico-resize nil)
@@ -443,13 +443,14 @@
   ;; Recommended: Enable Corfu globally.
   ;; This is recommended since Dabbrev can be used globally (M-/).
   ;; See also `corfu-excluded-modes'.
-  :init
-  (global-corfu-mode)
+  ;; :init
+  ;; (global-corfu-mode)
   )
 
 (use-package kind-all-the-icons
   :ensure nil
   :load-path "~/.emacs.d/site-lisp/"
+  :after corfu
   :demand
   :config
   (add-to-list 'corfu-margin-formatters

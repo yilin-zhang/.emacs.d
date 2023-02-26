@@ -4,8 +4,8 @@
 ;;                            Process
 ;; --------------------------------------------------------------
 ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
-(setq read-process-output-max (* 3 1024 1024))
-(setq gc-cons-threshold 100000000)
+(setq read-process-output-max (* 3 1024 1024)
+      gc-cons-threshold 100000000)
 
 ;; --------------------------------------------------------------
 ;;                            Paths
@@ -20,7 +20,7 @@
 ;; Start server
 (use-package server
   :ensure nil
-  :hook (after-init . server-mode))
+  :hook after-init)
 
 ;; --------------------------------------------------------------
 ;;                            Features
@@ -83,7 +83,7 @@
 ;; users to locate the cursor.
 (use-package beacon
   :diminish
-  :init (beacon-mode t)
+  :hook after-init
   :custom
   (beacon-color 0.5)
   (beacon-size 70))
@@ -91,7 +91,7 @@
 ;; move the cursor to the newly created window
 ;; makes people easier to close it (C-g)
 (use-package popwin
-  :init (popwin-mode 1))
+  :hook after-init)
 
 ;; --------------------------------------------------------------
 ;;                             Line Numbers
@@ -112,18 +112,17 @@
 ;;                              Files
 ;; --------------------------------------------------------------
 
-;; disable backup file
-(setq make-backup-files nil)
-
-;; disable auto-save
-(setq auto-save-default nil)
+(setq make-backup-files nil  ; disable backup file
+      auto-save-default nil  ; disable auto-save
+      )
 
 ;; enable recentf-mode
 (use-package recentf
   :ensure nil
   :init
-  (setq recentf-max-saved-items 50)
-  (recentf-mode t))
+  (recentf-mode t)
+  :custom
+  (recentf-max-saved-items 50))
 
 ;; --------------------------------------------------------------
 ;;                          Icons and Emoji
@@ -139,7 +138,7 @@
   :bind ("C-x C-b" . ibuffer))
 
 (use-package all-the-icons-ibuffer
-  :hook (ibuffer-mode . all-the-icons-ibuffer-mode))
+  :hook ibuffer-mode)
 
 ;; --------------------------------------------------------------
 ;;                              Fonts
@@ -181,11 +180,11 @@
 
 ;; The setting of this variable must come before enable
 ;; display-time-mode, or it will not work.
-(setq display-time-24hr-format 1)
-
-(setq display-time-string-forms
+(setq display-time-24hr-format 1
+      display-time-string-forms
       '((propertize (concat 24-hours ":" minutes " ")
                     'face 'font-lock-constant-face)))
+
 
 (defun yilin/toggle-frame-fullscreen ()
   "toggle-frame-fullscreen plus display-time-mode."

@@ -100,9 +100,8 @@
   :hook (after-init . show-paren-mode)
   :init
   (setq show-paren-style 'parenthesis)
-  :config
-  (set-face-background 'show-paren-match (face-foreground 'warning))
-  (set-face-attribute 'show-paren-match nil :weight 'extra-bold))
+  :custom-face
+  (show-paren-match ((t (:background ,(face-foreground 'warning))))))
 
 ;; Automatic parenthesis pairing
 (use-package elec-pair

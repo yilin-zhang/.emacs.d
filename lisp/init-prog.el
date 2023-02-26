@@ -13,11 +13,19 @@
 ;; --------------------------------------------------------------
 ;;                     Tree Sitter
 ;; --------------------------------------------------------------
-(use-package tree-sitter
-  :init (global-tree-sitter-mode t))
+(if (< emacs-major-version 29)
+    (progn
+      (use-package tree-sitter
+        :init (global-tree-sitter-mode t))
+      (use-package tree-sitter-langs
+        :hook (tree-sitter-after-on . tree-sitter-hl-mode)))
 
-(use-package tree-sitter-langs
-  :hook (tree-sitter-after-on . tree-sitter-hl-mode))
+  ;; https://archive.casouri.cc/note/2023/tree-sitter-in-emacs-29/index.html
+  (setq major-mode-remap-alist
+        '((python-mode . python-ts-mode)
+          (js-mode . js-ts-mode)
+          (json-mode . json-ts-mode)))
+  )
 
 ;; --------------------------------------------------------------
 ;;                     LSP / ctags Configurations

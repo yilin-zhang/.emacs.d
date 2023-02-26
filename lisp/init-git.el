@@ -16,9 +16,9 @@
   :defines desktop-minor-mode-table
   :commands diff-hl-magit-post-refresh
   :custom-face
-  (diff-hl-change ((t (:foreground ,(face-background 'highlight) :background nil))))
-  (diff-hl-insert ((t (:background nil))))
-  (diff-hl-delete ((t (:background nil))))
+  (diff-hl-change ((t (:foreground ,(face-background 'highlight) :background unspecified))))
+  (diff-hl-insert ((t (:background unspecified))))
+  (diff-hl-delete ((t (:background unspecified))))
   :bind (:map diff-hl-command-map
               ("SPC" . diff-hl-mark-hunk))
   :hook ((after-init . global-diff-hl-mode)

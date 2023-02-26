@@ -82,12 +82,11 @@
 ;; Make the cursor have a tail, which is easier for
 ;; users to locate the cursor.
 (use-package beacon
-  :ensure t
   :diminish
-  :hook (after-init . beacon-mode)
-  :config
-  (setq beacon-color 0.5)
-  (setq beacon-size 70))
+  :init (beacon-mode t)
+  :custom
+  (beacon-color 0.5)
+  (beacon-size 70))
 
 ;; move the cursor to the newly created window
 ;; makes people easier to close it (C-g)
@@ -122,11 +121,9 @@
 ;; enable recentf-mode
 (use-package recentf
   :ensure nil
-  :bind ("C-x C-r" . recentf-open-files)
   :init
   (setq recentf-max-saved-items 50)
-  :hook
-  (after-init . recentf-mode))
+  (recentf-mode t))
 
 ;; --------------------------------------------------------------
 ;;                          Icons and Emoji
@@ -137,7 +134,10 @@
 ;;                             Buffer
 ;; --------------------------------------------------------------
 ;; use ibuffer instead of CRM buffer
-(global-set-key (kbd "C-x C-b") 'ibuffer)
+(use-package ibuffer
+  :ensure nil
+  :bind ("C-x C-b" . ibuffer))
+
 (use-package all-the-icons-ibuffer
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode))
 
@@ -166,12 +166,12 @@
 ;; https://github.com/seagle0128/doom-modeline
 (use-package doom-modeline
   :init
-  (setq doom-modeline-support-imenu t)
   (doom-modeline-mode 1)
-  :config
-  (setq find-file-visit-truename t
-        doom-modeline-hud t
-        doom-modeline-modal-icon nil))
+  :custom
+  (doom-modeline-support-imenu t)
+  (doom-modeline-hud t)
+  (doom-modeline-modal-icon nil)
+  (find-file-visit-truename t))
 
 ;; --------------------------------------------------------------
 ;;                            Custom

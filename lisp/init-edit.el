@@ -128,9 +128,18 @@
 ;; `https://github.com/condy0919/emacs-newbie/blob/master/introduction-to-builtin-modes.md'
 (use-package whitespace
   :ensure nil
-  ;; :hook (after-init . global-whitespace-mode) ;; 注意，这里是全局打开
-  ;; :hook ((prog-mode outline-mode conf-mode) . whitespace-mode)
   :hook (prog-mode . whitespace-mode)
+  :custom
+  (whitespace-line-column nil)
+  (whitespace-style
+   '(face                               ; visualize things below:
+     empty                              ; empty lines at beginning/end of buffer
+     ;; lines-tail                         ; lines go beyond `fill-column'
+     space-before-tab                   ; spaces before tab
+     trailing                           ; trailing blanks
+     tabs                               ; tabs (show by face)
+     tab-mark                           ; tabs (show by symbol)
+     ))
   :config
   ;; Don't use different background for tabs.
   (face-spec-set 'whitespace-tab
@@ -156,19 +165,7 @@
                     :background "#d8d8d8" :foreground "#de4da1")
                    (t
                     :inherit warning
-                    :background "#404040" :foreground "#ee6aa7")))
-
-  (setq
-   whitespace-line-column nil
-   whitespace-style
-   '(face                               ; visualize things below:
-     empty                              ; empty lines at beginning/end of buffer
-     ;; lines-tail                         ; lines go beyond `fill-column'
-     space-before-tab                   ; spaces before tab
-     trailing                           ; trailing blanks
-     tabs                               ; tabs (show by face)
-     tab-mark                           ; tabs (show by symbol)
-     )))
+                    :background "#404040" :foreground "#ee6aa7"))))
 
 ;; Minor mode to aggressively keep your code always indented
 (use-package aggressive-indent
@@ -242,13 +239,10 @@
   (setq enable-recursive-minibuffers t))
 
 (use-package orderless
-  :init
-  ;; Configure a custom style dispatcher (see the Consult wiki)
-  ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
-  ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-  (setq completion-styles '(orderless basic)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
+  (completion-category-overrides '((file (styles partial-completion)))))
 
 (use-package marginalia
   ;; Either bind `marginalia-cycle' globally or only in the minibuffer
@@ -382,8 +376,6 @@
   )
 
 (use-package embark
-  :ensure t
-
   :bind
   (("C-." . embark-act)         ;; pick some comfortable binding
    ("C-;" . embark-dwim)        ;; good alternative: M-.
@@ -404,7 +396,6 @@
 
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
-  :ensure t
   :after (embark consult)
   :demand t ; only necessary if you have the hook below
   ;; if you want to have consult previews as you move around an

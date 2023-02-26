@@ -32,11 +32,7 @@
 ;;                     Web Configuration
 ;; --------------------------------------------------------------
 (use-package web-mode
-  :init
-  (setq auto-mode-alist
-        (append
-         '(("\\.html\\'" . web-mode))
-         auto-mode-alist)))
+  :mode ("\\.html\\'" . web-mode))
 
 (use-package rainbow-mode
   :hook
@@ -51,7 +47,8 @@
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
-  :config (setq markdown-command "multimarkdown"))
+  :custom
+  (markdown-command "multimarkdown"))
 
 ;; --------------------------------------------------------------
 ;;                     Serialization
@@ -61,7 +58,6 @@
 ;; set indentation for json-mode
 ;; make it a local variable so that it doesn't conflict with the indentation in js mode
 (use-package json-mode
-  :ensure t
   :hook (json-mode . (lambda ()
                        (make-local-variable 'js-indent-level)
                        (setq js-indent-level 2))))

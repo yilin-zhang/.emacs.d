@@ -2,6 +2,9 @@
 ;;; Commentary:
 ;;; Code:
 
+;; Move custom settings to a separate file
+(setq custom-file "~/.emacs.d/custom.el")
+
 (require 'package)
 (setq package-enable-at-startup nil)
 (setq package-native-compile t)
@@ -68,103 +71,6 @@
 (require 'init-org)
 (require 'init-markup)
 (require 'init-prog)
-
-;; ============================================================================
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages '(
-                               ;; init
-                               diminish
-                               use-package
-
-                               ;; basic
-                               exec-path-from-shell
-                               doom-themes
-                               doom-modeline
-                               fcitx
-                               popwin
-                               all-the-icons
-                               all-the-icons-ibuffer
-
-                               ;; edit
-                               yasnippet-snippets
-                               hl-todo
-                               symbol-overlay
-                               aggressive-indent
-                               which-key
-                               corfu
-                               vertico
-                               orderless
-                               marginalia
-                               consult
-                               embark
-                               embark-consult
-                               evil
-                               evil-leader
-                               evil-surround
-                               yasnippet
-                               highlight-indent-guides
-                               rainbow-delimiters
-                               beacon
-                               undo-tree
-
-                               ;; org
-                               org-superstar
-                               org-ref
-                               htmlize
-                               org-appear
-                               denote
-
-                               ;; dired
-                               diredfl
-                               all-the-icons-dired
-                               async
-
-                               ;; markup
-                               markdown-mode
-                               cdlatex
-                               auctex
-                               yaml-mode
-                               web-mode
-                               rainbow-mode
-                               json-mode
-                               csv-mode
-
-                               ;; prog
-                               code-cells
-                               tree-sitter
-                               tree-sitter-langs
-                               eglot
-                               citre
-                               cmake-mode
-                               elispfl
-                               pyvenv
-                               dockerfile-mode
-
-                               ;; git
-                               magit
-                               diff-hl
-
-                               ;; utils
-                               ibuffer-project
-                               auto-save
-                               quelpa-use-package
-                               eyebrowse
-                               writeroom-mode
-                               elfeed
-                               youdao-dictionary
-                               neotree
-                               )))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
 
 (provide 'init)
 ;;; init.el ends here

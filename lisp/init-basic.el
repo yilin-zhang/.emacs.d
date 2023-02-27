@@ -142,6 +142,19 @@
        'default nil :font "Sarasa Mono SC 13")))
 
 ;; --------------------------------------------------------------
+;;                           File Tree
+;; --------------------------------------------------------------
+(use-package treemacs
+  :hook (treemacs-mode . treemacs-project-follow-mode)
+  :bind
+  ("<f8>" . treemacs)
+  (:map treemacs-mode-map
+        ("<mouse-1>" . treemacs-single-click-expand-action)
+        ("j" . treemacs-next-line)
+        ("k" . treemacs-previous-line)
+        ))
+
+;; --------------------------------------------------------------
 ;;                        Theme and Modeline
 ;; --------------------------------------------------------------
 ;; doom-themes-visual-bell-config must be loaded after setting
@@ -149,7 +162,7 @@
 (use-package doom-themes
   :init
   (load-theme 'doom-gruvbox t)
-  (doom-themes-neotree-config)
+  (doom-themes-treemacs-config)
   ;; Disable visual bell because it causes buffer selecting error
   ;; when it works with dired-async
   ;; (doom-themes-visual-bell-config)

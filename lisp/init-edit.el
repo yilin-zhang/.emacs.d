@@ -47,8 +47,7 @@
       "r" 'consult-ripgrep
       "p" 'consult-yank-pop
       "a" 'org-agenda
-      "i" 'org-clock-in
-      "o" 'org-clock-out
+      "o" 'other-window
       "g" 'magit-status
       "d" 'dired-jump
       "s" 'outline-cycle))

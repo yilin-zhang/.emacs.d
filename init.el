@@ -85,7 +85,6 @@
                                exec-path-from-shell
                                doom-themes
                                doom-modeline
-                               beacon
                                fcitx
                                popwin
                                all-the-icons
@@ -110,6 +109,8 @@
                                yasnippet
                                highlight-indent-guides
                                rainbow-delimiters
+                               beacon
+                               undo-tree
 
                                ;; org
                                org-superstar

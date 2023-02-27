@@ -503,8 +503,24 @@
   (dolist (keyword '("WORKAROUND" "HACK" "TRICK"))
     (cl-pushnew `(,keyword . ,(face-foreground 'warning)) hl-todo-keyword-faces)))
 
+;; Make the cursor have a tail, which is easier for
+;; users to locate the cursor.
 (use-package beacon
-  :config (beacon-mode 1))
+  :diminish
+  :hook after-init
+  :custom
+  (beacon-color 0.5)
+  (beacon-size 70))
+
+;; --------------------------------------------------------------
+;;                            Undo
+;; --------------------------------------------------------------
+(use-package undo-tree
+  :hook (after-init . global-undo-tree-mode)
+  :bind
+  ("C-/" . undo-tree-undo)
+  ("M-/" . undo-tree-redo)
+  )
 
 ;; --------------------------------------------------------------
 ;;                            Custom

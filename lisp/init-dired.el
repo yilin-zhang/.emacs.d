@@ -17,9 +17,14 @@
 
 (use-package async
   :init
-  ;; Do not update mode line
   (setq dired-async-message-function
-        (lambda (text face &rest args)))
+        (lambda (text face &rest args)
+          "Notify end of operation in `mode-line'."
+          (message (propertize
+                    (if args
+                        (apply #'format text args)
+                      text)
+                    'face face))))
   :hook (dired-mode . dired-async-mode))
 
 ;; support --dired

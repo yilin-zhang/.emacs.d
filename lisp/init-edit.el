@@ -524,6 +524,18 @@
   (undo-tree-auto-save-history nil))
 
 ;; --------------------------------------------------------------
+;;                            Other
+;; --------------------------------------------------------------
+(use-package separedit
+  :bind (:map prog-mode-map
+              ("C-c '" . separedit))
+  :hook (separedit-buffer-creation . auto-fill-mode)
+  :custom
+  (separedit-preserve-string-indentation t)
+  (separedit-continue-fill-column t)
+  )
+
+;; --------------------------------------------------------------
 ;;                            Custom
 ;; --------------------------------------------------------------
 

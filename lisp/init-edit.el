@@ -584,7 +584,24 @@ is already narrowed."
 (add-hook 'LaTeX-mode-hook
           (lambda ()
             (define-key LaTeX-mode-map "\C-xn"
-              nil)))
+                        nil)))
+
+(defun yilin/delete-minibuffer-directory ()
+  "Delete the directory name before the last slash in the minibuffer."
+  (interactive)
+  (let* ((end (point))
+         (beg (save-excursion
+                (when (eq ?/ (char-before))
+                  (backward-char))
+                (if (search-backward "/" nil t)
+                    (1+ (point))
+                  (backward-word)
+                  (point)))))
+    (delete-region beg end)))
+
+(define-key minibuffer-local-map
+            (kbd "M-<backspace>")
+            'yilin/delete-minibuffer-directory)
 
 (provide 'init-edit)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -211,7 +211,7 @@
 
 ;; Set key-binding for switching from a horizontal
 ;; split to a vertical split and vice versa.
-(defun toggle-window-split ()
+(defun yilin/toggle-window-split ()
   (interactive)
   (if (= (count-windows) 2)
       (let* ((this-win-buffer (window-buffer))
@@ -236,7 +236,7 @@
           (select-window first-win)
           (if this-win-2nd (other-window 1))))))
 
-(global-set-key (kbd "C-x |") 'toggle-window-split)
+(global-set-key (kbd "C-x |") 'yilin/toggle-window-split)
 
 ;; --------------------------------------------------------------
 ;;                            Backup

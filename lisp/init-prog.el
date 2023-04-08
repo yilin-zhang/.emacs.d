@@ -127,6 +127,28 @@
   :init
   (setenv "WORKON_HOME" "~/miniconda3/envs"))
 
+(defun yilin/generate-pyrightconfig ()
+  "Generate a pyrightconfig.json file in the current directory."
+  (interactive)
+  (let ((pyrightconfig-path (concat default-directory "pyrightconfig.json")))
+    (if (file-exists-p pyrightconfig-path)
+        (message "pyrightconfig.json already exists.")
+      (progn
+        ;; write string to pyrightconfig-path
+        (with-temp-file pyrightconfig-path
+          (insert "{
+  \"reportGeneralTypeIssues\": \"warning\",
+  \"reportOptionalSubscript\": \"warning\",
+  \"reportOptionalMemberAccess\": \"warning\",
+  \"reportOptionalCall\": \"warning\",
+  \"reportOptionalIterable\": \"warning\",
+  \"reportOptionalContextManager\": \"warning\",
+  \"reportOptionalOperand\": \"warning\",
+  \"reportOptionalVariable\": \"warning\",
+  \"extraPaths\": [],
+}"))
+        (message "pyrightconfig.json generated.")))))
+
 ;; --------------------------------------------------------------
 ;;                     Rust Mode Configurations
 ;; --------------------------------------------------------------

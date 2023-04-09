@@ -62,13 +62,10 @@
   :hook (after-init . eyebrowse-mode))
 
 (use-package auto-save
-  :quelpa
-  (auto-save :repo "manateelazycat/auto-save" :fetcher github)
-  :preface
-  (defun my-auto-save-hook ()
-    (require 'auto-save)
-    (auto-save-enable))
-  :hook (after-init . my-auto-save-hook)
+  :ensure nil
+  :quelpa (auto-save :repo "manateelazycat/auto-save"
+                     :fetcher github)
+  :hook (after-init . auto-save-enable)
   :config
   (setq auto-save-silent t)             ; quietly save
   ;; (setq auto-save-delete-trailing-whitespace t) ; automatically delete spaces at the end of the line when saving
@@ -77,6 +74,23 @@
             (string-suffix-p
              "gpg"
              (file-name-extension (buffer-name)) t)))))
+
+;; --------------------------------------------------------------
+;;                           Copilot
+;; --------------------------------------------------------------
+(use-package editorconfig)  ; dependency of copilot
+
+(use-package copilot
+  :ensure nil
+  :quelpa (copilot :fetcher github
+                   :repo "zerolfx/copilot.el"
+                   :branch "main"
+                   :files ("dist" "*.el"))
+  :bind
+  (:map copilot-mode-map
+        ("M-Y" . copilot-accept-completion)
+        ("M-J" . copilot-next-completion)
+        ("M-K" . copilot-previous-completion)))
 
 (provide 'init-utils)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

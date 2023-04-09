@@ -405,13 +405,14 @@
 (use-package all-the-icons-completion
   :ensure nil
   :load-path "~/.emacs.d/site-lisp/all-the-icons-completion"
-  :demand
+  :demand t
   :config (all-the-icons-completion-mode))
 
 (use-package color-rg
   :ensure nil
-  :load-path "~/.emacs.d/site-lisp/color-rg"
-  :demand
+  :demand t
+  :quelpa (color-rg :fetcher github
+                    :repo "manateelazycat/color-rg")
   :config
   (evil-set-initial-state 'color-rg-mode 'emacs))
 
@@ -450,7 +451,7 @@
   :ensure nil
   :load-path "~/.emacs.d/site-lisp/"
   :after corfu
-  :demand
+  :demand t
   :config
   (add-to-list 'corfu-margin-formatters
                #'kind-all-the-icons-margin-formatter))

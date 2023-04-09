@@ -49,7 +49,7 @@
   (markdown-command "multimarkdown"))
 
 ;; --------------------------------------------------------------
-;;                     Serialization
+;;                     Data / Config
 ;; --------------------------------------------------------------
 (use-package yaml-mode)
 
@@ -61,18 +61,6 @@
                        (setq js-indent-level 2))))
 
 (use-package csv-mode)
-
-;; --------------------------------------------------------------
-;;                    LilyPond Mode Configurations
-;; --------------------------------------------------------------
-;; This package is in the system directory: /usr/share/emacs/site-lisp
-(use-package lilypond-mode
-  :load-path "/usr/share/emacs/site-lisp"
-  :ensure nil
-  :mode (("\\.ly$" . LilyPond-mode)
-         ("\\.ily$" . LilyPond-mode))
-  :config
-  (setq LilyPond-pdf-command "atril"))
 
 (provide 'init-markup)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

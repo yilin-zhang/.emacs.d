@@ -151,13 +151,8 @@ The buffer's major mode should be `org-mode'."
 
 ;; literature management
 ;; path variables can be set in custom/custom-post.el
-;; WORKAROUND: This package cannot be defered, otherwise the keybinding
-;; won't be loaded until you run the command
 (use-package org-ref
-  :after org
-  :init (require 'org-ref))
-
-(use-package denote)
+  :after org)
 
 ;; --------------------------------------------------------------
 ;;                            Custom

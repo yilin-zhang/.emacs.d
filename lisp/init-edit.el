@@ -420,6 +420,14 @@
 ;;                           Completion
 ;; --------------------------------------------------------------
 
+;; Path auto completion
+(use-package comint
+  :ensure nil
+  :init
+  (add-to-list 'completion-at-point-functions #'comint--complete-file-name-data)
+  (setq comint-completion-addsuffix nil
+        comint-completion-autolist nil))
+
 (use-package corfu
   ;; Optional customizations
   :custom

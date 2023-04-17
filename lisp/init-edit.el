@@ -68,6 +68,9 @@
 (use-package yasnippet
   :diminish (yas-minor-mode)
   :hook (after-init . yas-global-mode)
+  :bind
+  (:map yas-minor-mode-map
+        ("M-y" . yas-expand))
   :config
   (use-package yasnippet-snippets))
 

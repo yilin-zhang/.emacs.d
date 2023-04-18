@@ -2,10 +2,11 @@
 
 ;; Magit
 (use-package magit
-  :commands transient-insert-suffix
-  :bind (("C-x g" . magit-status)
-         ("C-x M-g" . magit-dispatch-popup)
-         ("C-c M-g" . magit-file-popup)))
+  :commands (transient-insert-suffix magit-status)
+  :after evil
+  :init
+  (evil-leader/set-key "g" 'magit-status)
+  :bind ("C-x g" . magit-status))
 
 (defun diff-hl-dired-mode-unless-remote ()
   (unless (file-remote-p default-directory)

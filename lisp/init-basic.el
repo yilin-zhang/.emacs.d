@@ -113,8 +113,7 @@
 ;; enable recentf-mode
 (use-package recentf
   :ensure nil
-  :init
-  (recentf-mode t)
+  :hook after-init
   :custom
   (recentf-max-saved-items 50))
 

@@ -45,11 +45,9 @@
     "f" 'find-file
     "b" 'switch-to-buffer
     "k" 'kill-buffer
-    "r" 'consult-ripgrep
     "p" 'consult-yank-pop
     "a" 'org-agenda
     "o" 'other-window
-    "g" 'magit-status
     "d" 'dired-jump
     "s" 'outline-cycle))
 
@@ -411,14 +409,25 @@
 (use-package all-the-icons-completion
   :ensure nil
   :load-path "~/.emacs.d/site-lisp/all-the-icons-completion"
-  :demand t
-  :config (all-the-icons-completion-mode))
+  :hook after-init)
 
 (use-package color-rg
   :ensure nil
-  :demand t
   :quelpa (color-rg :fetcher github
                     :repo "manateelazycat/color-rg")
+  :init
+  (evil-leader/set-key
+    "r" 'color-rg-search-input)
+  :commands (color-rg-search-input
+             color-rg-search-symbol
+             color-rg-search-input-in-project
+             color-rg-search-symbol-in-project
+             color-rg-search-symbol-in-current-file
+             color-rg-search-input-in-current-file
+             color-rg-search-project-rails
+             color-rg-search-symbol-with-type
+             color-rg-search-project-with-type
+             color-rg-search-project-rails-with-type)
   :config
   (evil-set-initial-state 'color-rg-mode 'emacs))
 

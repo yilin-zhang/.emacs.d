@@ -134,6 +134,7 @@ The buffer's major mode should be `org-mode'."
   (setq calendar-chinese-all-holidays-flag t))
 
 (use-package org-superstar
+  :after org
   :hook (org-mode . org-superstar-mode)
   :config
   (setq org-superstar-headline-bullets-list
@@ -144,6 +145,7 @@ The buffer's major mode should be `org-mode'."
           (?- . ?–))))
 
 (use-package org-appear
+  :after org
   :hook (org-mode . org-appear-mode))
 
 (use-package htmlize

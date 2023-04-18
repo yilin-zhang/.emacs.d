@@ -12,6 +12,18 @@
   (setq writeroom-width 90))
 
 ;; --------------------------------------------------------------
+;;                         Better Doc
+;; --------------------------------------------------------------
+(use-package helpful
+  :bind
+  ("C-h f" . helpful-callable)
+  ("C-h v" . helpful-variable)
+  ("C-h k" . helpful-key)
+  ("C-h x" . helpful-command)
+  ("C-h d" . helpful-at-point)
+  ("C-h F" . helpful-function))
+
+;; --------------------------------------------------------------
 ;;                           Note Taking
 ;; --------------------------------------------------------------
 (use-package denote)

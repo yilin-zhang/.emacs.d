@@ -39,6 +39,8 @@
 (use-package ibuffer-project
   :hook (ibuffer . yilin/ibuffer-project-hook))
 
+(use-package eyebrowse
+  :hook (after-init . eyebrowse-mode))
 
 ;; --------------------------------------------------------------
 ;;                           Feed

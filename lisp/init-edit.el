@@ -23,7 +23,7 @@
 (use-package evil
   :init
   (setq evil-want-C-i-jump nil) ;; make sure TAB is working in terminal
-  (evil-mode 1)
+  :hook after-init
   :bind
   ;; some Emacs bindings in insert state
   (:map evil-insert-state-map
@@ -38,7 +38,7 @@
 
 (use-package evil-leader
   :after evil
-  :init (global-evil-leader-mode)
+  :hook (evil-mode . global-evil-leader-mode)
   :config
   (evil-leader/set-leader "SPC")
   (evil-leader/set-key
@@ -53,7 +53,7 @@
 
 (use-package evil-surround
   :after evil
-  :init (global-evil-surround-mode))
+  :hook (evil-mode . global-evil-surround-mode))
 
 (when (eq system-type 'gnu/linux)
   (use-package fcitx

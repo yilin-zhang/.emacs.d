@@ -25,6 +25,7 @@
                         (apply #'format text args)
                       text)
                     'face face))))
+  :after dired
   :hook (dired-mode . dired-async-mode))
 
 ;; support --dired
@@ -34,9 +35,11 @@
   :custom (ls-lisp-use-insert-directory-program nil))
 
 (use-package diredfl
-  :init (diredfl-global-mode 1))
+  :after dired
+  :hook (dired-mode . diredfl-mode))
 
 (use-package all-the-icons-dired
+  :after dired
   :hook (dired-mode . all-the-icons-dired-mode)
   :custom (all-the-icons-dired-monochrome nil))
 

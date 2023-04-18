@@ -20,9 +20,10 @@
 ;;                            Paths
 ;; --------------------------------------------------------------
 (use-package exec-path-from-shell
-  :init
-  (when (memq window-system '(mac ns x))
-    (exec-path-from-shell-initialize)))
+  :hook (after-init . (lambda ()
+                        (when (memq window-system '(mac ns x))
+                          (exec-path-from-shell-initialize)))))
+
 ;; --------------------------------------------------------------
 ;;                            Server
 ;; --------------------------------------------------------------
@@ -131,6 +132,7 @@
   :bind ("C-x C-b" . ibuffer))
 
 (use-package all-the-icons-ibuffer
+  :after ibuffer
   :hook ibuffer-mode)
 
 ;; --------------------------------------------------------------
@@ -164,6 +166,7 @@
 (use-package doom-themes
   :init
   (load-theme 'doom-gruvbox t)
+  :config
   (doom-themes-treemacs-config)
   ;; Disable visual bell because it causes buffer selecting error
   ;; when it works with dired-async
@@ -172,8 +175,7 @@
 
 ;; https://github.com/seagle0128/doom-modeline
 (use-package doom-modeline
-  :init
-  (doom-modeline-mode 1)
+  :hook after-init
   :custom
   (doom-modeline-support-imenu t)
   (doom-modeline-hud t)

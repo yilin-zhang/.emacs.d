@@ -34,25 +34,28 @@
         ("C-k" . kill-line))
   :config
   (evil-set-initial-state 'special-mode 'emacs)
-  (evil-set-initial-state 'eshell-mode 'emacs)
-  (use-package evil-leader
-    :hook
-    (after-init . global-evil-leader-mode)
-    :config
-    (evil-leader/set-leader "SPC")
-    (evil-leader/set-key
-      "f" 'find-file
-      "b" 'switch-to-buffer
-      "k" 'kill-buffer
-      "r" 'consult-ripgrep
-      "p" 'consult-yank-pop
-      "a" 'org-agenda
-      "o" 'other-window
-      "g" 'magit-status
-      "d" 'dired-jump
-      "s" 'outline-cycle))
-  (use-package evil-surround
-    :hook (after-init . global-evil-surround-mode)))
+  (evil-set-initial-state 'eshell-mode 'emacs))
+
+(use-package evil-leader
+  :after evil
+  :init (global-evil-leader-mode)
+  :config
+  (evil-leader/set-leader "SPC")
+  (evil-leader/set-key
+    "f" 'find-file
+    "b" 'switch-to-buffer
+    "k" 'kill-buffer
+    "r" 'consult-ripgrep
+    "p" 'consult-yank-pop
+    "a" 'org-agenda
+    "o" 'other-window
+    "g" 'magit-status
+    "d" 'dired-jump
+    "s" 'outline-cycle))
+
+(use-package evil-surround
+  :after evil
+  :init (global-evil-surround-mode))
 
 (when (eq system-type 'gnu/linux)
   (use-package fcitx

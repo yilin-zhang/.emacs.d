@@ -1,11 +1,20 @@
 ;; init-basic.el --- Basic configurations. -*- lexical-binding: t -*-
 
 ;; --------------------------------------------------------------
-;;                            Process
+;;                         Performance
 ;; --------------------------------------------------------------
 ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
 (setq read-process-output-max (* 3 1024 1024)
       gc-cons-threshold 100000000)
+
+(defun yilin/display-startup-time ()
+  (message "Emacs loaded in %s with %d garbage collections."
+           (format "%.2f seconds"
+                   (float-time
+                    (time-subtract after-init-time before-init-time)))
+           gcs-done))
+
+(add-hook 'emacs-startup-hook #'yilin/display-startup-time)
 
 ;; --------------------------------------------------------------
 ;;                            Paths

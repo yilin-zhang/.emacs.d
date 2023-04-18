@@ -64,19 +64,15 @@
 ;;                           Fancy Stuff
 ;; --------------------------------------------------------------
 
-;; Youdao Dictionay
-(use-package youdao-dictionary
-  :bind (("C-c Y" . youdao-dictionary-search-at-point)
-         ("C-c y" . youdao-dictionary-search-at-point-tooltip))
+(use-package dictionary
+  :ensure nil
+  :after evil
+  :init
+  (evil-leader/set-key
+    "y" 'dictionary-lookup-definition)
   :config
-  (evil-set-initial-state 'youdao-dictionary-mode 'emacs)
-  ;; Cache documents
-  (setq url-automatic-caching t)
-  ;; Enable Chinese word segmentation support (支持中文分词)
-  (setq youdao-dictionary-use-chinese-word-segmentation t))
-
-(use-package eyebrowse
-  :hook (after-init . eyebrowse-mode))
+  (setq dictionary-use-single-buffer t)
+  (setq dictionary-server "dict.org"))
 
 (use-package auto-save
   :ensure nil

@@ -415,6 +415,7 @@
   :ensure nil
   :quelpa (color-rg :fetcher github
                     :repo "manateelazycat/color-rg")
+  :after evil
   :init
   (evil-leader/set-key
     "r" 'color-rg-search-input)

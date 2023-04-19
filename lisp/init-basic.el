@@ -4,8 +4,7 @@
 ;;                         Performance
 ;; --------------------------------------------------------------
 ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
-(setq read-process-output-max (* 3 1024 1024)
-      gc-cons-threshold 100000000)
+(setq read-process-output-max (* 3 1024 1024))
 
 (defun yilin/display-startup-time ()
   (message "Emacs loaded in %s with %d garbage collections."

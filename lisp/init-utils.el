@@ -1,6 +1,16 @@
 ;; init-utils.el --- Utility configurations. -*- lexical-binding: t -*-
 
 ;; --------------------------------------------------------------
+;;                         Terminal
+;; --------------------------------------------------------------
+(use-package vterm
+  :after evil
+  :commands (vterm)
+  :hook (vterm-mode . (lambda () (setq-local global-hl-line-mode nil)))
+  :config
+  (evil-set-initial-state 'vterm-mode 'emacs))
+
+;; --------------------------------------------------------------
 ;;                         Better Writting
 ;; --------------------------------------------------------------
 (use-package writeroom-mode

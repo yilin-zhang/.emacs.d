@@ -33,7 +33,7 @@
         ("C-e" . end-of-line)
         ("C-k" . kill-line))
   :config
-  (evil-set-initial-state 'special-mode 'emacs)
+  (evil-set-initial-state 'special-mode 'motion)
   (evil-set-initial-state 'eshell-mode 'emacs))
 
 (use-package evil-leader

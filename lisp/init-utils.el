@@ -62,15 +62,10 @@
         ("k" . previous-line)
         ("h" . backward-char)
         ("l" . forward-char))
-  (:map elfeed-show-mode-map
-        ("j" . next-line)
-        ("k" . previous-line)
-        ("h" . backward-char)
-        ("l" . forward-char))
   :config
   (setq elfeed-search-filter "@6-months-ago")
   (evil-set-initial-state 'elfeed-search-mode 'emacs)
-  (evil-set-initial-state 'elfeed-show-mode 'emacs))
+  (evil-set-initial-state 'elfeed-show-mode 'motion))
 
 ;; --------------------------------------------------------------
 ;;                           Fancy Stuff

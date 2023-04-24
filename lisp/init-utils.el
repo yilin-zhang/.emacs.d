@@ -4,11 +4,8 @@
 ;;                         Terminal
 ;; --------------------------------------------------------------
 (use-package vterm
-  :after evil
   :commands (vterm)
-  :hook (vterm-mode . (lambda () (setq-local global-hl-line-mode nil)))
-  :config
-  (evil-set-initial-state 'vterm-mode 'emacs))
+  :hook (vterm-mode . (lambda () (setq-local global-hl-line-mode nil))))
 
 ;; --------------------------------------------------------------
 ;;                         Better Writting
@@ -63,9 +60,7 @@
         ("h" . backward-char)
         ("l" . forward-char))
   :config
-  (setq elfeed-search-filter "@6-months-ago")
-  (evil-set-initial-state 'elfeed-search-mode 'emacs)
-  (evil-set-initial-state 'elfeed-show-mode 'motion))
+  (setq elfeed-search-filter "@6-months-ago"))
 
 ;; --------------------------------------------------------------
 ;;                           Fancy Stuff
@@ -73,10 +68,6 @@
 
 (use-package dictionary
   :ensure nil
-  :after evil
-  :init
-  (evil-leader/set-key
-    "y" 'dictionary-lookup-definition)
   :config
   (setq dictionary-use-single-buffer t)
   (setq dictionary-server "dict.org"))

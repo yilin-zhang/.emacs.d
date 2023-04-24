@@ -91,16 +91,7 @@
 ;;                             Line Numbers
 ;; --------------------------------------------------------------
 ;; show line number under prog-mode
-;; if using emacs26, then use the second line,
-;; or just use the first line.
-;; (add-hook 'prog-mode-hook 'linum-mode)
-;; (global-display-line-numbers-mode)
-(if (version<= "26" emacs-version )
-    (progn
-      (setq display-line-numbers-type 'relative)
-      (add-hook 'prog-mode-hook 'display-line-numbers-mode)
-      )
-  (add-hook 'prog-mode-hook 'linum-mode))
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
 ;; --------------------------------------------------------------
 ;;                              Files

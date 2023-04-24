@@ -3,9 +3,6 @@
 ;; Magit
 (use-package magit
   :commands (transient-insert-suffix magit-status)
-  :after evil
-  :init
-  (evil-leader/set-key "g" 'magit-status)
   :bind ("C-x g" . magit-status))
 
 (defun diff-hl-dired-mode-unless-remote ()

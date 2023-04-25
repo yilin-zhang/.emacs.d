@@ -53,7 +53,15 @@
    '("9" . meow-digit-argument)
    '("0" . meow-digit-argument)
    '("/" . meow-keypad-describe-key)
-   '("?" . meow-cheatsheet))
+   '("?" . meow-cheatsheet)
+   ;; Custom leader bindings
+   '("f" . find-file)
+   '("b" . switch-to-buffer)
+   '("k" . kill-buffer)
+   '("p" . consult-yank-pop)
+   '("o" . other-window)
+   '("d" . dired-jump)
+   '("s" . outline-cycle))
   (meow-normal-define-key
    '("0" . meow-expand-0)
    '("9" . meow-expand-9)
@@ -75,7 +83,7 @@
    '("A" . meow-open-below)
    '("b" . meow-back-word)
    '("B" . meow-back-symbol)
-   '("c" . meow-save)
+   '("c" . meow-change-save)
    '("d" . meow-kill)
    '("e" . meow-next-word)
    '("E" . meow-next-symbol)
@@ -348,7 +356,7 @@
          ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
          ("C-M-#" . consult-register)
          ;; Other custom bindings
-         ("M-Y" . consult-yank-pop)                ;; orig. yank-pop
+         ("M-Y" . consult-yank-pop)                ;; orig. yank-pop (M-y is for yasnippet, use Y instead)
          ("<help> a" . consult-apropos)            ;; orig. apropos-command
          ;; M-g bindings (goto-map)
          ("M-g e" . consult-compile-error)

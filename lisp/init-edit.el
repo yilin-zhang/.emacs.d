@@ -32,6 +32,7 @@
 ;; --------------------------------------------------------------
 (defun meow-setup ()
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+  (setq meow-use-clipboard t)
   (meow-motion-overwrite-define-key
    '("j" . meow-next)
    '("k" . meow-prev)
@@ -74,7 +75,7 @@
    '("A" . meow-open-below)
    '("b" . meow-back-word)
    '("B" . meow-back-symbol)
-   '("c" . meow-change)
+   '("c" . meow-save)
    '("d" . meow-kill)
    '("e" . meow-next-word)
    '("E" . meow-next-symbol)
@@ -106,6 +107,7 @@
    '("u" . meow-undo)
    '("U" . meow-undo-in-selection)
    '("v" . meow-line)
+   '("V" . rectangle-mark-mode)
    '("w" . meow-mark-word)
    '("W" . meow-mark-symbol)
    '("x" . meow-delete)
@@ -346,7 +348,7 @@
          ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
          ("C-M-#" . consult-register)
          ;; Other custom bindings
-         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+         ("M-Y" . consult-yank-pop)                ;; orig. yank-pop
          ("<help> a" . consult-apropos)            ;; orig. apropos-command
          ;; M-g bindings (goto-map)
          ("M-g e" . consult-compile-error)
@@ -548,10 +550,6 @@
 (use-package symbol-overlay
   :diminish
   :defines iedit-mode
-  :commands (symbol-overlay-get-symbol
-             symbol-overlay-assoc
-             symbol-overlay-get-list
-             symbol-overlay-jump-call)
   :bind (("M-i" . symbol-overlay-put)
          ("M-n" . symbol-overlay-jump-next)
          ("M-p" . symbol-overlay-jump-prev)
@@ -561,7 +559,22 @@
          ([M-f3] . symbol-overlay-remove-all))
   :hook ((prog-mode . symbol-overlay-mode)
          (iedit-mode . (lambda () (symbol-overlay-mode -1)))
-         (iedit-mode-end . symbol-overlay-mode)))
+         (iedit-mode-end . symbol-overlay-mode))
+  :config
+  ;; Disable symbol highlighting while selecting
+  (defun turn-off-symbol-overlay (&rest _)
+    "Turn off symbol highlighting."
+    (interactive)
+    (symbol-overlay-mode -1))
+  (advice-add #'set-mark :after #'turn-off-symbol-overlay)
+
+  (defun turn-on-symbol-overlay (&rest _)
+    "Turn on symbol highlighting."
+    (interactive)
+    (when (derived-mode-p 'prog-mode 'yaml-mode)
+      (symbol-overlay-mode 1)))
+  (advice-add #'deactivate-mark :after #'turn-on-symbol-overlay))
+
 
 ;; highlight indentations
 (use-package highlight-indent-guides

@@ -30,6 +30,25 @@
 ;; --------------------------------------------------------------
 ;;                            Meow
 ;; --------------------------------------------------------------
+
+;; indent-rigid-xxx-to-tab-stop has strange behaviour in python-mode
+;; where the indentation is 8 spaces. Use python-indent-shift-xxx instead.
+(defun yilin/indent-right ()
+  (interactive)
+  (if (or (eq major-mode 'python-mode)
+          (eq major-mode 'python-ts-mode))
+      (python-indent-shift-right (region-beginning) (region-end)
+                                 python-indent-offset)
+    (indent-rigidly-right-to-tab-stop (region-beginning) (region-end))))
+
+(defun yilin/indent-left ()
+  (interactive)
+  (if (or (eq major-mode 'python-mode)
+          (eq major-mode 'python-ts-mode))
+      (python-indent-shift-left (region-beginning) (region-end)
+                                python-indent-offset)
+    (indent-rigidly-left-to-tab-stop (region-beginning) (region-end))))
+
 (defun meow-setup ()
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
   (setq meow-use-clipboard t)
@@ -79,8 +98,8 @@
    '("." . meow-bounds-of-thing)
    '("[" . meow-beginning-of-thing)
    '("]" . meow-end-of-thing)
-   '("<" . indent-rigidly-left-to-tab-stop)
-   '(">" . indent-rigidly-right-to-tab-stop)
+   '("<" . yilin/indent-left)
+   '(">" . yilin/indent-right)
    '("a" . meow-append)
    '("A" . meow-open-below)
    '("b" . meow-back-word)

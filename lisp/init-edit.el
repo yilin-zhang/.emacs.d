@@ -79,6 +79,8 @@
    '("." . meow-bounds-of-thing)
    '("[" . meow-beginning-of-thing)
    '("]" . meow-end-of-thing)
+   '("<" . indent-rigidly-left-to-tab-stop)
+   '(">" . indent-rigidly-right-to-tab-stop)
    '("a" . meow-append)
    '("A" . meow-open-below)
    '("b" . meow-back-word)

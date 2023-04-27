@@ -49,6 +49,9 @@
 
 (setq confirm-kill-emacs 'yes-or-no-p)
 
+(global-auto-revert-mode 1)
+(setq global-auto-revert-non-file-buffers t)
+
 ;; --------------------------------------------------------------
 ;;                             Window
 ;; --------------------------------------------------------------

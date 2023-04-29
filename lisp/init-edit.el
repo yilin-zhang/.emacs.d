@@ -149,7 +149,8 @@
   ;; Make sure C-[ works in GUI
   (when window-system
     (define-key input-decode-map (kbd "C-[") [control-bracketleft])
-    (define-key meow-insert-state-keymap [control-bracketleft] 'meow-insert-exit)))
+    (define-key meow-insert-state-keymap [control-bracketleft] 'meow-insert-exit)
+    (define-key meow-normal-state-keymap [control-bracketleft] 'ignore)))
 
 (use-package meow
   :demand t

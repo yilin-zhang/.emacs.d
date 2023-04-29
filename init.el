@@ -14,6 +14,7 @@
 
 ;; Configure package sources
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                         ("nongnu" . "https://elpa.nongnu.org/nongnu/")
                          ("melpa" . "http://melpa.org/packages/")))
 ;;(setq package-archives '(("gnu" . "http://elpa.emacs-china.org/gnu/")
 ;;                         ("melpa" . "http://elpa.emacs-china.org/melpa/")))

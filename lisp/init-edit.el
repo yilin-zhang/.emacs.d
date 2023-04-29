@@ -161,6 +161,15 @@
   (meow-global-mode 1)
   (meow-setup))
 
+(defun yilin/toggle-meow-mode ()
+  "Toggle meow-mode"
+  (interactive)
+  (if (bound-and-true-p meow-mode)
+      (meow-mode -1)
+    (meow-mode 1)))
+
+(global-set-key (kbd "C-z") 'yilin/toggle-meow-mode)
+
 ;; --------------------------------------------------------------
 ;;                      Template and Spellchecker
 ;; --------------------------------------------------------------

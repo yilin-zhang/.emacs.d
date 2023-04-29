@@ -80,7 +80,8 @@
    '("p" . consult-yank-pop)
    '("o" . other-window)
    '("d" . dired-jump)
-   '("s" . outline-cycle))
+   '("s" . outline-cycle)
+   '("r" . color-rg-search-input))
   (meow-normal-define-key
    '("0" . meow-expand-0)
    '("9" . meow-expand-9)
@@ -513,6 +514,7 @@
   :ensure nil
   :quelpa (color-rg :fetcher github
                     :repo "manateelazycat/color-rg")
+  :hook (color-rg-mode . (lambda () (meow-mode -1)))
   :commands (color-rg-search-input
              color-rg-search-symbol
              color-rg-search-input-in-project

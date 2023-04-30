@@ -44,7 +44,9 @@
   :config
   (setq eglot-events-buffer-size 0)
   (add-to-list 'eglot-server-programs
-               '(json-mode . ("vscode-json-languageserver" "--stdio"))))
+               '(json-mode . ("vscode-json-languageserver" "--stdio")))
+  (add-to-list 'eglot-server-programs
+               '((c-mode c-ts-mode c++-mode c++-ts-mode) . ("ccls"))))
 
 ;; (use-package lsp-mode
 ;;   :init

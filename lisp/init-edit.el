@@ -587,15 +587,6 @@
 ;; --------------------------------------------------------------
 ;;                            Hightlight
 ;; --------------------------------------------------------------
-;; highlight indentations
-(use-package highlight-indent-guides
-  :diminish
-  :hook (prog-mode . highlight-indent-guides-mode)
-  :config
-  (setq highlight-indent-guides-method 'bitmap
-        highlight-indent-guides-bitmap-function #'highlight-indent-guides--bitmap-line
-        highlight-indent-guides-responsive t))
-
 ;; Highlight TODO and similar keywords in comments and strings
 (use-package hl-todo
   :custom-face (hl-todo ((t (:box t :inherit))))

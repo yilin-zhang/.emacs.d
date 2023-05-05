@@ -42,7 +42,10 @@
   ("s-b" . xref-find-definitions)
   ("s-r" . xref-find-references)
   :config
-  (setq eglot-events-buffer-size 0)
+  (setq eglot-events-buffer-size 0
+        eglot-ignored-server-capabilities '(:hoverProvider
+                                            :documentHighlightProvider)
+        eglot-autoshutdown t)
   (add-to-list 'eglot-server-programs
                '(json-mode . ("vscode-json-languageserver" "--stdio")))
   (add-to-list 'eglot-server-programs

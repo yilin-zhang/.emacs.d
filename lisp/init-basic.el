@@ -158,13 +158,7 @@
 ;; ring-bell-function, or it will not work.
 (use-package doom-themes
   :init
-  (load-theme 'doom-monokai-pro t)
-  ;; The following face settings are for monokai-pro only
-  (custom-set-faces
-   ;; brighten up the shadow (the default is too dark)
-   `(shadow ((t (:foreground ,(doom-color 'base6)))))
-   ;; slightly brighten up line number (the defualt is base4)
-   `(line-number ((t (:foreground ,(doom-color 'base5))))))
+  (load-theme 'doom-gruvbox t)
   :config
   (doom-themes-treemacs-config)
   ;; Disable visual bell because it causes buffer selecting error

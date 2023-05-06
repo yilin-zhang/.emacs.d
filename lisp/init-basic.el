@@ -114,7 +114,7 @@
 ;; --------------------------------------------------------------
 ;;                          Icons and Emoji
 ;; --------------------------------------------------------------
-(use-package all-the-icons)
+(use-package nerd-icons)
 
 ;; --------------------------------------------------------------
 ;;                             Buffer
@@ -124,7 +124,7 @@
   :ensure nil
   :bind ("C-x C-b" . ibuffer))
 
-(use-package all-the-icons-ibuffer
+(use-package nerd-icons-ibuffer
   :after ibuffer
   :hook ibuffer-mode)
 

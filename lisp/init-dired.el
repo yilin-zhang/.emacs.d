@@ -38,10 +38,9 @@
   :after dired
   :hook (dired-mode . diredfl-mode))
 
-(use-package all-the-icons-dired
+(use-package nerd-icons-dired
   :after dired
-  :hook (dired-mode . all-the-icons-dired-mode)
-  :custom (all-the-icons-dired-monochrome nil))
+  :hook dired-mode)
 
 (provide 'init-dired)
 

@@ -514,9 +514,7 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
-(use-package all-the-icons-completion
-  :ensure nil
-  :load-path "~/.emacs.d/site-lisp/all-the-icons-completion"
+(use-package nerd-icons-completion
   :hook after-init)
 
 (use-package color-rg

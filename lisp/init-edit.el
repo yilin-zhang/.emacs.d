@@ -615,14 +615,7 @@
 ;; --------------------------------------------------------------
 ;;                            Undo
 ;; --------------------------------------------------------------
-(use-package undo-tree
-  :hook
-  (after-init . global-undo-tree-mode)
-  :bind
-  ("C-/" . undo-tree-undo)
-  ("M-/" . undo-tree-redo)
-  :custom
-  (undo-tree-auto-save-history nil))
+(use-package vundo)
 
 ;; --------------------------------------------------------------
 ;;                            Other

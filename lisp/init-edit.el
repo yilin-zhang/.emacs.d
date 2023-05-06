@@ -572,6 +572,17 @@
   ;; (global-corfu-mode)
   )
 
+;; A custom package to show icons in corfu completion
+;; Adapted from `'https://emacs-china.org/t/corfu-all-the-icons-icon/20907'
+(use-package kind-nerd-icons
+  :ensure nil
+  :load-path "~/.emacs.d/site-lisp/"
+  :after (corfu nerd-icons)
+  :demand t
+  :config
+  (add-to-list 'corfu-margin-formatters
+               #'kind-nerd-icons-margin-formatter))
+
 ;; --------------------------------------------------------------
 ;;                            Hightlight
 ;; --------------------------------------------------------------

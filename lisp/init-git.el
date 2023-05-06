@@ -3,7 +3,9 @@
 ;; Magit
 (use-package magit
   :commands (transient-insert-suffix magit-status)
-  :bind ("C-x g" . magit-status))
+  :bind ("C-x g" . magit-status)
+  ;; turn off auto revert since global-auto-revert-mode is enabled
+  :config (magit-auto-revert-mode -1))
 
 (defun diff-hl-dired-mode-unless-remote ()
   (unless (file-remote-p default-directory)

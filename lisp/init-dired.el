@@ -13,7 +13,10 @@
   (dired-dwim-target t)
   ;; display file sizes in “human-readable” format
   (dired-listing-switches "-alh")
-  )
+  :config
+  ;; support --dired
+  (when (eq system-type 'darwin)
+    (setq insert-directory-program "gls")))
 
 (use-package async
   :init
@@ -27,12 +30,6 @@
                     'face face))))
   :after dired
   :hook (dired-mode . dired-async-mode))
-
-;; support --dired
-(use-package ls-lisp
-  :ensure nil
-  :demand
-  :custom (ls-lisp-use-insert-directory-program nil))
 
 (use-package diredfl
   :after dired

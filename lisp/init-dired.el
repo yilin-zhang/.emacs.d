@@ -37,11 +37,7 @@
 
 (use-package nerd-icons-dired
   :after dired
-  :hook dired-mode
-  :config
-  ;; override the face defined in the package, use default face
-  (custom-set-faces
-   '(nerd-icons-dired-dir-face ((t nil)))))
+  :hook dired-mode)
 
 (provide 'init-dired)
 

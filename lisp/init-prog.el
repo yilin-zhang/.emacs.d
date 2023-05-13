@@ -116,10 +116,8 @@
 ;; --------------------------------------------------------------
 ;;                     Lisp Mode Configurations
 ;; --------------------------------------------------------------
-
 (use-package elispfl
-  :quelpa
-  (elispfl :repo "cireu/elispfl" :fetcher github)
+  :load-path "~/.emacs.d/site-lisp/"
   :hook (emacs-lisp-mode . elispfl-mode))
 
 ;; --------------------------------------------------------------

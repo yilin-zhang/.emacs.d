@@ -10,7 +10,8 @@
 (when (eq system-type 'darwin)
   ;; Compatible with Emacs Mac port
   (setq mac-option-modifier 'meta
-        mac-command-modifier 'super)
+        mac-command-modifier 'super
+        mac-function-modifier 'hyper)
   (bind-keys ([(super a)] . mark-whole-buffer)
              ([(super c)] . kill-ring-save)
              ([(super l)] . goto-line)

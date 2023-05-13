@@ -47,9 +47,7 @@
                                             :documentHighlightProvider)
         eglot-autoshutdown t)
   (add-to-list 'eglot-server-programs
-               '(json-mode . ("vscode-json-languageserver" "--stdio")))
-  (add-to-list 'eglot-server-programs
-               '((c-mode c-ts-mode c++-mode c++-ts-mode) . ("ccls"))))
+               '(json-mode . ("vscode-json-languageserver" "--stdio"))))
 
 ;; (use-package lsp-mode
 ;;   :init

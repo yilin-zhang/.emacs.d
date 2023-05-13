@@ -618,9 +618,6 @@
          (dired-mode . yilin/diff-hl-dired-mode-unless-remote))
   :init (setq diff-hl-draw-borders nil)
   :config
-  ;; Highlight on-the-fly
-  (diff-hl-flydiff-mode 1)
-
   ;; Set fringe style
   (setq-default fringes-outside-margins t)
 

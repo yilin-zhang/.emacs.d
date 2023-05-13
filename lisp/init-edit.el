@@ -559,7 +559,7 @@
   ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
   ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
   ;; (corfu-scroll-margin 5)        ;; Use scroll margin
-  (corfu-auto-delay 0.1)
+  (corfu-auto-delay 0.2)
 
   ;; Enable Corfu only for certain modes.
   :hook ((prog-mode . corfu-mode)

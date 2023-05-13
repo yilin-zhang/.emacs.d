@@ -602,14 +602,54 @@
   (dolist (keyword '("WORKAROUND" "HACK" "TRICK"))
     (cl-pushnew `(,keyword . ,(face-foreground 'warning)) hl-todo-keyword-faces)))
 
+;; Highlight uncommitted changes using VC
+(use-package diff-hl
+  :preface
+  (defun yilin/diff-hl-dired-mode-unless-remote ()
+    (unless (file-remote-p default-directory)
+      (diff-hl-dired-mode)))
+  :custom-face
+  (diff-hl-change ((t (:inherit custom-changed :foreground unspecified :background unspecified))))
+  (diff-hl-insert ((t (:inherit diff-added :background unspecified))))
+  (diff-hl-delete ((t (:inherit diff-removed :background unspecified))))
+  :bind (:map diff-hl-command-map
+              ("SPC" . diff-hl-mark-hunk))
+  :hook ((after-init . global-diff-hl-mode)
+         (dired-mode . yilin/diff-hl-dired-mode-unless-remote))
+  :init (setq diff-hl-draw-borders nil)
+  :config
+  ;; Highlight on-the-fly
+  (diff-hl-flydiff-mode 1)
+
+  ;; Set fringe style
+  (setq-default fringes-outside-margins t)
+
+  (with-no-warnings
+    (defun my-diff-hl-fringe-bmp-function (_type _pos)
+      "Fringe bitmap function for use as `diff-hl-fringe-bmp-function'."
+      (define-fringe-bitmap 'my-diff-hl-bmp
+        (vector (if (eq system-type 'gnu/linux) #b11111100 #b11100000))
+        1 8
+        '(center t)))
+    (setq diff-hl-fringe-bmp-function #'my-diff-hl-fringe-bmp-function)
+
+    (unless (display-graphic-p)
+      ;; Fall back to the display margin since the fringe is unavailable in tty
+      (diff-hl-margin-mode 1)
+      ;; Avoid restoring `diff-hl-margin-mode'
+      (with-eval-after-load 'desktop
+        (add-to-list 'desktop-minor-mode-table
+                     '(diff-hl-margin-mode nil))))
+
+    ;; Integration with magit
+    (with-eval-after-load 'magit
+      (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
+      (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))))
+
 ;; Make the cursor have a tail, which is easier for
 ;; users to locate the cursor.
-(use-package beacon
-  :diminish
-  :hook after-init
-  :custom
-  (beacon-color 0.5)
-  (beacon-size 70))
+(use-package pulsar
+  :hook (after-init . pulsar-global-mode))
 
 ;; --------------------------------------------------------------
 ;;                            Undo

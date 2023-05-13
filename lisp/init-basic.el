@@ -91,12 +91,6 @@
   :hook after-init)
 
 ;; --------------------------------------------------------------
-;;                             Line Numbers
-;; --------------------------------------------------------------
-;; show line number under prog-mode
-(add-hook 'prog-mode-hook 'display-line-numbers-mode)
-
-;; --------------------------------------------------------------
 ;;                              Files
 ;; --------------------------------------------------------------
 
@@ -157,7 +151,6 @@
   :hook after-init
   :custom
   (doom-modeline-support-imenu t)
-  (doom-modeline-hud t)
   (doom-modeline-modal-icon nil)
   (find-file-visit-truename t))
 

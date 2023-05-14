@@ -31,10 +31,6 @@
   :after dired
   :hook (dired-mode . dired-async-mode))
 
-(use-package diredfl
-  :after dired
-  :hook (dired-mode . diredfl-mode))
-
 (use-package nerd-icons-dired
   :after dired
   :hook dired-mode)

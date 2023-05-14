@@ -1,5 +1,10 @@
 ;; init-prog.el --- Configurations for programming languages. -*- lexical-binding: t -*-
 
+(use-package flymake
+  :ensure nil
+  :custom
+  (flymake-no-changes-timeout nil))
+
 (use-package prog-mode
   :ensure nil
   :hook
@@ -7,8 +12,7 @@
 
 (use-package code-cells
   :hook
-  (python-mode . code-cells-mode-maybe)
-  )
+  (python-mode . code-cells-mode-maybe))
 
 ;; --------------------------------------------------------------
 ;;                     Tree Sitter

@@ -3,7 +3,7 @@
 (use-package flymake
   :ensure nil
   :custom
-  (flymake-no-changes-timeout nil))
+  (flymake-no-changes-timeout 1))
 
 (use-package prog-mode
   :ensure nil

@@ -15,11 +15,13 @@
 
 (add-hook 'emacs-startup-hook #'yilin/display-startup-time)
 
+;; settings from Centaur Emcas
 (use-package gcmh
   :hook after-init
-  :custom
-  (gcmh-high-cons-threshold (* 128 1024 1024))
-  (gcmh-idle-delay 10))
+  :init
+  (setq gcmh-idle-delay 'auto
+        gcmh-auto-idle-delay-factor 10
+        gcmh-high-cons-threshold #x1000000)) ; 16MB
 
 ;; --------------------------------------------------------------
 ;;                            Paths

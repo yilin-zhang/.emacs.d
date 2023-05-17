@@ -15,6 +15,12 @@
 
 (add-hook 'emacs-startup-hook #'yilin/display-startup-time)
 
+(use-package gcmh
+  :hook after-init
+  :custom
+  (gcmh-high-cons-threshold (* 128 1024 1024))
+  (gcmh-idle-delay 10))
+
 ;; --------------------------------------------------------------
 ;;                            Paths
 ;; --------------------------------------------------------------

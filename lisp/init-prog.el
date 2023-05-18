@@ -150,7 +150,7 @@
   \"reportOptionalContextManager\": \"warning\",
   \"reportOptionalOperand\": \"warning\",
   \"reportOptionalVariable\": \"warning\",
-  \"extraPaths\": [],
+  \"extraPaths\": []
 }"))
         (message "pyrightconfig.json generated.")))))
 

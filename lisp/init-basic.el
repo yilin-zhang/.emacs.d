@@ -83,6 +83,9 @@
 ;; lock the cursor postion when scrolling up and down
 (setq scroll-preserve-screen-position 'always)
 
+;; Enable pixel scroll precision mode
+(pixel-scroll-precision-mode t)
+
 ;; make cursor jump to the newly created window
 (global-set-key "\C-x2" (lambda () (interactive)(split-window-vertically) (other-window 1)))
 (global-set-key "\C-x3" (lambda () (interactive)(split-window-horizontally) (other-window 1)))

@@ -40,13 +40,13 @@
 ;; --------------------------------------------------------------
 ;;                     Markdown Mode Configurations
 ;; --------------------------------------------------------------
-
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :custom
-  (markdown-command "multimarkdown"))
+  (markdown-command "multimarkdown")
+  (markdown-fontify-code-blocks-natively t))
 
 ;; --------------------------------------------------------------
 ;;                     Data / Config

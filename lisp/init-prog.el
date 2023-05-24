@@ -12,7 +12,11 @@
 
 (use-package code-cells
   :hook
-  (python-mode . code-cells-mode-maybe))
+  (python-mode . code-cells-mode-maybe)
+  :config
+  ;; remap the prefix
+  (define-key code-cells-mode-map (kbd "C-c g")
+              (lookup-key code-cells-mode-map (kbd "C-c %"))))
 
 (use-package jupyter)
 

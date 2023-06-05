@@ -4,6 +4,7 @@
   :ensure nil
   :custom
   (dired-auto-revert-buffer t)
+  (dired-do-revert-buffer t)
   ;; Always delete and copy recursively
   (dired-recursive-deletes 'always)
   (dired-recursive-copies 'always)

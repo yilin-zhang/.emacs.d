@@ -4,8 +4,12 @@
 ;;                         Terminal
 ;; --------------------------------------------------------------
 (use-package vterm
-  :commands (vterm)
+  :commands vterm
   :hook (vterm-mode . (lambda () (setq-local global-hl-line-mode nil))))
+
+(use-package multi-vterm
+  :commands multi-vterm
+  :after vterm)
 
 ;; --------------------------------------------------------------
 ;;                         Better Writting

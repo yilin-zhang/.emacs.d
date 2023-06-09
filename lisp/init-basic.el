@@ -146,16 +146,15 @@
 ;; --------------------------------------------------------------
 ;;                        Theme and Modeline
 ;; --------------------------------------------------------------
-;; doom-themes-visual-bell-config must be loaded after setting
-;; ring-bell-function, or it will not work.
-(use-package doom-themes
+(use-package spacemacs-theme
   :init
-  (load-theme 'doom-gruvbox t)
-  :config
-  ;; Disable visual bell because it causes buffer selecting error
-  ;; when it works with dired-async
-  ;; (doom-themes-visual-bell-config)
-  (doom-themes-org-config))
+  (load-theme 'spacemacs-dark t)
+  :custom
+  (spacemacs-theme-org-height nil)
+  (spacemacs-theme-comment-bg nil)
+  (spacemacs-theme-custom-colors '((comment-light . "#777777")
+                                   (cursor . "DarkGoldenrod2")))
+  (spacemacs-theme-comment-italic t))
 
 ;; https://github.com/seagle0128/doom-modeline
 (use-package doom-modeline

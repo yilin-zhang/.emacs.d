@@ -3,9 +3,7 @@
 ;; Magit
 (use-package magit
   :commands (transient-insert-suffix magit-status)
-  :bind ("C-x g" . magit-status)
-  ;; turn off auto revert since global-auto-revert-mode is enabled
-  :config (magit-auto-revert-mode -1))
+  :bind ("C-x g" . magit-status))
 
 (provide 'init-git)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

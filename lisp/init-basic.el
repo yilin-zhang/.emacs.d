@@ -146,9 +146,16 @@
 ;; --------------------------------------------------------------
 ;;                        Theme and Modeline
 ;; --------------------------------------------------------------
-(use-package gruvbox-theme
+;; doom-themes-visual-bell-config must be loaded after setting
+;; ring-bell-function, or it will not work.
+(use-package doom-themes
   :init
-  (load-theme 'gruvbox-dark-soft t))
+  (load-theme 'doom-gruvbox t)
+  :config
+  ;; Disable visual bell because it causes buffer selecting error
+  ;; when it works with dired-async
+  ;; (doom-themes-visual-bell-config)
+  (doom-themes-org-config))
 
 ;; https://github.com/seagle0128/doom-modeline
 (use-package doom-modeline

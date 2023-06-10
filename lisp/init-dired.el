@@ -20,18 +20,9 @@
   (when (eq system-type 'darwin)
     (setq insert-directory-program "gls")))
 
-(use-package async
-  :init
-  (setq dired-async-message-function
-        (lambda (text face &rest args)
-          "Notify end of operation in `mode-line'."
-          (message (propertize
-                    (if args
-                        (apply #'format text args)
-                      text)
-                    'face face))))
-  :after dired
-  :hook (dired-mode . dired-async-mode))
+(use-package dired-rsync
+  :bind (:map dired-mode-map
+              ("C-c C-r" . dired-rsync)))
 
 (use-package nerd-icons-dired
   :after dired

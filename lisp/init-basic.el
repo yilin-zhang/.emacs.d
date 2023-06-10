@@ -146,15 +146,9 @@
 ;; --------------------------------------------------------------
 ;;                        Theme and Modeline
 ;; --------------------------------------------------------------
-(use-package spacemacs-theme
+(use-package gruvbox-theme
   :init
-  (load-theme 'spacemacs-dark t)
-  :custom
-  (spacemacs-theme-org-height nil)
-  (spacemacs-theme-comment-bg nil)
-  (spacemacs-theme-custom-colors '((comment-light . "#777777")
-                                   (cursor . "DarkGoldenrod2")))
-  (spacemacs-theme-comment-italic t))
+  (load-theme 'gruvbox-dark-soft t))
 
 ;; https://github.com/seagle0128/doom-modeline
 (use-package doom-modeline

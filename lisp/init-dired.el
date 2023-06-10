@@ -24,6 +24,9 @@
   :bind (:map dired-mode-map
               ("C-c C-r" . dired-rsync)))
 
+(use-package diredfl
+  :hook (dired-mode . diredfl-mode))
+
 (use-package nerd-icons-dired
   :after dired
   :hook dired-mode)

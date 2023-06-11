@@ -42,77 +42,85 @@
 ;; --------------------------------------------------------------
 ;;                            Features
 ;; --------------------------------------------------------------
-;; disable ring-bell-function
-(setq ring-bell-function 'ignore)
-
-;; change yes or no to y or n
-(fset 'yes-or-no-p 'y-or-n-p)
-(setq-default major-mode 'text-mode
-              fill-column 80)
-
-(setq-default truncate-lines t)
-
-;; handle long lines
-(global-so-long-mode 1)
-
-(setq confirm-kill-emacs 'yes-or-no-p)
-
-(use-package autorevert
+;; Set some basic features
+(use-package emacs
   :ensure nil
-  :diminish
-  :hook (after-init . global-auto-revert-mode)
-  :custom
-  (global-auto-revert-non-file-buffers t))
+  :init
+  (tool-bar-mode -1)
+  (setq inhibit-splash-screen 1) ; disable welcome screen
+  :hook
+  (after-init . global-so-long-mode)
+  (after-init . delete-selection-mode)
+  (after-init . global-hl-line-mode) ; highlight the current line
+  (after-init . pixel-scroll-precision-mode)
+  :config
+  ;; Confirmation
+  (fset 'yes-or-no-p 'y-or-n-p) ; change yes or no to y or n
+  (setq confirm-kill-emacs 'yes-or-no-p)
+  ;; Editing
+  (setq-default major-mode 'text-mode
+                fill-column 80)
+  (setq-default truncate-lines t)
+  (setq ring-bell-function 'ignore) ; disable ring-bell-function
+  ;; Cursor and scrolling
+  (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; one line at a time
+  (setq mouse-wheel-progressive-speed nil) ; don't accelerate scrolling
+  (setq mouse-wheel-follow-mouse 't) ; scroll window under mouse
+  (setq scroll-step 1
+        scroll-conservatively 100000) ; keyboard scroll one line at a time
+  (setq scroll-preserve-screen-position 'always) ; lock cursor position when scrolling
+  ;; File saving
+  (setq make-backup-files nil  ; disable backup file
+        auto-save-default nil  ; disable auto-save
+        )
+  :bind
+  ;; Focus on the new window after splitting
+  ("C-x 2" . (lambda () (interactive) (split-window-vertically) (other-window 1)))
+  ("C-x 3" . (lambda () (interactive) (split-window-horizontally) (other-window 1)))
+  )
 
-;; --------------------------------------------------------------
-;;                             Window
-;; --------------------------------------------------------------
-;; disable tool-bar-mode
-(tool-bar-mode -1)
-
-;; disable welcome screen
-(setq inhibit-splash-screen 1)
-
-;; --------------------------------------------------------------
-;;                             Cursor
-;; --------------------------------------------------------------
-;; scroll one line at a time (less "jumpy" than defaults)
-;; https://www.emacswiki.org/emacs/SmoothScrolling
-(setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; one line at a time
-(setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
-(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
-(setq scroll-step 1
-      scroll-conservatively 100000) ;; keyboard scroll one line at a time
-
-;; lock the cursor postion when scrolling up and down
-(setq scroll-preserve-screen-position 'always)
-
-;; Enable pixel scroll precision mode
-(pixel-scroll-precision-mode t)
-
-;; make cursor jump to the newly created window
-(global-set-key "\C-x2" (lambda () (interactive)(split-window-vertically) (other-window 1)))
-(global-set-key "\C-x3" (lambda () (interactive)(split-window-horizontally) (other-window 1)))
-
-;; enable delete-selection-mode
-(delete-selection-mode t)
-
-;; highlight the current line
-(global-hl-line-mode 1)
-
-;; move the cursor to the newly created window
-;; makes people easier to close it (C-g)
 (use-package popwin
   :hook after-init)
 
 ;; --------------------------------------------------------------
+;;                          Auto Revert
+;; --------------------------------------------------------------
+;; The revert mechanism is borrowed by Doom Emacs.
+;; All visible buffers are reverted immediately when
+;; a) a file is saved or
+;; b) Emacs is refocused (after using another app).
+
+;;;###autoload
+(defun yilin/visible-buffers (&optional buffer-list)
+  "Return a list of visible buffers (i.e. not buried)."
+  (let ((buffers (delete-dups (mapcar #'window-buffer (window-list)))))
+    (if buffer-list
+        (cl-delete-if (lambda (b) (memq b buffer-list))
+                      buffers)
+      (delete-dups buffers))))
+
+(use-package autorevert
+  :ensure nil
+  :diminish
+  :hook
+  (focus-in . yilin/auto-revert-buffers-h)
+  (after-save . yilin/auto-revert-buffers-h)
+  :config
+  (defun yilin/auto-revert-buffer-h ()
+    "Auto revert current buffer, if necessary."
+    (unless (or auto-revert-mode (active-minibuffer-window))
+      (let ((auto-revert-mode t))
+        (auto-revert-handler))))
+
+  (defun yilin/auto-revert-buffers-h ()
+    "Auto revert stale buffers in visible windows, if necessary."
+    (dolist (buf (yilin/visible-buffers))
+      (with-current-buffer buf
+        (yilin/auto-revert-buffer-h)))))
+
+;; --------------------------------------------------------------
 ;;                              Files
 ;; --------------------------------------------------------------
-
-(setq make-backup-files nil  ; disable backup file
-      auto-save-default nil  ; disable auto-save
-      )
-
 ;; enable recentf-mode
 (use-package recentf
   :ensure nil

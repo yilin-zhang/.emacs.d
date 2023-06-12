@@ -1,5 +1,7 @@
 ;; init-basic.el --- Basic configurations. -*- lexical-binding: t -*-
 
+(require 'cl-lib)
+
 ;; --------------------------------------------------------------
 ;;                         Performance
 ;; --------------------------------------------------------------
@@ -83,12 +85,37 @@
   :hook after-init)
 
 ;; --------------------------------------------------------------
-;;                          Auto Revert
+;;                          Buffers
 ;; --------------------------------------------------------------
-;; The revert mechanism is borrowed by Doom Emacs.
-;; All visible buffers are reverted immediately when
-;; a) a file is saved or
-;; b) Emacs is refocused (after using another app).
+;; Create some hooks for buffer related operations.
+;; (Borrowed from Doom Emacs. Mainly for auto-revert.)
+
+(defvar yilin/switch-buffer-hook nil
+  "A list of hooks run after changing the current buffer.")
+
+(defvar yilin/switch-window-hook nil
+  "A list of hooks run after changing the focused windows.")
+
+(defvar yilin/switch-frame-hook nil
+  "A list of hooks run after changing the focused frame.")
+
+(defun yilin/run-switch-buffer-hooks-h (&optional _)
+  (let ((gc-cons-threshold most-positive-fixnum)
+        (inhibit-redisplay t))
+    (run-hooks 'yilin/switch-buffer-hook)))
+
+(defun yilin/run-switch-window-or-frame-hooks-h (&optional _)
+  (let ((gc-cons-threshold most-positive-fixnum)
+        (inhibit-redisplay t))
+    (unless (equal (old-selected-frame) (selected-frame))
+      (run-hooks 'yilin/switch-frame-hook))
+    (unless (or (minibufferp)
+                (equal (old-selected-window) (minibuffer-window)))
+      (run-hooks 'yilin/switch-window-hook))))
+
+(add-hook 'window-selection-change-functions #'yilin/run-switch-window-or-frame-hooks-h)
+(add-hook 'window-buffer-change-functions #'yilin/run-switch-buffer-hooks-h)
+(add-function :after after-focus-change-function #'yilin/run-switch-window-or-frame-hooks-h)
 
 ;;;###autoload
 (defun yilin/visible-buffers (&optional buffer-list)
@@ -99,13 +126,27 @@
                       buffers)
       (delete-dups buffers))))
 
+;; --------------------------------------------------------------
+;;                          Auto Revert
+;; --------------------------------------------------------------
+;; The revert mechanism is borrowed from Doom Emacs.
+;; All visible buffers are reverted immediately when
+;; a) a file is saved or
+;; b) Emacs is refocused (after using another app).
+
 (use-package autorevert
   :ensure nil
   :diminish
   :hook
-  (focus-in . yilin/auto-revert-buffers-h)
   (after-save . yilin/auto-revert-buffers-h)
+  (yilin/switch-buffer . yilin/auto-revert-buffers-h)
+  (yilin/switch-window . yilin/auto-revert-buffers-h)
+  (yilin/switch-frame . yilin/auto-revert-buffers-h)
   :config
+  (setq auto-revert-verbose t ; let us know when it happens
+        auto-revert-use-notify nil
+        auto-revert-stop-on-user-input nil)
+
   (defun yilin/auto-revert-buffer-h ()
     "Auto revert current buffer, if necessary."
     (unless (or auto-revert-mode (active-minibuffer-window))

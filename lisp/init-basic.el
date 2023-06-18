@@ -132,81 +132,17 @@
   :hook after-init)
 
 ;; --------------------------------------------------------------
-;;                          Buffers
-;; --------------------------------------------------------------
-;; Create some hooks for buffer related operations.
-;; (Borrowed from Doom Emacs. Mainly for auto-revert.)
-
-(defvar yilin/switch-buffer-hook nil
-  "A list of hooks run after changing the current buffer.")
-
-(defvar yilin/switch-window-hook nil
-  "A list of hooks run after changing the focused windows.")
-
-(defvar yilin/switch-frame-hook nil
-  "A list of hooks run after changing the focused frame.")
-
-(defun yilin/run-switch-buffer-hooks-h (&optional _)
-  (let ((gc-cons-threshold most-positive-fixnum)
-        (inhibit-redisplay t))
-    (run-hooks 'yilin/switch-buffer-hook)))
-
-(defun yilin/run-switch-window-or-frame-hooks-h (&optional _)
-  (let ((gc-cons-threshold most-positive-fixnum)
-        (inhibit-redisplay t))
-    (unless (equal (old-selected-frame) (selected-frame))
-      (run-hooks 'yilin/switch-frame-hook))
-    (unless (or (minibufferp)
-                (equal (old-selected-window) (minibuffer-window)))
-      (run-hooks 'yilin/switch-window-hook))))
-
-(add-hook 'window-selection-change-functions #'yilin/run-switch-window-or-frame-hooks-h)
-(add-hook 'window-buffer-change-functions #'yilin/run-switch-buffer-hooks-h)
-(add-function :after after-focus-change-function #'yilin/run-switch-window-or-frame-hooks-h)
-
-;;;###autoload
-(defun yilin/visible-buffers (&optional buffer-list)
-  "Return a list of visible buffers (i.e. not buried)."
-  (let ((buffers (delete-dups (mapcar #'window-buffer (window-list)))))
-    (if buffer-list
-        (cl-delete-if (lambda (b) (memq b buffer-list))
-                      buffers)
-      (delete-dups buffers))))
-
-;; --------------------------------------------------------------
 ;;                          Auto Revert
 ;; --------------------------------------------------------------
-;; The revert mechanism is borrowed from Doom Emacs.
-;; All visible buffers are reverted immediately when
-;; a) a file is saved or
-;; b) Emacs is refocused (after using another app).
-
-(use-package autorevert
-  :ensure nil
-  :diminish
-  :hook
-  (after-save . yilin/auto-revert-buffers-h)
-  (yilin/switch-buffer . yilin/auto-revert-buffers-h)
-  (yilin/switch-window . yilin/auto-revert-buffers-h)
-  (yilin/switch-frame . yilin/auto-revert-buffers-h)
+(use-package lazy-revert
+  :load-path "~/.emacs.d/site-lisp/lazy-revert/"
+  :hook (after-init . lazy-revert-mode)
   :config
   (setq auto-revert-verbose t ; let us know when it happens
         auto-revert-use-notify nil
         auto-revert-stop-on-user-input nil
         ;; Only prompts for confirmation when buffer is unsaved.
-        revert-without-query (list "."))
-
-  (defun yilin/auto-revert-buffer-h ()
-    "Auto revert current buffer, if necessary."
-    (unless (or auto-revert-mode (active-minibuffer-window))
-      (let ((auto-revert-mode t))
-        (auto-revert-handler))))
-
-  (defun yilin/auto-revert-buffers-h ()
-    "Auto revert stale buffers in visible windows, if necessary."
-    (dolist (buf (yilin/visible-buffers))
-      (with-current-buffer buf
-        (yilin/auto-revert-buffer-h)))))
+        revert-without-query (list ".")))
 
 ;; --------------------------------------------------------------
 ;;                              Files

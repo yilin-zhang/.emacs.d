@@ -174,12 +174,22 @@
 ;; --------------------------------------------------------------
 ;;                              Fonts
 ;; --------------------------------------------------------------
+
+(defvar yilin/default-font-size 15 "The default font size")
+
+(defun yilin/set-fonts (&optional font-size)
+  (interactive (list (read-number "Enter size: " yilin/default-font-size)))
+  (let ((-font-size (if (and font-size (< 0 font-size))
+                        font-size
+                      yilin/default-font-size)))
+    (set-face-attribute 'default nil :font (font-spec :family "Sarasa Mono SC" :size -font-size))
+    (set-face-attribute 'variable-pitch nil :font (font-spec :family "Noto Serif CJK SC" :size -font-size))))
+
+(defun yilin/set-variable-pitch ()
+  (buffer-face-set 'variable-pitch))
+
 (if (display-graphic-p)
-    (if (eq system-type 'darwin)
-        (set-face-attribute
-         'default nil :font "Sarasa Mono SC 15")
-      (set-face-attribute
-       'default nil :font "Sarasa Mono SC 13")))
+    (yilin/set-fonts))
 
 ;; --------------------------------------------------------------
 ;;                        Theme and Modeline

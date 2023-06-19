@@ -70,6 +70,9 @@
   :config
   (setq elfeed-search-filter "@6-months-ago"))
 
+(use-package info
+  :hook (Info-mode . yilin/set-variable-pitch))
+
 ;; --------------------------------------------------------------
 ;;                           Fancy Stuff
 ;; --------------------------------------------------------------

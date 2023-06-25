@@ -1,5 +1,7 @@
 ;; init-prog.el --- Configurations for programming languages. -*- lexical-binding: t -*-
 
+(require 'pulse)
+
 (use-package flymake
   :ensure nil
   :custom
@@ -12,13 +14,29 @@
 
 (use-package code-cells
   :hook
-  (python-mode . code-cells-mode-maybe)
-  :config
-  ;; remap the prefix
-  (define-key code-cells-mode-map (kbd "C-c g")
-              (lookup-key code-cells-mode-map (kbd "C-c %"))))
+  (python-mode . code-cells-mode-maybe))
 
-(use-package jupyter)
+(use-package jupyter
+  :hook
+  (jupyter-repl-interaction-mode . code-cells-mode))
+
+;;;###autoload
+(defun yilin/jupyter-smart-eval (insert)
+  (interactive "P")
+  (save-excursion
+    (when (and (boundp 'code-cells-mode)
+               (not (region-active-p)))
+      (code-cells-mark-cell))
+    (jupyter-eval-line-or-region insert)
+    (if (region-active-p)
+        (progn
+          (pulse-momentary-highlight-region (region-beginning) (region-end))
+          (deactivate-mark))
+      (pulse-momentary-highlight-one-line))))
+
+(with-eval-after-load 'jupyter-repl
+  (define-key jupyter-repl-interaction-mode-map
+              (kbd "C-c C-c") #'yilin/jupyter-smart-eval))
 
 ;; --------------------------------------------------------------
 ;;                     Tree Sitter

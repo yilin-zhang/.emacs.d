@@ -1,7 +1,5 @@
 ;; init-prog.el --- Configurations for programming languages. -*- lexical-binding: t -*-
 
-(require 'pulse)
-
 (use-package flymake
   :ensure nil
   :custom
@@ -35,6 +33,7 @@
       (pulse-momentary-highlight-one-line))))
 
 (with-eval-after-load 'jupyter-repl
+  (require 'pulse)
   (define-key jupyter-repl-interaction-mode-map
               (kbd "C-c C-c") #'yilin/jupyter-smart-eval))
 

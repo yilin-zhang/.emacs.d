@@ -16,13 +16,9 @@
 ;; --------------------------------------------------------------
 ;;                         Better Writting
 ;; --------------------------------------------------------------
-(use-package writeroom-mode
+(use-package olivetti
   :bind
-  ("<f6>" . global-writeroom-mode)
-  ("<f7>" . writeroom-mode)
-  :config
-  (add-to-list 'writeroom-major-modes 'org-mode)
-  (setq writeroom-width 90))
+  ("<f7>" . olivetti-mode))
 
 ;; --------------------------------------------------------------
 ;;                         Better Doc

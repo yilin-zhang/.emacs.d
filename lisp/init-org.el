@@ -9,7 +9,8 @@
                       (:line-width 2 :color nil :style released-button))))
     "Face for displaying key bindings in Spacemacs documents."
     :group 'org-faces)
-  (defun my-prettify-org-buffer ()
+
+  (defun yilin/prettify-org-buffer ()
     "Apply visual enchantments to the current buffer.
 The buffer's major mode should be `org-mode'."
     (interactive)
@@ -29,8 +30,9 @@ The buffer's major mode should be `org-mode'."
                                       (:strike-through t))))
     (when (require 'space-doc nil t)
       (space-doc-mode)))
-  ;; Copy from `https://emacs-china.org/t/org-agenda/8679'
-  (defun my-org-agenda-time-grid-spacing ()
+
+  ;; `https://emacs-china.org/t/org-agenda/8679'
+  (defun yilin/org-agenda-time-grid-spacing ()
     "Set different line spacing w.r.t. time duration."
     (save-excursion
       (let* ((background (alist-get 'background-mode (frame-parameters)))
@@ -63,8 +65,8 @@ The buffer's major mode should be `org-mode'."
   (org-mode . auto-fill-mode)
   (org-mode . (lambda()(diminish 'org-indent-mode)))
   (org-mode . (lambda()(setq truncate-lines nil)))
-  (org-mode . my-prettify-org-buffer)
-  (org-agenda-finalize . my-org-agenda-time-grid-spacing)
+  (org-mode . yilin/prettify-org-buffer)
+  (org-agenda-finalize . yilin/org-agenda-time-grid-spacing)
   :config
   (setq system-time-locale "C")       ; make sure the time stamps are in English
   (setq org-log-done 'time            ; add time stamp after an item is DONE
@@ -79,6 +81,8 @@ The buffer's major mode should be `org-mode'."
   (setq org-priority-faces `((?A . (:foreground ,(face-foreground 'error)))
                              (?B . (:foreground ,(face-foreground 'warning)))
                              (?C . (:foreground ,(face-foreground 'success)))))
+  ;; Load habit module
+  (add-to-list 'org-modules 'org-habit t)
   ;; Latex preview scale
   (setq org-export-backends '(ascii html icalendar latex md)
         org-format-latex-options (plist-put org-format-latex-options :scale 2.3)
@@ -116,7 +120,6 @@ The buffer's major mode should be `org-mode'."
                      ((org-agenda-skip-function
                        '(org-agenda-skip-if nil '(scheduled deadline)))
                       (org-agenda-overriding-header "\nLow Priority Tasks\n")))))))
-
   ;; Set org capture
   (setq org-default-notes-file "~/inbox.org"
         org-capture-templates
@@ -133,6 +136,7 @@ The buffer's major mode should be `org-mode'."
   ;; Calendar
   (setq calendar-chinese-all-holidays-flag t))
 
+;; Bullet beautification
 (use-package org-superstar
   :after org
   :hook (org-mode . org-superstar-mode)
@@ -144,14 +148,16 @@ The buffer's major mode should be `org-mode'."
           (?* . ?➤)
           (?- . ?–))))
 
+;; Auto hide and appear markers
 (use-package org-appear
   :after org
   :hook (org-mode . org-appear-mode))
 
+;; Convert the buffer text and the associated decorations to HTML
 (use-package htmlize
   :after org)
 
-;; literature management
+;; Literature management
 ;; path variables can be set in custom/custom-post.el
 (use-package org-ref
   :after org)

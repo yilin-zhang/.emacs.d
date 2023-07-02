@@ -172,7 +172,16 @@
 (global-set-key (kbd "C-z") 'yilin/toggle-meow-mode)
 
 ;; --------------------------------------------------------------
-;;                      Template
+;;                         Spell checker
+;; --------------------------------------------------------------
+(use-package jinx
+  :hook (text-mode prog-mode conf-mode)
+  :bind
+  ("M-$" . jinx-correct)
+  ("C-M-$" . jinx-languages))
+
+;; --------------------------------------------------------------
+;;                         Template
 ;; --------------------------------------------------------------
 
 (use-package yasnippet
@@ -565,7 +574,7 @@
                #'kind-nerd-icons-margin-formatter))
 
 ;; --------------------------------------------------------------
-;;                            Hightlight
+;;                            Highlight
 ;; --------------------------------------------------------------
 ;; Highlight TODO and similar keywords in comments and strings
 (use-package hl-todo
@@ -650,19 +659,24 @@
 ;;                            Custom
 ;; --------------------------------------------------------------
 
-;; Copy from `https://www.emacswiki.org/emacs/UnfillParagraph'
-(defun my-unfill-paragraph (&optional region)
+;; **************************************************************
+;; Unfill paragraph (the reversed operation to auto-fill)
+;; `https://www.emacswiki.org/emacs/UnfillParagraph'
+;; **************************************************************
+(defun yilin/unfill-paragraph (&optional region)
   "Takes a multi-line paragraph and makes it into a single line of text."
   (interactive (progn (barf-if-buffer-read-only) '(t)))
   (let ((fill-column (point-max))
         ;; This would override `fill-column' if it's an integer.
         (emacs-lisp-docstring-fill-column t))
     (fill-paragraph nil region)))
-(define-key global-map (kbd "M-Q") 'my-unfill-paragraph)
+(define-key global-map (kbd "M-Q") 'yilin/unfill-paragraph)
 
+;; **************************************************************
 ;; Narrow and widen
-;; Copy from `https://endlessparentheses.com/emacs-narrow-or-widen-dwim.html'
-(defun my-narrow-or-widen-dwim (p)
+;; `https://endlessparentheses.com/emacs-narrow-or-widen-dwim.html'
+;; **************************************************************
+(defun yilin/narrow-or-widen-dwim (p)
   "Widen if buffer is narrowed, narrow-dwim otherwise.
 Dwim means: region, org-src-block, org-subtree, or
 defun, whichever applies first. Narrowing to
@@ -687,16 +701,12 @@ is already narrowed."
         ((derived-mode-p 'latex-mode)
          (LaTeX-narrow-to-environment))
         (t (narrow-to-defun))))
+;; This line replaces Emacs' entire narrowing keymap
+(define-key ctl-x-map "n" #'yilin/narrow-or-widen-dwim)
 
-;; This line actually replaces Emacs' entire narrowing
-;; keymap, that's how much I like this command. Only
-;; copy it if that's what you want.
-(define-key ctl-x-map "n" #'my-narrow-or-widen-dwim)
-(add-hook 'LaTeX-mode-hook
-          (lambda ()
-            (define-key LaTeX-mode-map "\C-xn"
-                        nil)))
-
+;; **************************************************************
+;; Press M-<backspace> to delete the entire file/directory name
+;; **************************************************************
 (defun yilin/delete-minibuffer-directory ()
   "Delete the directory name before the last slash in the minibuffer."
   (interactive)
@@ -709,10 +719,16 @@ is already narrowed."
                   (backward-word)
                   (point)))))
     (delete-region beg end)))
-
 (define-key minibuffer-local-map
             (kbd "M-<backspace>")
             'yilin/delete-minibuffer-directory)
+
+;; **************************************************************
+;; Insert time stamp
+;; **************************************************************
+(defun yilin/insert-timestamp ()
+  (interactive)
+  (insert (format-time-string "%Y%m%d%H%M%S")))
 
 (provide 'init-edit)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -47,7 +47,7 @@
       (use-package tree-sitter-langs
         :hook (tree-sitter-after-on . tree-sitter-hl-mode)))
 
-  ;; https://archive.casouri.cc/note/2023/tree-sitter-in-emacs-29/index.html
+  ;; `'https://archive.casouri.cc/note/2023/tree-sitter-in-emacs-29/index.html'
   (setq major-mode-remap-alist
         '((python-mode . python-ts-mode)
           (js-mode . js-ts-mode)
@@ -74,37 +74,15 @@
                                             :documentHighlightProvider)
         eglot-autoshutdown t)
   (add-to-list 'eglot-server-programs
-               '(json-mode . ("vscode-json-languageserver" "--stdio"))))
+               '(json-mode . ("vscode-json-languageserver" "--stdio")))
 
-;; (use-package lsp-mode
-;;   :init
-;;   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-;;   (setq lsp-keymap-prefix "C-c l")
-;;   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-;;          (prog-mode . (lambda ()
-;;                         (unless (derived-mode-p 'emacs-lisp-mode
-;;                                                 'lisp-mode
-;;                                                 'makefile-mode
-;;                                                 'web-mode)
-;;                           (lsp))))
-;;          ;; if you want which-key integration
-;;          (lsp-mode . lsp-enable-which-key-integration)
-;;          )
-;;   :commands lsp
-;;   :bind
-;;   ("s-b" . lsp-find-definition)
-;;   ("s-r" . lsp-find-references)
-;;   :config
-;;   (setq lsp-modeline-diagnostics-enable nil)
-;;   (setq lsp-eldoc-render-all t)
-;;   (setq lsp-log-io nil)
-;;   )
-
-;; (use-package lsp-pyright
-;;   :ensure t
-;;   :hook (python-mode . (lambda ()
-;;                          (require 'lsp-pyright)
-;;                          (lsp))))  ; or lsp-deferred
+  ;; Re-opens the current buffer before reconnection
+  (defun yilin/eglot-reconnect ()
+    (interactive)
+    (let ((filepath (buffer-file-name)))
+      (kill-buffer (current-buffer))
+      (find-file filepath)
+      (eglot-reconnect (eglot--current-server-or-lose)))))
 
 (use-package citre
   :defer t

@@ -34,3 +34,46 @@ brew install ripgrep
    #+end_src
 **** nerd-icons
 Install nerd fonts in Emacs: =M-x nerd-icons-install-fonts=
+
+* Customization
+Create file =~/.emacs.d/custom/custom-post.el=. The configuration in the file will
+be loaded last.
+
+** Org
+The most important configuration is to set =org-agenda-files=, so that Emacs knows
+where you agenda files are.
+#+begin_src elisp
+(use-package org
+  :ensure nil
+  :config
+  (add-to-list 'org-agenda-files "~/info.org")
+  (add-to-list 'org-agenda-files "~/inbox.org")
+  ;; org-ref
+  (setq reftex-default-bibliography '("~/references.bib"))
+  ;; see org-ref for use of these variables
+  (setq org-ref-bibliography-notes "~/bib-notes.org"
+        org-ref-default-bibliography '("~/references.bib")
+        org-ref-pdf-directory "~/bibtex-pdfs/")
+  )
+#+end_src
+
+** Elfeed (RSS)
+Set the RSS feeds by setting =elfeed-feeds=. Example:
+#+begin_src elisp
+(setq elfeed-feeds '("https://protesilaos.com/books.xml"))
+#+end_src
+
+** Denote
+Set the denote bucket by setting =denote-directory=. Example:
+#+begin_src elisp
+(setq denote-directory "~/Documents/notebooks/denote")
+#+end_src
+
+** Meow
+Define some leader keys. Example:
+#+begin_src elisp
+(meow-leader-define-key
+ '("t" . yilin/open-in-terminal)
+ '("e" . yilin/open-in-finder))
+#+end_src
+

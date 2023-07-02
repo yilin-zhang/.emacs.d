@@ -1,16 +1,6 @@
 ;; init-utils.el --- Utility configurations. -*- lexical-binding: t -*-
 
 ;; --------------------------------------------------------------
-;;                         Spell checker
-;; --------------------------------------------------------------
-
-(use-package jinx
-  :hook (text-mode prog-mode conf-mode)
-  :bind
-  ("M-$" . jinx-correct)
-  ("C-M-$" . jinx-languages))
-
-;; --------------------------------------------------------------
 ;;                         Terminal
 ;; --------------------------------------------------------------
 (use-package vterm
@@ -43,7 +33,7 @@
   ("C-h F" . helpful-function))
 
 ;; --------------------------------------------------------------
-;;                           Note Taking
+;;                        Note Taking
 ;; --------------------------------------------------------------
 (use-package denote)
 
@@ -80,9 +70,8 @@
   :hook (Info-mode . yilin/set-variable-pitch))
 
 ;; --------------------------------------------------------------
-;;                           Fancy Stuff
+;;                        Fancy Stuff
 ;; --------------------------------------------------------------
-
 (use-package dictionary
   :ensure nil
   :config

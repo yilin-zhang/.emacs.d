@@ -505,7 +505,8 @@
   (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package nerd-icons-completion
-  :hook after-init)
+  :after vertico
+  :hook vertico-mode)
 
 (use-package color-rg
   :ensure nil

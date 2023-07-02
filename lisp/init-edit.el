@@ -172,7 +172,7 @@
 (global-set-key (kbd "C-z") 'yilin/toggle-meow-mode)
 
 ;; --------------------------------------------------------------
-;;                      Template and Spellchecker
+;;                      Template
 ;; --------------------------------------------------------------
 
 (use-package yasnippet
@@ -183,25 +183,6 @@
         ("M-y" . yas-expand))
   :config
   (use-package yasnippet-snippets))
-
-;; On-the-fly spell checker
-(use-package flyspell
-  :ensure nil
-  :diminish
-  :if (executable-find "aspell")
-  :hook (((text-mode outline-mode) . flyspell-mode)
-         ;; WORKAROUND When using eglot, flyspell-prog-mode leads to
-         ;; "<t> undefined" problem. The problem seems to be addressed
-         ;; in Emacs 26.2
-         ;; https://github.com/company-mode/company-mode/issues/760
-         ;; (prog-mode . flyspell-prog-mode)
-         (flyspell-mode . (lambda ()
-                            (dolist (key '("C-;" "C-," "C-."))
-                              (unbind-key key flyspell-mode-map)))))
-  :init
-  (setq flyspell-issue-message-flag nil
-        ispell-program-name "aspell"
-        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together")))
 
 ;; --------------------------------------------------------------
 ;;                      Parentheses and Region

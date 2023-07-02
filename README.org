@@ -1,0 +1,36 @@
+#+TITLE: .emacs.d
+
+A personal Emacs configuration.
+
+* Installation
+** Clone the repository
+#+begin_src sh
+git clone https://github.com/yilin-zhang/.emacs.d.git ~/.emacs.d
+cd ~/.emacs.d
+git submodule update --init
+#+end_src
+** Install dependencies (macOS)
+*** Global
+#+begin_src sh
+brew tap homebrew/cask-fonts
+brew install coreutils font-sarasa-gothic font-noto-serif-cjk-sc
+#+end_src
+*** Package
+**** color-rg
+#+begin_src sh
+brew install ripgrep
+#+end_src
+**** jinx
+1. Install =enchant= and =pkgconf=
+   #+begin_src sh
+   brew install enchant pkgconf
+   #+end_src
+
+2. Override the configuration to use =AppleSpell= by default.
+   Create or modify =~/.config/enchant/enchant.ordering=:
+   #+begin_src
+   *:AppleSpell
+   en_US:AppleSpell
+   #+end_src
+**** nerd-icons
+Install nerd fonts in Emacs: =M-x nerd-icons-install-fonts=

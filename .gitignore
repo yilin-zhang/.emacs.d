@@ -4,3 +4,4 @@
 !/lisp/*.el
 !/site-lisp
 !/snippets
+!README.org

@@ -63,8 +63,8 @@ The buffer's major mode should be `org-mode'."
   :hook
   (org-mode . org-indent-mode)
   (org-mode . auto-fill-mode)
-  (org-mode . (lambda()(diminish 'org-indent-mode)))
-  (org-mode . (lambda()(setq truncate-lines nil)))
+  (org-mode . (lambda () (diminish 'org-indent-mode)))
+  (org-mode . (lambda () (setq truncate-lines nil)))
   (org-mode . yilin/prettify-org-buffer)
   (org-agenda-finalize . yilin/org-agenda-time-grid-spacing)
   :config
@@ -78,6 +78,7 @@ The buffer's major mode should be `org-mode'."
         org-image-actual-width nil      ; make org support image scaling
         org-edit-src-content-indentation 0
         )
+  ;; Priority
   (setq org-priority-faces `((?A . (:foreground ,(face-foreground 'error)))
                              (?B . (:foreground ,(face-foreground 'warning)))
                              (?C . (:foreground ,(face-foreground 'success)))))
@@ -97,14 +98,18 @@ The buffer's major mode should be `org-mode'."
            ((todo "DOING"
                   ((org-agenda-skip-function
                     '(org-agenda-skip-if nil '(nottimestamp)))
-                   (org-agenda-overriding-header "On-going Tasks\n")))
+                   (org-agenda-overriding-header "On-going\n")))
+            (todo "WAITING"
+                  ((org-agenda-skip-function
+                    '(org-agenda-skip-if nil '(nottimestamp)))
+                   (org-agenda-overriding-header "\nBlocked\n")))
             (agenda ""
                     ((org-agenda-span 'day)
                      (org-agenda-entry-types '(:scheduled :timestamp))
                      (org-agenda-format-date "")
                      (org-agenda-skip-function
-                      '(org-agenda-skip-entry-if 'todo '("DOING" "DONE")))
-                     (org-agenda-overriding-header "\nScheduled Todo Tasks")))
+                      '(org-agenda-skip-entry-if 'todo '("DOING" "WAITING" "DONE")))
+                     (org-agenda-overriding-header "\nNot Started")))
             (agenda ""
                     ((org-agenda-span 'day)
                      (org-agenda-entry-types '(:deadline))
@@ -114,7 +119,7 @@ The buffer's major mode should be `org-mode'."
                       '(org-agenda-skip-entry-if 'todo 'done))
                      (org-agenda-overriding-header "\nDeadlines")))
             (tags "CLOSED>=\"<today>\""
-                  ((org-agenda-overriding-header "\nCompleted Today\n")))))
+                  ((org-agenda-overriding-header "\nCompleted\n")))))
           ("l" "Low priority tasks"
            ((alltodo ""
                      ((org-agenda-skip-function
@@ -130,9 +135,10 @@ The buffer's major mode should be `org-mode'."
           ("i" "Info" entry (file+headline org-default-notes-file "Info")
            "* %?\n%t\n")))
   ;; Set keywords properties
-  (setq org-todo-keywords '((sequence "TODO(t)" "DOING(i)" "HANGUP(h)"
+  (setq org-todo-keywords '((sequence "TODO(t)" "DOING(i)" "WAITING(w)" "HANGUP(h)"
                                       "|" "DONE(d)" "CANCEL(c)"))
-        org-todo-keyword-faces '(("HANGUP" . warning)))
+        org-todo-keyword-faces '(("WAITING" . warning)
+                                 ("HANGUP" . warning)))
   ;; Calendar
   (setq calendar-chinese-all-holidays-flag t))
 

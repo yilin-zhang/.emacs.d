@@ -197,9 +197,9 @@
 ;; doom-themes-visual-bell-config must be loaded after setting
 ;; ring-bell-function, or it will not work.
 (use-package doom-themes
-  :init
-  (load-theme 'doom-gruvbox t)
+  :demand t
   :config
+  (load-theme 'doom-gruvbox t)
   ;; Disable visual bell because it causes buffer selecting error
   ;; when it works with dired-async
   ;; (doom-themes-visual-bell-config)

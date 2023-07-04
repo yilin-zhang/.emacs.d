@@ -17,6 +17,31 @@
         gcmh-high-cons-threshold #x1000000)) ; 16MB
 
 ;; --------------------------------------------------------------
+;;                        Theme and Modeline
+;; --------------------------------------------------------------
+;; doom-themes-visual-bell-config must be loaded after setting
+;; ring-bell-function, or it will not work.
+(use-package doom-themes
+  :demand t
+  :config
+  (load-theme 'doom-gruvbox t)
+  ;; Disable visual bell because it causes buffer selecting error
+  ;; when it works with dired-async
+  ;; (doom-themes-visual-bell-config)
+  (doom-themes-org-config))
+
+(use-package doom-modeline
+  :hook after-init
+  :custom
+  (doom-modeline-support-imenu t)
+  (doom-modeline-modal-icon nil)
+  (find-file-visit-truename t))
+
+;; Visually distinguish file buffers from other buffers
+(use-package solaire-mode
+  :hook (after-init . solaire-global-mode))
+
+;; --------------------------------------------------------------
 ;;                            Paths
 ;; --------------------------------------------------------------
 (use-package exec-path-from-shell
@@ -190,29 +215,6 @@
 
 (if (display-graphic-p)
     (yilin/set-fonts))
-
-;; --------------------------------------------------------------
-;;                        Theme and Modeline
-;; --------------------------------------------------------------
-;; doom-themes-visual-bell-config must be loaded after setting
-;; ring-bell-function, or it will not work.
-(use-package doom-themes
-  :demand t
-  :config
-  (load-theme 'doom-gruvbox t)
-  ;; Disable visual bell because it causes buffer selecting error
-  ;; when it works with dired-async
-  ;; (doom-themes-visual-bell-config)
-  (doom-themes-org-config))
-
-;; https://github.com/seagle0128/doom-modeline
-(use-package doom-modeline
-  :hook after-init
-  :custom
-  (doom-modeline-support-imenu t)
-  (doom-modeline-modal-icon nil)
-  (find-file-visit-truename t))
-
 
 (provide 'init-basic)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

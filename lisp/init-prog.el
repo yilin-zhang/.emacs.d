@@ -35,7 +35,7 @@
 (with-eval-after-load 'jupyter-repl
   (require 'pulse)
   (define-key jupyter-repl-interaction-mode-map
-              (kbd "C-c C-c") #'yilin/jupyter-smart-eval))
+              (kbd "C-<return>") #'yilin/jupyter-smart-eval))
 
 ;; --------------------------------------------------------------
 ;;                     Tree Sitter

@@ -169,6 +169,13 @@
         ;; Only prompts for confirmation when buffer is unsaved.
         revert-without-query (list ".")))
 
+(defun yilin/revert-all-buffers ()
+  (interactive)
+  (dolist (buf (buffer-list))
+    (with-current-buffer buf
+      (let ((auto-revert-mode t))
+        (auto-revert-handler)))))
+
 ;; --------------------------------------------------------------
 ;;                              Files
 ;; --------------------------------------------------------------

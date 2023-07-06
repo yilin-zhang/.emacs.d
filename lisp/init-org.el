@@ -98,7 +98,7 @@ The buffer's major mode should be `org-mode'."
            ((todo "DOING"
                   ((org-agenda-skip-function
                     '(org-agenda-skip-if nil '(nottimestamp)))
-                   (org-agenda-overriding-header "On-going\n")))
+                   (org-agenda-overriding-header "In Progress\n")))
             (todo "WAITING"
                   ((org-agenda-skip-function
                     '(org-agenda-skip-if nil '(nottimestamp)))
@@ -108,7 +108,7 @@ The buffer's major mode should be `org-mode'."
                      (org-agenda-entry-types '(:scheduled :timestamp))
                      (org-agenda-format-date "")
                      (org-agenda-skip-function
-                      '(org-agenda-skip-entry-if 'todo '("DOING" "WAITING" "DONE")))
+                      '(org-agenda-skip-entry-if 'todo '("DOING" "WAITING" "DONE" "CANCEL")))
                      (org-agenda-overriding-header "\nNot Started")))
             (agenda ""
                     ((org-agenda-span 'day)

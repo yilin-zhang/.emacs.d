@@ -125,16 +125,17 @@ The buffer's major mode should be `org-mode'."
                      ((org-agenda-skip-function
                        '(org-agenda-skip-if nil '(scheduled deadline)))
                       (org-agenda-overriding-header "\nLow Priority Tasks\n")))))))
-  ;; Set org capture
+  ;; Tags (adapt from Bullet Journal)
+  (setq org-tag-alist '(("event" . ?e)
+                        ("task" . ?t)
+                        ("note" . ?n))
+        ;; Each item only belongs to one category, one key stroke is sufficient
+        org-fast-tag-selection-single-key t)
+  ;; Org capture
   (setq org-default-notes-file "~/inbox.org"
         org-capture-templates
-        '(("l" "Life" entry (file+headline org-default-notes-file "Life")
-           "* TODO %?\n")
-          ("w" "Work" entry (file+headline org-default-notes-file "Work")
-           "* TODO %?\n%a")
-          ("i" "Info" entry (file+headline org-default-notes-file "Info")
-           "* %?\n%t\n")))
-  ;; Set keywords properties
+        '(("l" "Log" entry (file org-default-notes-file) "* %?\n")))
+  ;; Keywords
   (setq org-todo-keywords '((sequence "TODO(t)" "DOING(i)" "WAITING(w)" "HANGUP(h)"
                                       "|" "DONE(d)" "CANCEL(c)"))
         org-todo-keyword-faces '(("WAITING" . warning)

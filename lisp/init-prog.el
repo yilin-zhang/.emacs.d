@@ -55,12 +55,13 @@
   )
 
 ;; --------------------------------------------------------------
-;;                     LSP / ctags Configurations
+;;                     IDE
 ;; --------------------------------------------------------------
+
+(global-set-key (kbd "s-b") 'xref-find-definitions)
+(global-set-key (kbd "s-r") 'xref-find-references)
+
 (use-package eglot
-  :bind
-  ("s-b" . xref-find-definitions)
-  ("s-r" . xref-find-references)
   :config
   (setq eglot-events-buffer-size 0
         eglot-ignored-server-capabilities '(:hoverProvider

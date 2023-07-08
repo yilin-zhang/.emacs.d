@@ -58,13 +58,6 @@
 ;;                     LSP / ctags Configurations
 ;; --------------------------------------------------------------
 (use-package eglot
-  :hook ((prog-mode . (lambda ()
-                        (unless (derived-mode-p 'emacs-lisp-mode
-                                                'lisp-mode
-                                                'makefile-mode
-                                                'web-mode)
-                          (eglot-ensure))))
-         ((markdown-mode yaml-mode) . eglot-ensure))
   :bind
   ("s-b" . xref-find-definitions)
   ("s-r" . xref-find-references)

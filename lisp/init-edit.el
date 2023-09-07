@@ -76,7 +76,7 @@
    '("?" . meow-cheatsheet)
    ;; Custom leader bindings
    '("f" . find-file)
-   '("b" . switch-to-buffer)
+   '("b" . consult-buffer)
    '("k" . kill-buffer)
    '("p" . consult-yank-pop)
    '("o" . other-window)
@@ -158,9 +158,11 @@
   :demand t
   :hook
   (meow-insert-exit . corfu-quit)
+  ;; Should not put meow-setup under :config,
+  ;; otherwise some leader bindings will not bind
+  (after-init . meow-setup)
   :config
-  (meow-global-mode 1)
-  (meow-setup))
+  (meow-global-mode 1))
 
 (defun yilin/toggle-meow-mode ()
   "Toggle meow-mode"

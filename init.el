@@ -2,8 +2,11 @@
 ;;; Commentary:
 ;;; Code:
 
-;; Increase gc threshold for loading
-(setq gc-cons-threshold (* 64 1024 1024))
+;; Defer garbage collection further back in the startup process
+(setq gc-cons-threshold most-positive-fixnum)
+
+;; Prevent flashing of unstyled modeline at startup
+(setq-default mode-line-format nil)
 
 ;; Move custom settings to a separate file
 (setq custom-file "~/.emacs.d/custom.el")
@@ -58,9 +61,6 @@
 (when (file-directory-p "~/.emacs.d/custom")
   (push (expand-file-name "custom" user-emacs-directory) load-path)
   (require 'custom-post))
-
-;; Make gc pauses faster by decreasing the threshold.
-(setq gc-cons-threshold (* 2 1024 1024))
 
 (provide 'init)
 ;;; init.el ends here

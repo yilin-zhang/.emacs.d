@@ -10,7 +10,7 @@
 
 ;; settings from Centaur Emcas
 (use-package gcmh
-  :hook after-init
+  :hook emacs-startup
   :init
   (setq gcmh-idle-delay 'auto
         gcmh-auto-idle-delay-factor 10

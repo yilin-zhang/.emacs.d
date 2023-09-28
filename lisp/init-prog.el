@@ -51,7 +51,8 @@
   (setq major-mode-remap-alist
         '((python-mode . python-ts-mode)
           (js-mode . js-ts-mode)
-          (json-mode . json-ts-mode)))
+          (json-mode . json-ts-mode)
+          (css-mode . css-ts-mode)))
   )
 
 ;; --------------------------------------------------------------
@@ -148,6 +149,35 @@
   \"extraPaths\": []
 }"))
         (message "pyrightconfig.json generated.")))))
+
+;; --------------------------------------------------------------
+;;                     Web Dev Configuration
+;; --------------------------------------------------------------
+(use-package web-mode
+  :mode
+  ("\\.html\\'" . web-mode)
+  ("\\.vue\\'" . web-mode)
+  :hook
+  (web-mode . (lambda () (setq-local tab-width web-mode-indent-style)))
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-code-indent-offset 2)
+  (web-mode-part-padding 0)
+  (web-mode-block-padding 0)
+  (web-mode-style-padding 0)
+  (web-mode-script-padding 0))
+
+(use-package rainbow-mode
+  :hook (css-mode js-mode))
+
+(use-package js-mode
+  :ensure nil
+  :custom (js-indent-level 2))  ; this indent level also applies to json-mode
+
+(use-package css-mode
+  :ensure nil
+  :custom (css-indent-offset 2))
 
 ;; --------------------------------------------------------------
 ;;                     Rust Mode Configurations

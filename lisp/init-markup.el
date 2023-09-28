@@ -29,15 +29,6 @@
   (LaTeX-mode . outline-minor-mode))
 
 ;; --------------------------------------------------------------
-;;                     Web Configuration
-;; --------------------------------------------------------------
-(use-package web-mode
-  :mode ("\\.html\\'" . web-mode))
-
-(use-package rainbow-mode
-  :hook (css-mode js-mode))
-
-;; --------------------------------------------------------------
 ;;                     Markdown Mode Configurations
 ;; --------------------------------------------------------------
 (use-package markdown-mode
@@ -52,13 +43,6 @@
 ;;                     Data / Config
 ;; --------------------------------------------------------------
 (use-package yaml-mode)
-
-;; set indentation for json-mode
-;; make it a local variable so that it doesn't conflict with the indentation in js mode
-(use-package json-mode
-  :hook (json-mode . (lambda ()
-                       (make-local-variable 'js-indent-level)
-                       (setq js-indent-level 2))))
 
 (use-package csv-mode)
 

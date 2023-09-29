@@ -62,7 +62,7 @@
 (global-set-key (kbd "s-b") 'xref-find-definitions)
 (global-set-key (kbd "s-r") 'xref-find-references)
 
-;; `https://www.reddit.com/r/emacs/comments/11svcvj/emacs_setup_for_vue_typescript_volar_eglot_webmode/'
+;; `https://github.com/joaotavora/eglot/discussions/1184'
 (defun yilin/vue-eglot-init-options ()
   (let ((tsdk-path
          (expand-file-name
@@ -71,24 +71,22 @@
     `(:typescript
       (:tsdk
        ,tsdk-path
-       :languageFeatures
-       (:completion
-        (
-         :defaultTagNameCase "both"
-         :defaultAttrNameCase "kebabCase"
-         :getDocumentNameCasesRequest nil
-         :getDocumentSelectionRequest nil
-         )
-        :diagnostics
-        (:getDocumentVersionRequest nil))
-       :documentFeatures
-       (:documentFormatting
-        (
-         :defaultPrintWidth 100
-         :getDocumentPrintWidthRequest nil
-         )
-        :documentSymbol t
-        :documentColor t)))))
+       :languageFeatures (:completion
+                          (
+                           :defaultTagNameCase "both"
+                           :defaultAttrNameCase "kebabCase"
+                           :getDocumentNameCasesRequest nil
+                           :getDocumentSelectionRequest nil
+                           )
+                          :diagnostics
+                          (:getDocumentVersionRequest nil))
+       :documentFeatures (:documentFormatting
+                          (
+                           :defaultPrintWidth 100
+                           :getDocumentPrintWidthRequest nil
+                           )
+                          :documentSymbol t
+                          :documentColor t)))))
 
 (use-package eglot
   :config

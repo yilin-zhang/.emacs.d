@@ -62,6 +62,34 @@
 (global-set-key (kbd "s-b") 'xref-find-definitions)
 (global-set-key (kbd "s-r") 'xref-find-references)
 
+;; `https://www.reddit.com/r/emacs/comments/11svcvj/emacs_setup_for_vue_typescript_volar_eglot_webmode/'
+(defun yilin/vue-eglot-init-options ()
+  (let ((tsdk-path
+         (expand-file-name
+          "lib"
+          (shell-command-to-string "npm list --global --parseable typescript | head -n1 | tr -d \"\n\""))))
+    `(:typescript
+      (:tsdk
+       ,tsdk-path
+       :languageFeatures
+       (:completion
+        (
+         :defaultTagNameCase "both"
+         :defaultAttrNameCase "kebabCase"
+         :getDocumentNameCasesRequest nil
+         :getDocumentSelectionRequest nil
+         )
+        :diagnostics
+        (:getDocumentVersionRequest nil))
+       :documentFeatures
+       (:documentFormatting
+        (
+         :defaultPrintWidth 100
+         :getDocumentPrintWidthRequest nil
+         )
+        :documentSymbol t
+        :documentColor t)))))
+
 (use-package eglot
   :config
   (setq eglot-events-buffer-size 0
@@ -70,6 +98,9 @@
         eglot-autoshutdown t)
   (add-to-list 'eglot-server-programs
                '(json-mode . ("vscode-json-languageserver" "--stdio")))
+  (add-to-list 'eglot-server-programs
+               `(vue-mode . ("vue-language-server" "--stdio"
+                             :initializationOptions ,(yilin/vue-eglot-init-options))))
 
   ;; Re-opens the current buffer before reconnection
   (defun yilin/eglot-reconnect ()
@@ -155,8 +186,14 @@
 ;; --------------------------------------------------------------
 (use-package web-mode
   :mode
-  ("\\.html\\'" . web-mode)
-  ("\\.vue\\'" . web-mode)
+  ("\\.html\\'"
+   "\\.phtml\\'"
+   "\\.tpl\\.php\\'"
+   "\\.[agj]sp\\'"
+   "\\.as[cp]x\\'"
+   "\\.erb\\'"
+   "\\.mustache\\'"
+   "\\.djhtml\\'")
   :hook
   (web-mode . (lambda () (setq-local tab-width web-mode-indent-style)))
   :custom
@@ -178,6 +215,9 @@
 (use-package css-mode
   :ensure nil
   :custom (css-indent-offset 2))
+
+(define-derived-mode vue-mode web-mode "Vue")
+(add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
 
 ;; --------------------------------------------------------------
 ;;                     Rust Mode Configurations

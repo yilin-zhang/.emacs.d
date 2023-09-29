@@ -43,7 +43,7 @@
          (indent-rigidly (region-beginning) (region-end) js-indent-level))
         ((member major-mode '(css-mode css-ts-mode))
          (indent-rigidly (region-beginning) (region-end) css-indent-offset))
-        (t (indent-rigidly-left-to-tab-stop (region-beginning) (region-end)))))
+        (t (indent-rigidly-right-to-tab-stop (region-beginning) (region-end)))))
 
 (defun yilin/indent-left ()
   (interactive)

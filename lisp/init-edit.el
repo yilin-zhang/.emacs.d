@@ -532,6 +532,12 @@
              color-rg-search-project-with-type
              color-rg-search-project-rails-with-type))
 
+(use-package breadcrumb
+  :ensure nil
+  :quelpa (breadcrumb :fetcher github
+                      :repo "joaotavora/breadcrumb")
+  :hook (prog-mode . breadcrumb-local-mode))
+
 ;; --------------------------------------------------------------
 ;;                           Completion
 ;; --------------------------------------------------------------

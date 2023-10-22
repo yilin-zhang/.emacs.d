@@ -34,6 +34,14 @@ brew install ripgrep
    #+end_src
 **** nerd-icons
 Install nerd fonts in Emacs: =M-x nerd-icons-install-fonts=
+** LSP
+| Language | Server                       |
+|----------+------------------------------|
+| Python   | `pyright`                    |
+| JS/TS    | `typescript-langauge-server` |
+| JSON     | `vscode-json-languageserver  |
+| Vue      | `vue-language-server`        |
+| Lua      | `lua-language-server`        |
 
 * Customization
 Create file =~/.emacs.d/custom/custom-post.el=. The configuration in the file will

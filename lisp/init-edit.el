@@ -43,6 +43,8 @@
          (indent-rigidly (region-beginning) (region-end) js-indent-level))
         ((member major-mode '(css-mode css-ts-mode))
          (indent-rigidly (region-beginning) (region-end) css-indent-offset))
+        ((member major-mode '(lua-mode pico8-mode))
+         (indent-rigidly (region-beginning) (region-end) lua-indent-level))
         (t (indent-rigidly-right-to-tab-stop (region-beginning) (region-end)))))
 
 (defun yilin/indent-left ()
@@ -54,6 +56,8 @@
          (indent-rigidly (region-beginning) (region-end) (- js-indent-level)))
         ((member major-mode '(css-mode css-ts-mode))
          (indent-rigidly (region-beginning) (region-end) (- css-indent-offset)))
+        ((member major-mode '(lua-mode pico8-mode))
+         (indent-rigidly (region-beginning) (region-end) (- lua-indent-level)))
         (t (indent-rigidly-left-to-tab-stop (region-beginning) (region-end)))))
 
 (defun meow-setup ()

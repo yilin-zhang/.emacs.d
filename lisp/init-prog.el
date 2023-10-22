@@ -14,31 +14,8 @@
   :hook
   (python-mode . code-cells-mode-maybe))
 
-(use-package jupyter
-  :hook
-  (jupyter-repl-interaction-mode . code-cells-mode))
-
-;;;###autoload
-(defun yilin/jupyter-smart-eval (insert)
-  (interactive "P")
-  (save-excursion
-    (when (and (boundp 'code-cells-mode)
-               (not (region-active-p)))
-      (code-cells-mark-cell))
-    (jupyter-eval-line-or-region insert)
-    (if (region-active-p)
-        (progn
-          (pulse-momentary-highlight-region (region-beginning) (region-end))
-          (deactivate-mark))
-      (pulse-momentary-highlight-one-line))))
-
-(with-eval-after-load 'jupyter-repl
-  (require 'pulse)
-  (define-key jupyter-repl-interaction-mode-map
-              (kbd "C-<return>") #'yilin/jupyter-smart-eval))
-
 ;; --------------------------------------------------------------
-;;                     Tree Sitter
+;;                         Tree Sitter
 ;; --------------------------------------------------------------
 (if (< emacs-major-version 29)
     (progn
@@ -56,7 +33,7 @@
   )
 
 ;; --------------------------------------------------------------
-;;                     IDE
+;;                             LSP
 ;; --------------------------------------------------------------
 
 (global-set-key (kbd "s-b") 'xref-find-definitions)
@@ -138,24 +115,48 @@
    citre-auto-enable-citre-mode-modes nil))
 
 ;; --------------------------------------------------------------
-;;                     C/C++ Mode Configurations
+;;                        C/C++ Configurations
 ;; --------------------------------------------------------------
 (use-package cmake-mode)
 
 ;; --------------------------------------------------------------
-;;                     Lisp Mode Configurations
+;;                        Lisp Configurations
 ;; --------------------------------------------------------------
 (use-package elispfl
   :load-path "~/.emacs.d/site-lisp/"
   :hook (emacs-lisp-mode . elispfl-mode))
 
 ;; --------------------------------------------------------------
-;;                     Python Mode Configurations
+;;                       Python Configurations
 ;; --------------------------------------------------------------
 
 (use-package pyvenv
   :init
   (setenv "WORKON_HOME" "~/miniconda3/envs"))
+
+(use-package jupyter
+  :after code-cells
+  :hook
+  (jupyter-repl-interaction-mode . code-cells-mode))
+
+;;;###autoload
+(defun yilin/jupyter-smart-eval (insert)
+  (interactive "P")
+  (save-excursion
+    (when (and (boundp 'code-cells-mode)
+               (not (region-active-p)))
+      (code-cells-mark-cell))
+    (jupyter-eval-line-or-region insert)
+    (if (region-active-p)
+        (progn
+          (pulse-momentary-highlight-region (region-beginning) (region-end))
+          (deactivate-mark))
+      (pulse-momentary-highlight-one-line))))
+
+(with-eval-after-load 'jupyter-repl
+  (require 'pulse)
+  (define-key jupyter-repl-interaction-mode-map
+              (kbd "C-<return>") #'yilin/jupyter-smart-eval))
 
 (defun yilin/generate-pyrightconfig ()
   "Generate a pyrightconfig.json file in the current directory."
@@ -180,7 +181,7 @@
         (message "pyrightconfig.json generated.")))))
 
 ;; --------------------------------------------------------------
-;;                     Web Dev Configuration
+;;                      Web Configuration
 ;; --------------------------------------------------------------
 (use-package web-mode
   :mode
@@ -218,9 +219,54 @@
 (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
 
 ;; --------------------------------------------------------------
-;;                     Rust Mode Configurations
+;;                       Rust Configurations
 ;; --------------------------------------------------------------
 (use-package rust-mode)
+
+;; --------------------------------------------------------------
+;;                       Lua Configurations
+;; --------------------------------------------------------------
+(use-package lua-mode)
+
+;;;###autoload
+(defun yilin/pico8-narrow-buffer ()
+  (interactive)
+  (cl-flet ((find-string-point (str)
+              (save-excursion
+                (goto-char (point-min))
+                (search-forward str nil t))))
+    (let* ((lua-point (find-string-point "__lua__"))
+           (gfx-point (find-string-point "__gfx__"))
+           (map-point (find-string-point "__map__"))
+           (sfx-point (find-string-point "__sfx__"))
+           (end-point (or gfx-point map-point sfx-point (point-max))))
+      (narrow-to-region (1+ lua-point)
+                        (save-excursion
+                          (goto-char end-point)
+                          (beginning-of-line)
+                          (1- (point)))))))
+
+(use-package pico8-mode
+  :ensure nil
+  :quelpa (pico8-mode :fetcher github
+                      :repo "Kaali/pico8-mode"
+                      :branch "master"
+                      :files ("dist" "*.el"))
+  :mode "\\.p8\\'"
+  :hook
+  (pico8-mode . (lambda () (setq-local lua-indent-level 1)))
+  (pico8-mode . yilin/pico8-narrow-buffer)
+  :config
+  (set-face-attribute 'pico8--non-lua-overlay nil
+                      :foreground (face-foreground 'shadow)
+                      :weight 'bold))
+
+(with-eval-after-load 'nerd-icons
+  (add-to-list 'nerd-icons-extension-icon-alist
+               '("p8" nerd-icons-sucicon "nf-seti-lua" :face nerd-icons-lpink))
+  (add-to-list 'nerd-icons-mode-icon-alist
+               '(pico8-mode nerd-icons-sucicon "nf-seti-lua" :face nerd-icons-lpink))
+  )
 
 ;; --------------------------------------------------------------
 ;;                           Container

@@ -87,6 +87,9 @@
                 fill-column 80)
   (setq-default truncate-lines t)
   (setq ring-bell-function 'ignore) ; disable ring-bell-function
+  ;; Enable indentation+completion using the TAB key.
+  ;; `completion-at-point' is often bound to M-TAB.
+  (setq tab-always-indent 'complete)
   ;; Cursor and scrolling
   (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; one line at a time
   (setq mouse-wheel-progressive-speed nil) ; don't accelerate scrolling

@@ -201,7 +201,10 @@
   :hook (after-init . yas-global-mode)
   :bind
   (:map yas-minor-mode-map
-        ("M-y" . yas-expand))
+        ("M-y" . yas-expand)
+        ;; Disable tab expansion
+        ("TAB" . nil)
+        ("<tab>" . nil))
   :config
   (use-package yasnippet-snippets))
 

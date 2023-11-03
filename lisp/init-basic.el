@@ -37,10 +37,6 @@
   (doom-modeline-modal-icon nil)
   (find-file-visit-truename t))
 
-;; Visually distinguish file buffers from other buffers
-(use-package solaire-mode
-  :hook (after-init . solaire-global-mode))
-
 ;; --------------------------------------------------------------
 ;;                            Paths
 ;; --------------------------------------------------------------

@@ -8,7 +8,7 @@
 ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
 (setq read-process-output-max (* 3 1024 1024))
 
-;; settings from Centaur Emcas
+;; settings from Centaur Emacs
 (use-package gcmh
   :hook emacs-startup
   :init
@@ -68,11 +68,16 @@
         display-time-string-forms
         '((propertize (concat 24-hours ":" minutes " ")
                       'face 'font-lock-constant-face)))
+  ;; UI
+  (setq window-divider-default-places t
+        window-divider-default-bottom-width 1
+        window-divider-default-right-width 1)
   :hook
   (after-init . global-so-long-mode)
   (after-init . delete-selection-mode)
   (after-init . global-hl-line-mode) ; highlight the current line
   (after-init . pixel-scroll-precision-mode)
+  (window-setup . window-divider-mode)
   (emacs-startup . yilin/display-startup-time)
   :config
   ;; Confirmation

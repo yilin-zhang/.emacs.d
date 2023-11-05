@@ -76,9 +76,9 @@
   (after-init . global-so-long-mode)
   (after-init . delete-selection-mode)
   (after-init . global-hl-line-mode) ; highlight the current line
-  (after-init . pixel-scroll-precision-mode)
   (window-setup . window-divider-mode)
   (emacs-startup . yilin/display-startup-time)
+  (emacs-startup . yilin/pixel-scroll-precision-mode)
   :config
   ;; Confirmation
   (fset 'yes-or-no-p 'y-or-n-p) ; change yes or no to y or n
@@ -149,6 +149,12 @@
                      (float-time
                       (time-subtract after-init-time before-init-time)))
              gcs-done))
+
+  (defun yilin/pixel-scroll-precision-mode ()
+    ;; emacs-mac has it built-in, no need to enable it
+    (unless (eq system-type 'darwin)
+      (pixel-scroll-precision-mode 1)))
+
   :bind
   ;; Focus on the new window after splitting
   ("C-x 2" . (lambda () (interactive) (split-window-vertically) (other-window 1)))

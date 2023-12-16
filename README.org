@@ -20,7 +20,7 @@ brew install coreutils font-sarasa-gothic font-noto-serif-cjk-sc
 #+begin_src sh
 brew install ripgrep
 #+end_src
-**** jinx
+**** jinx (not used on Emacs 29)
 1. Install =enchant= and =pkgconf=
    #+begin_src sh
    brew install enchant pkgconf
@@ -42,6 +42,8 @@ Install nerd fonts in Emacs: =M-x nerd-icons-install-fonts=
 | JSON     | `vscode-json-languageserver  |
 | Vue      | `vue-language-server`        |
 | Lua      | `lua-language-server`        |
+** ChatGPT
+Put the OpenAI API key in a text file at =~/.emacs.d/custom/gptel-api-key=.
 
 * Customization
 Create file =~/.emacs.d/custom/custom-post.el=. The configuration in the file will
@@ -85,3 +87,10 @@ Define some leader keys. Example:
  '("e" . yilin/open-in-finder))
 #+end_src
 
+** GPTel
+Add system prompts. Example:
+#+begin_src elisp
+(dolist (directive '((custom-role-a . "You are a large language model and ...")
+                     (custom-role-b . "You are a large language model and ...")))
+    (add-to-list 'gptel-directives directive))
+#+end_src

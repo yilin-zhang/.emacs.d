@@ -121,6 +121,53 @@
   :hook (Info-mode . yilin/set-variable-pitch))
 
 ;; --------------------------------------------------------------
+;;                           LLM
+;; --------------------------------------------------------------
+(use-package gptel
+  :bind (:map gptel-mode-map
+              ("C-<return>" . yilin/gptel-add-prompt))
+  :hook
+  (gptel-mode . visual-line-mode)
+  (gptel-mode . (lambda () (auto-fill-mode -1)))
+  (gptel-mode . yilin/gptel--setup-default-directive)
+  :config
+  (defun yilin/gptel-add-prompt ()
+    (interactive)
+    (gptel-prompt-string)
+    (let ((prefix (cdr (assoc major-mode gptel-prompt-prefix-alist)))
+          (filling (if (and (equal (point) 0) (eolp))
+                       ""
+                     "\n\n")))
+      (end-of-line)
+      (insert (concat filling prefix))))
+
+  (defun yilin/gptel-select-directive ()
+    "Select the role of ChatGPT"
+    (interactive)
+    (let ((option
+           (intern (completing-read "AI's role: " gptel-directives))))
+      (setq gptel--system-message
+            (alist-get option gptel-directives))
+      (message "Selected AI's role: %s" option)))
+
+  (defun yilin/gptel--setup-default-directive ()
+    (setq gptel--system-message (alist-get 'teacher gptel-directives)))
+
+  (defun yilin/gptel--get-api-key ()
+    (with-temp-buffer
+      (insert-file-contents "~/.emacs.d/custom/gptel-api-key")
+      (string-trim (buffer-string))))
+
+  (setq gptel-default-mode 'markdown-mode)
+  (setq gptel-api-key (yilin/gptel--get-api-key))
+  ;; custom ai roles
+  (dolist (directive '((teacher . "You are a large language model\
+ and a patient teacher, who can break down complex concepts and\
+ terms into easy-to-follow text.")))
+    (add-to-list 'gptel-directives directive))
+  )
+
+;; --------------------------------------------------------------
 ;;                        Fancy Stuff
 ;; --------------------------------------------------------------
 (use-package dictionary

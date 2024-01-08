@@ -77,6 +77,13 @@
                `(vue-mode . ("vue-language-server" "--stdio"
                              :initializationOptions ,(yilin/vue-eglot-init-options))))
 
+  (use-package eglot-booster
+    :ensure nil
+    :load-path "~/.emacs.d/site-lisp/"
+    :demand t
+    :config
+    (eglot-booster-run))
+
   ;; Re-opens the current buffer before reconnection
   (defun yilin/eglot-reconnect ()
     (interactive)

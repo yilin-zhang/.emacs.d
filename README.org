@@ -35,13 +35,13 @@ brew install ripgrep
 **** nerd-icons
 Install nerd fonts in Emacs: =M-x nerd-icons-install-fonts=
 ** LSP
-| Language | Server                       |
-|----------+------------------------------|
-| Python   | `pyright`                    |
-| JS/TS    | `typescript-langauge-server` |
-| JSON     | `vscode-json-languageserver  |
-| Vue      | `vue-language-server`        |
-| Lua      | `lua-language-server`        |
+| Language | Server                     |
+|----------+----------------------------|
+| Python   | =pyright=                    |
+| JS/TS    | =typescript-langauge-server= |
+| JSON     | =vscode-json-languageserver= |
+| Vue      | =vue-language-server=        |
+| Lua      | =lua-language-server=        |
 
 By default, the config it also enables =emacs-lsp-booster=. Follow the README to
 install the booster: https://github.com/blahgeek/emacs-lsp-booster.

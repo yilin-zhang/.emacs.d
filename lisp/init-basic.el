@@ -225,6 +225,7 @@
                         font-size
                       yilin/default-font-size)))
     (set-face-attribute 'default nil :font (font-spec :family "Sarasa Mono SC" :size -font-size))
+    (set-face-attribute 'fixed-pitch nil :font (font-spec :family "Sarasa Mono SC" :size -font-size))
     (set-face-attribute 'variable-pitch nil :font (font-spec :family "Noto Serif CJK SC" :size -font-size))))
 
 (defun yilin/set-variable-pitch ()

@@ -69,7 +69,9 @@
 ;; --------------------------------------------------------------
 (use-package olivetti
   :bind
-  ("<f7>" . olivetti-mode))
+  ("<f7>" . olivetti-mode)
+  :hook
+  (org-mode . olivetti-mode))
 
 ;; --------------------------------------------------------------
 ;;                         Better Doc

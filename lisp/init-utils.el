@@ -192,6 +192,47 @@
              "gpg"
              (file-name-extension (buffer-name)) t)))))
 
+;; --------------------------------------------------------------
+;;                            Custom
+;; --------------------------------------------------------------
+
+;; **************************************************************
+;; Open in finder and terminal (Mac)
+;; **************************************************************
+(defun yilin/open-in-finder ()
+  "Open the current dir in Finder."
+  (interactive)
+  (shell-command (format "open \"%s\"" default-directory)))
+
+(defun yilin/open-in-terminal ()
+  "Open the current dir in a new terminal window."
+  (interactive)
+  (shell-command (format "open -a iTerm.app \"%s\"" default-directory)))
+
+(meow-leader-define-key
+ '("t" . yilin/open-in-terminal)
+ '("e" . yilin/open-in-finder))
+
+;; **************************************************************
+;; Copy file path and name
+;; **************************************************************
+(defun yilin/copy-file-path ()
+  "Copy the current buffer file path to the clipboard."
+  (interactive)
+  (let ((filename (yilin/-copy-file-path)))
+    (when filename
+      (kill-new filename)
+      (message "Copied buffer file path '%s' to the clipboard." filename))))
+
+(defun yilin/copy-file-name ()
+  "Copy the current buffer file path to the clipboard."
+  (interactive)
+  (let ((filename (file-name-base (yilin/-copy-file-path))))
+    (when filename
+      (kill-new filename)
+      (message "Copied buffer file name '%s' to the clipboard." filename))))
+
+
 (provide 'init-utils)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-utils.el ends here

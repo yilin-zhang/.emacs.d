@@ -130,9 +130,7 @@
 ;;                       Python Configurations
 ;; --------------------------------------------------------------
 
-(use-package pyvenv
-  :init
-  (setenv "WORKON_HOME" "~/miniconda3/envs"))
+(use-package pyvenv)
 
 (use-package jupyter
   :after code-cells

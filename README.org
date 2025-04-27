@@ -68,12 +68,6 @@ where you agenda files are.
   )
 #+end_src
 
-** Elfeed (RSS)
-Set the RSS feeds by setting =elfeed-feeds=. Example:
-#+begin_src elisp
-(setq elfeed-feeds '("https://protesilaos.com/books.xml"))
-#+end_src
-
 ** Denote
 Set the denote bucket by setting =denote-directory=. Example:
 #+begin_src elisp
@@ -86,12 +80,4 @@ Define some leader keys. Example:
 (meow-leader-define-key
  '("t" . yilin/open-in-terminal)
  '("e" . yilin/open-in-finder))
-#+end_src
-
-** GPTel
-Add system prompts. Example:
-#+begin_src elisp
-(dolist (directive '((custom-role-a . "You are a large language model and ...")
-                     (custom-role-b . "You are a large language model and ...")))
-    (add-to-list 'gptel-directives directive))
 #+end_src

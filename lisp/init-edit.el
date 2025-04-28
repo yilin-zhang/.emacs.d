@@ -569,6 +569,43 @@
                       :repo "joaotavora/breadcrumb")
   :hook (prog-mode . breadcrumb-local-mode))
 
+;; Keybinding reference:
+;; `https://github.com/kickingvegas/casual/tree/main/docs'
+(use-package casual
+  :bind
+  ("C-o" . casual-editkit-main-tmenu)
+  (:map org-agenda-mode-map
+        ("C-o" . casual-agenda-tmenu))
+  (:map bookmark-bmenu-mode-map
+        ("C-o" . casual-bookmarks-tmenu))
+  (:map calc-mode-map
+        ("C-o" . casual-calc-tmenu))
+  (:map calc-alg-map
+        ("C-o" . casual-calc-tmenu))
+  (:map calendar-mode-map
+        ("C-o" . casual-calendar-tmenu))
+  (:map dired-mode-map
+        ("C-o" . casual-dired-tmenu)
+        ("s" . casual-dired-sort-by-tmenu)
+        ("/" . casual-dired-search-replace-tmenu)
+        )
+  (:map ibuffer-mode-map
+        ("C-o" . casual-ibuffer-tmenu)
+        ("F" . casual-ibuffer-filter-tmenu)
+        ("s" . casual-ibuffer-sortby-tmenu))
+  (:map image-mode-map
+        ("C-o" . casual-image-resize-tmenu))
+  (:map Info-mode-map
+        ("C-o" . casual-info-tmenu))
+  (:map isearch-mode-map
+        ("C-o" . casual-isearch-tmenu))
+  (:map makefile-mode-map
+        ("C-o" . casual-make-tmenu))
+  (:map reb-mode-map
+        ("C-o" . casual-re-builder-tmenu))
+  (:map reb-lisp-mode-map
+        ("C-o" . casual-re-builder-tmenu)))
+
 ;; --------------------------------------------------------------
 ;;                           Completion
 ;; --------------------------------------------------------------

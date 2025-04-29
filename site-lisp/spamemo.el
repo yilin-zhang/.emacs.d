@@ -60,7 +60,7 @@ This forces users to repeat difficult cards until they are learned."
   :group 'spamemo)
 
 (defface spamemo-word-face
-  '((t :inherit font-lock-keyword-face :weight bold))
+  '((t :inherit font-lock-keyword-face :weight bold :height 1.5))
   "Face for displaying the current word."
   :group 'spamemo)
 
@@ -82,7 +82,21 @@ This forces users to repeat difficult cards until they are learned."
    1.18385  ; grade 2 (good)
    3.173    ; grade 3 (hard)
    15.69105 ; grade 4 (easy)
-   7.1949 0.5345 1.4604 0.0046 1.54575 0.1192 1.01925 1.9395 0.11 0.29605 2.2698 0.2315 2.9898 0.51655 0.6621
+   7.1949
+   0.5345
+   1.4604
+   0.0046
+   1.54575
+   0.1192
+   1.01925
+   1.9395
+   0.11
+   0.29605
+   2.2698
+   0.2315
+   2.9898
+   0.51655
+   0.6621
    ]
   "The weights of the FSRS algorithm.")
 
@@ -404,10 +418,8 @@ This function handles three distinct cases:
     (with-current-buffer buffer
       (let ((inhibit-read-only t))
         (erase-buffer)
-        (spamemo-review-mode)
-        (spamemo--insert-instructions)))
+        (spamemo-review-mode)))
     buffer))
-
 
 (defun spamemo--center-text (text)
   "Center TEXT in the current window width."
@@ -417,46 +429,42 @@ This function handles three distinct cases:
     (concat (make-string padding ?\s) text)))
 
 (defun spamemo--insert-instructions ()
-  "Insert the instructions in the review buffer with centered text and fancy title."
+  "Insert the instructions in the review buffer with centered text."
   (let ((inhibit-read-only t)
-        (title "* SpaMemo Review *")
         (separator (make-string 30 ?═)))
     (erase-buffer)
-    ;; Insert fancy title with separator
-    (insert (spamemo--center-text separator))
-    (insert "\n")
-    (insert (spamemo--center-text (propertize title 'face '(:weight bold))))
-    (insert "\n")
-    (insert (spamemo--center-text separator))
-    (insert "\n\n")
-    ;; Insert rest of instructions
-    (let ((lines '("How well do you know this word?"
-                   "1 - Forgot"
-                   "2 - Hard"
-                   "3 - Good"
-                   "4 - Easy"
-                   "Press 'l' to look up this word in browser"
-                   "")))
+    (let* ((lines '("How well do you know this word?"
+                    "1 - Forgot"
+                    "2 - Hard"
+                    "3 - Good"
+                    "4 - Easy"
+                    "Press 'l' to look up this word in browser"
+                    ""
+                    ""
+                    ""))
+           (text-n-lines (+ (length lines) 1)) ; another line for word
+           (top-n-lines (max 0 (- (floor (window-height) 2) (+ text-n-lines 5)))) ; 5 is an arbitrary number to bring the text up a little
+           )
+      (insert (make-string top-n-lines ?\n))
       (dolist (line lines)
         (insert (spamemo--center-text line))
         (insert "\n")))))
 
-(defun spamemo--display-word (word)
+(defun spamemo--display-current-word ()
   "Display WORD in the review buffer."
   (with-current-buffer (get-buffer spamemo-review-buffer-name)
+    (setq header-line-format (spamemo--center-text "SpaMemo Review"))
     (let ((inhibit-read-only t))
       ;; Clean up buffer and re-insert instructions
       (spamemo--insert-instructions)
       ;; Add the word label (centered)
       (goto-char (point-max))
-      (insert "\n")
       ;; Create a propertized version of the word first
-      (let ((propertized-word (propertize word 'face 'spamemo-word-face)))
+      (let ((propertized-word (propertize spamemo-current-word 'face 'spamemo-word-face)))
         ;; Then center and insert this propertized word
         (insert (spamemo--center-text propertized-word)))
-      (insert "\n\n")
       ))
-  (setq spamemo-current-word word))
+  )
 
 (defun spamemo--lookup-word (word)
   "Look up WORD in an online dictionary."
@@ -467,7 +475,8 @@ This function handles three distinct cases:
 When current list is empty, re-check for due words and continue if any exist."
   (if (or spamemo-due-words (setq spamemo-due-words (spamemo-get-due-words)))
       (let ((word (pop spamemo-due-words)))
-        (spamemo--display-word word))
+        (setq spamemo-current-word word)
+        (spamemo--display-current-word))
     (progn
       (message "Review finished!")
       (quit-window))))
@@ -520,6 +529,16 @@ When current list is empty, re-check for due words and continue if any exist."
     (let ((buffer (spamemo--setup-review-buffer)))
       (switch-to-buffer buffer)
       (spamemo-review-next-word))))
+
+;;;###autoload
+(defun spamemo-review-refresh ()
+  "Refresh the review window."
+  (interactive)
+  (if (null spamemo-due-words)
+      (message "No words to review")
+    (let ((buffer (spamemo--setup-review-buffer)))
+      (switch-to-buffer buffer)
+      (spamemo--display-current-word))))
 
 ;;;###autoload
 (defun spamemo-add-word (word)

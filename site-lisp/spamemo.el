@@ -573,5 +573,11 @@ Use this command after you changed the vocab file."
   (setq spamemo-deck (spamemo--load-deck))
   (message "Reloaded SpaMemo deck"))
 
+;;;###autoload
+(defun spamemo-open-vocab-file ()
+  "Open the vocab file."
+  (interactive)
+  (find-file spamemo-vocab-file))
+
 (provide 'spamemo)
 ;;; spamemo.el ends here

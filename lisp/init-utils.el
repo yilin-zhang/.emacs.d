@@ -123,7 +123,7 @@
   :ensure nil
   :load-path "~/.emacs.d/site-lisp/"
   :commands
-  (spamemo-add-word spamemo-review spamemo-reload-deck))
+  (spamemo-add-word spamemo-review spamemo-reload-deck spamemo-open-vocab-file))
 
 ;; --------------------------------------------------------------
 ;;                            Calc

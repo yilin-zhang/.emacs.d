@@ -179,7 +179,7 @@ GRADE is the rating given (2=hard, 3=good, 4=easy)."
          (t_r (- (exp (* w_10 (- 1 R))) 1))
          (h (if (= grade 2) w_15 1))
          (b (if (= grade 4) w_16 1))
-         (alpha (+ 1 (* t_d t_s t_r h b (exp 8)))))
+         (alpha (+ 1 (* t_d t_s t_r h b (exp w_8)))))
     (* S alpha)))
 
 (defun spamemo--get-new-stability-failure (meta grade)

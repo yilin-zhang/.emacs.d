@@ -117,6 +117,10 @@ This forces users to repeat difficult cards until they are learned."
   "Clamp VALUE to be between MIN-VAL and MAX-VAL."
   (min max-val (max min-val value)))
 
+(defun spamemo--shuffle-list (list)
+  "Shuffle LIST randomly."
+  (seq-sort (lambda (_a _b) (< (random 10) 5)) list))
+
 (defun spamemo--days-since (date-string)
   "Calculate days passed since DATE-STRING (in ISO 8601 format) until now.
 Returns a float if less than 1 day has passed."
@@ -373,30 +377,6 @@ This function handles three distinct cases:
 
 ;; Core functionality
 
-(defun spamemo-add-word (word)
-  "Add WORD to the vocabulary deck.
-After adding a word, prompts if you want to add another."
-  (interactive "sWord to add: ")
-  (when (string-empty-p word)
-    (error "Word cannot be empty"))
-
-  (unless spamemo-deck
-    (setq spamemo-deck (spamemo--load-deck)))
-
-  (let ((status-msg
-         (if (gethash word spamemo-deck)
-             (format "Word '%s' already exists in the deck. " word)
-           (let ((meta (make-spamemo-word-meta)))
-             (puthash word meta spamemo-deck)
-             (spamemo--save-deck spamemo-deck)
-             (format "Added '%s' to the deck. " word)))))
-
-    (let ((choice (read-char-choice
-                   (concat status-msg "Add another word? (y/n or ENTER for yes): ")
-                   '(?y ?n ?\r))))
-      (when (or (eq choice ?y) (eq choice ?\r))
-        (call-interactively #'spamemo-add-word)))))
-
 (defun spamemo-get-due-words ()
   "Get list of words that are due for review."
   (unless spamemo-deck
@@ -407,7 +387,7 @@ After adding a word, prompts if you want to add another."
                (when (spamemo--is-due meta)
                  (push word due-words)))
              spamemo-deck)
-    due-words))
+    (spamemo--shuffle-list due-words)))
 
 (defun spamemo-update-word (word grade)
   "Update WORD with review GRADE (1-4)."
@@ -485,21 +465,12 @@ After adding a word, prompts if you want to add another."
 (defun spamemo-review-next-word ()
   "Review the next due word.
 When current list is empty, re-check for due words and continue if any exist."
-  (if (null spamemo-due-words)
-      (progn
-        ;; Check if there are new due words
-        (setq spamemo-deck (spamemo--load-deck))
-        (setq spamemo-due-words (spamemo-get-due-words))
-        (if (null spamemo-due-words)
-            (progn
-              (message "No more words to review")
-              (quit-window))
-          (progn
-            (setq spamemo-due-words (spamemo--shuffle-list spamemo-due-words))
-            (let ((word (pop spamemo-due-words)))
-              (spamemo--display-word word)))))
-    (let ((word (pop spamemo-due-words)))
-      (spamemo--display-word word))))
+  (if (or spamemo-due-words (setq spamemo-due-words (spamemo-get-due-words)))
+      (let ((word (pop spamemo-due-words)))
+        (spamemo--display-word word))
+    (progn
+      (message "Review finished!")
+      (quit-window))))
 
 (defun spamemo--handle-lookup ()
   (message "lookup word %s" spamemo-current-word)
@@ -539,41 +510,49 @@ When current list is empty, re-check for due words and continue if any exist."
   (buffer-disable-undo))
 
 ;;;###autoload
-(defun spamemo--shuffle-list (list)
-  "Shuffle LIST randomly."
-  (seq-sort (lambda (_a _b) (< (random 10) 5)) list))
-
 (defun spamemo-review ()
   "Start a review session."
   (interactive)
   (setq spamemo-deck (spamemo--load-deck))
   (setq spamemo-due-words (spamemo-get-due-words))
-
   (if (null spamemo-due-words)
       (message "No words to review")
-    (progn
-      (setq spamemo-due-words (spamemo--shuffle-list spamemo-due-words))
-      (let ((buffer (spamemo--setup-review-buffer)))
-        (switch-to-buffer buffer)
-        (spamemo-review-next-word)))))
+    (let ((buffer (spamemo--setup-review-buffer)))
+      (switch-to-buffer buffer)
+      (spamemo-review-next-word))))
 
 ;;;###autoload
-(defun spamemo-add-and-review ()
-  "Add words and then start a review session."
+(defun spamemo-add-word (word)
+  "Add WORD to the vocabulary deck.
+After adding a word, prompts if you want to add another."
+  (interactive "sWord to add: ")
+  (when (string-empty-p word)
+    (error "Word cannot be empty"))
+
+  (unless spamemo-deck
+    (setq spamemo-deck (spamemo--load-deck)))
+
+  (let ((status-msg
+         (if (gethash word spamemo-deck)
+             (format "Word '%s' already exists in the deck. " word)
+           (let ((meta (make-spamemo-word-meta)))
+             (puthash word meta spamemo-deck)
+             (spamemo--save-deck spamemo-deck)
+             (format "Added '%s' to the deck. " word)))))
+
+    (let ((choice (read-char-choice
+                   (concat status-msg "Add another word? (y/n or ENTER for yes): ")
+                   '(?y ?n ?\r))))
+      (when (or (eq choice ?y) (eq choice ?\r))
+        (call-interactively #'spamemo-add-word)))))
+
+;;;###autoload
+(defun spamemo-reload-deck ()
+  "Reload the vocab file to spamemo-deck.
+Use this command after you changed the vocab file."
   (interactive)
-  (let ((words '()))
-    (while (let ((word (read-string "Word to add (empty to finish): ")))
-             (if (string-empty-p word)
-                 nil
-               (push word words)
-               t)))
-
-    (setq spamemo-deck (spamemo--load-deck))
-    (dolist (word words)
-      (spamemo-add-word word))
-
-    (when (y-or-n-p "Start review session? ")
-      (spamemo-review))))
+  (setq spamemo-deck (spamemo--load-deck))
+  (message "Reloaded SpaMemo deck"))
 
 (provide 'spamemo)
 ;;; spamemo.el ends here

@@ -122,7 +122,8 @@
 (use-package spamemo
   :ensure nil
   :load-path "~/.emacs.d/site-lisp/"
-  :init (require 'spamemo))
+  :commands
+  (spamemo-add-word spamemo-review spamemo-reload-deck))
 
 ;; --------------------------------------------------------------
 ;;                            Calc

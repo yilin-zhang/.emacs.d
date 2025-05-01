@@ -60,6 +60,80 @@
          (indent-rigidly (region-beginning) (region-end) (- lua-indent-level)))
         (t (indent-rigidly-left-to-tab-stop (region-beginning) (region-end)))))
 
+(defun yilin/surround-region (char)
+  "Surround the selected region's non-whitespace content with CHAR.
+Supports *, =, +, / and properly pairs (, [, {."
+  (interactive "cEnter character to surround with: ")
+  (let* ((pairs '((?\( . ?\))
+                  (?\[ . ?\])
+                  (?\{ . ?\})
+                  (?\< . ?\>)))
+         (left-char char)
+         (right-char (or (cdr (assoc char pairs)) char)))
+    (if (use-region-p)
+        (let ((beg (region-beginning))
+              (end (region-end)))
+          (save-excursion
+            ;; Narrow to region to simplify handling
+            (save-restriction
+              (narrow-to-region beg end)
+              (goto-char (point-min))
+              (skip-chars-forward " \t\n")
+              (let ((left-pos (point)))
+                (goto-char (point-max))
+                (skip-chars-backward " \t\n")
+                (let ((right-pos (point)))
+                  ;; Insert in reverse to preserve positions
+                  (goto-char right-pos)
+                  (insert right-char)
+                  (goto-char left-pos)
+                  (insert left-char))))))
+      (message "No region selected"))))
+
+(defun yilin/surround-region-equal ()
+  (interactive)
+  (yilin/surround-region ?=))
+
+(defun yilin/surround-region-plus ()
+  (interactive)
+  (yilin/surround-region ?+))
+
+(defun yilin/surround-region-asterisk ()
+  (interactive)
+  (yilin/surround-region ?*))
+
+(defun yilin/surround-region-dash ()
+  (interactive)
+  (yilin/surround-region ?-))
+
+(defun yilin/surround-region-paren ()
+  (interactive)
+  (yilin/surround-region ?\())
+
+(defun yilin/surround-region-bracket ()
+  (interactive)
+  (yilin/surround-region ?\[))
+
+(defun yilin/surround-region-curly ()
+  (interactive)
+  (yilin/surround-region ?\{))
+
+(defun yilin/surround-region-angle ()
+  (interactive)
+  (yilin/surround-region ?\<))
+
+(defun yilin/surround-region-quote ()
+  (interactive)
+  (yilin/surround-region ?\'))
+
+(defun yilin/surround-region-dquote ()
+  (interactive)
+  (yilin/surround-region ?\"))
+
+(defun yilin/surround-region-slash ()
+  (interactive)
+  (yilin/surround-region ?/))
+
 (defun meow-setup ()
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
   (setq meow-use-clipboard t)
@@ -84,6 +158,22 @@
    '("0" . meow-digit-argument)
    '("/" . meow-keypad-describe-key)
    '("?" . meow-cheatsheet)
+   ;; Surround
+   '("=" . yilin/surround-region-equal)
+   '("+" . yilin/surround-region-plus)
+   '("*" . yilin/surround-region-asterisk)
+   '("-" . yilin/surround-region-dash)
+   '("(" . yilin/surround-region-paren)
+   '(")" . yilin/surround-region-paren)
+   '("[" . yilin/surround-region-bracket)
+   '("]" . yilin/surround-region-bracket)
+   '("{" . yilin/surround-region-curly)
+   '("}" . yilin/surround-region-curly)
+   '("<" . yilin/surround-region-angle)
+   '(">" . yilin/surround-region-angle)
+   '("'" . yilin/surround-region-quote)
+   '("\"" . yilin/surround-region-dquote)
+   '("/" . yilin/surround-region-slash)
    ;; Custom leader bindings
    '("f" . find-file)
    '("b" . consult-buffer)

@@ -50,13 +50,13 @@
 (push (expand-file-name "lisp" user-emacs-directory) load-path)
 
 (require 'init-basic)
-(require 'init-edit)
-(require 'init-utils)
 (require 'init-dired)
-(require 'init-git)
 (require 'init-org)
+(require 'init-git)
 (require 'init-markup)
 (require 'init-prog)
+(require 'init-edit)
+(require 'init-utils)
 
 (when (file-directory-p "~/.emacs.d/custom")
   (push (expand-file-name "custom" user-emacs-directory) load-path)

@@ -1,3 +1,0 @@
-[submodule "site-lisp/lazy-revert"]
-	path = site-lisp/lazy-revert
-	url = https://github.com/yilin-zhang/lazy-revert.git

@@ -170,7 +170,7 @@
 ;;                          Auto Revert
 ;; --------------------------------------------------------------
 (use-package lazy-revert
-  :load-path "~/.emacs.d/site-lisp/lazy-revert/"
+  :load-path "~/.emacs.d/site-lisp/"
   :hook (after-init . lazy-revert-mode)
   :config
   (setq auto-revert-verbose t ; let us know when it happens

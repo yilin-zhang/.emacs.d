@@ -7,7 +7,6 @@ A personal Emacs configuration.
 #+begin_src sh
 git clone https://github.com/yilin-zhang/.emacs.d.git ~/.emacs.d
 cd ~/.emacs.d
-git submodule update --init
 #+end_src
 ** Install dependencies (macOS)
 *** Global

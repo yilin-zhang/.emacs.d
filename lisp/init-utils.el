@@ -122,8 +122,14 @@
 (use-package spamemo
   :ensure nil
   :load-path "~/.emacs.d/site-lisp/"
-  :commands
-  (spamemo-add-word spamemo-review spamemo-reload-deck spamemo-open-vocab-file))
+  :commands (spamemo-add-word
+             spamemo-review spamemo-reload-deck
+             spamemo-open-vocab-file))
+
+(use-package spamemo-calendar
+  :ensure nil
+  :load-path "~/.emacs.d/site-lisp/"
+  :hook (after-init . spamemo-calendar-mode))
 
 ;; --------------------------------------------------------------
 ;;                            Calc

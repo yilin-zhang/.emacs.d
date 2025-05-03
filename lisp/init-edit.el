@@ -276,35 +276,11 @@ Supports *, =, +, / and properly pairs (, [, {."
 ;; --------------------------------------------------------------
 ;;                         Spell checker
 ;; --------------------------------------------------------------
-;; NOTE:
-;; Loading Jinx in Emacs 29 freezes Emacs. There is a workaround but not ideal.
-;; Use flyspell instead. The issue is gone in Emacs 30.
-;; `https://github.com/minad/jinx/pull/91'
-(if (<= emacs-major-version 29)
-    (progn
-      ;; config from Centaur Emacs
-      (use-package flyspell
-        :ensure nil
-        :diminish
-        :if (executable-find "aspell")
-        :hook (((text-mode outline-mode) . flyspell-mode)
-               (prog-mode . flyspell-prog-mode)
-               (flyspell-mode . (lambda ()
-                                  (dolist (key '("C-," "C-." "C-M-i" "C-c $"))
-                                    (unbind-key key flyspell-mode-map)))))
-        :init (setq flyspell-issue-message-flag nil
-                    ispell-program-name "aspell"
-                    ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together")))
-      ;; better UI
-      (use-package flyspell-correct
-        :after flyspell
-        :bind (:map flyspell-mode-map ("C-;" . flyspell-correct-wrapper))))
-
-  (use-package jinx
-    :hook (emacs-startup . global-jinx-mode)
-    :bind
-    ("C-;" . jinx-correct)
-    ("C-M-;" . jinx-languages)))
+(use-package jinx
+  :hook (emacs-startup . global-jinx-mode)
+  :bind
+  ("C-;" . jinx-correct)
+  ("C-M-;" . jinx-languages))
 
 ;; --------------------------------------------------------------
 ;;                         Template

@@ -114,6 +114,28 @@
    ;; certain modes (like `prog-mode'), set it like this.
    citre-auto-enable-citre-mode-modes nil))
 
+;; Config reference: `https://github.com/svaante/dape?tab=readme-ov-file#configuration'
+(use-package dape
+  :hook
+  ;; Save breakpoints on quit
+  (kill-emacs . dape-breakpoint-save)
+  ;; Load breakpoints on startup
+  (after-init . dape-breakpoint-load)
+  :config
+  ;; Turn on global bindings for setting breakpoints with mouse
+  (dape-breakpoint-global-mode)
+  ;; Info buffers to the left
+  (setq dape-buffer-window-arrangement 'left)
+  ;; Pulse source line (performance hit)
+  ;; (add-hook 'dape-display-source-hook 'pulse-momentary-highlight-one-line)
+  ;; Showing inlay hints
+  (setq dape-inlay-hints t)
+  ;; Save buffers on startup, useful for interpreted languages
+  (add-hook 'dape-start-hook (lambda () (save-some-buffers t t)))
+  ;; Kill compile buffer on build success
+  (add-hook 'dape-compile-hook 'kill-buffer)
+  )
+
 ;; --------------------------------------------------------------
 ;;                        C/C++ Configurations
 ;; --------------------------------------------------------------
@@ -129,32 +151,23 @@
 ;; --------------------------------------------------------------
 ;;                       Python Configurations
 ;; --------------------------------------------------------------
+(use-package pyvenv
+  :init
+  (defun yilin/pyvenv-activate-project (&optional path)
+    "Activate Python virtual environment for a project.
+With prefix arg, prompt for a directory and activate its project's venv.
+Otherwise, activate venv for the current project.
 
-(use-package pyvenv)
-
-(use-package jupyter
-  :after code-cells
-  :hook
-  (jupyter-repl-interaction-mode . code-cells-mode))
-
-;;;###autoload
-(defun yilin/jupyter-smart-eval (insert)
-  (interactive "P")
-  (save-excursion
-    (when (and (boundp 'code-cells-mode)
-               (not (region-active-p)))
-      (code-cells-mark-cell))
-    (jupyter-eval-line-or-region insert)
-    (if (region-active-p)
-        (progn
-          (pulse-momentary-highlight-region (region-beginning) (region-end))
-          (deactivate-mark))
-      (pulse-momentary-highlight-one-line))))
-
-(with-eval-after-load 'jupyter-repl
-  (require 'pulse)
-  (define-key jupyter-repl-interaction-mode-map
-              (kbd "C-<return>") #'yilin/jupyter-smart-eval))
+Assumes a '.venv' directory exists at the project root.
+Requires `project-current' to identify the project."
+    (interactive (list (when current-prefix-arg
+                         (read-directory-name "Project path: "))))
+    (let* ((dir (or path default-directory))
+           (proj (project-current nil dir))
+           (root (project-root proj))
+           (venv-dir (expand-file-name ".venv" root)))
+      (pyvenv-activate venv-dir)
+      (message "%s activated" venv-dir))))
 
 (defun yilin/generate-pyrightconfig ()
   "Generate a pyrightconfig.json file in the current directory."

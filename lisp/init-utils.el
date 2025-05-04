@@ -126,7 +126,7 @@
 ;; --------------------------------------------------------------
 (use-package trashcat
   :ensure nil
-  :load-path "~/.emacs.d/site-lisp/"
+  :load-path yilin/site-lisp-directory
   :commands trashcat)
 
 ;; --------------------------------------------------------------

@@ -127,7 +127,7 @@ The buffer's major mode should be `org-mode'."
                                    (todo . " %i %-12:c %b")
                                    (tags . " %i %-12:c")
                                    (search . " %i %-12:c")))
-  (setq org-agenda-breadcrumbs-separator " -> ")
+  (setq org-agenda-breadcrumbs-separator " » ")
   ;; Tags (adapt from Bullet Journal)
   (setq org-tag-alist '(("event" . ?e)
                         ("task" . ?t)

@@ -768,7 +768,7 @@ Supports *, =, +, / and properly pairs (, [, {."
 ;; Adapted from `'https://emacs-china.org/t/corfu-all-the-icons-icon/20907'
 (use-package kind-nerd-icons
   :ensure nil
-  :load-path "~/.emacs.d/site-lisp/"
+  :load-path yilin/site-lisp-directory
   :after (corfu nerd-icons)
   :demand t
   :config

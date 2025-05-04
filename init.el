@@ -2,14 +2,38 @@
 ;;; Commentary:
 ;;; Code:
 
+;; --------------------------------------------------------------
+;;                          Pre-Setup
+;; --------------------------------------------------------------
 ;; Defer garbage collection further back in the startup process
 (setq gc-cons-threshold most-positive-fixnum)
-
+;; https://emacs-lsp.github.io/lsp-mode/page/performance/
+(setq read-process-output-max (* 3 1024 1024))
 ;; Prevent flashing of unstyled modeline at startup
 (setq-default mode-line-format nil)
 
+;; --------------------------------------------------------------
+;;                            Paths
+;; --------------------------------------------------------------
 ;; Move custom settings to a separate file
-(setq custom-file "~/.emacs.d/custom.el")
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
+;; Custom directories
+(setq yilin/site-lisp-directory
+      (expand-file-name "site-lisp" user-emacs-directory))
+(setq yilin/config-lisp-directory
+      (expand-file-name "lisp" user-emacs-directory))
+(setq yilin/custom-lisp-directory
+      (expand-file-name "custom" user-emacs-directory))
+
+;; Add directories to load-path
+(push yilin/config-lisp-directory load-path)
+(when (file-directory-p yilin/custom-lisp-directory)
+  (push yilin/custom-lisp-directory load-path))
+
+;; --------------------------------------------------------------
+;;                           Package
+;; --------------------------------------------------------------
 
 (require 'package)
 (setq package-enable-at-startup nil
@@ -45,10 +69,9 @@
 ;; the key word ":diminish" only works when we have diminish
 (use-package diminish)
 
-;; ===================== REQUIRE INIT FILES ====================================
-
-(push (expand-file-name "lisp" user-emacs-directory) load-path)
-
+;; --------------------------------------------------------------
+;;                       Configurations
+;; --------------------------------------------------------------
 (require 'init-basic)
 (require 'init-dired)
 (require 'init-org)
@@ -58,8 +81,7 @@
 (require 'init-edit)
 (require 'init-utils)
 
-(when (file-directory-p "~/.emacs.d/custom")
-  (push (expand-file-name "custom" user-emacs-directory) load-path)
+(when (file-directory-p yilin/custom-lisp-directory)
   (require 'custom-post))
 
 (provide 'init)

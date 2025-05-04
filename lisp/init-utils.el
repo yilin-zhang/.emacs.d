@@ -121,14 +121,14 @@
 ;; --------------------------------------------------------------
 (use-package spamemo
   :ensure nil
-  :load-path "~/.emacs.d/site-lisp/"
+  :load-path yilin/site-lisp-directory
   :commands (spamemo-add-word
              spamemo-review spamemo-reload-deck
              spamemo-open-vocab-file))
 
 (use-package spamemo-calendar
   :ensure nil
-  :load-path "~/.emacs.d/site-lisp/"
+  :load-path yilin/site-lisp-directory
   :hook (after-init . spamemo-calendar-mode))
 
 ;; --------------------------------------------------------------
@@ -141,7 +141,7 @@
 ;; --------------------------------------------------------------
 (use-package trashcat
   :ensure nil
-  :load-path "~/.emacs.d/site-lisp/"
+  :load-path yilin/site-lisp-directory
   :commands trashcat)
 
 ;; --------------------------------------------------------------

@@ -5,9 +5,6 @@
 ;; --------------------------------------------------------------
 ;;                         Performance
 ;; --------------------------------------------------------------
-;; https://emacs-lsp.github.io/lsp-mode/page/performance/
-(setq read-process-output-max (* 3 1024 1024))
-
 ;; settings from Centaur Emacs
 (use-package gcmh
   :hook emacs-startup
@@ -169,7 +166,7 @@
 ;;                          Auto Revert
 ;; --------------------------------------------------------------
 (use-package lazy-revert
-  :load-path "~/.emacs.d/site-lisp/"
+  :load-path yilin/site-lisp-directory
   :hook after-init
   :config
   (setq auto-revert-verbose t ; let us know when it happens

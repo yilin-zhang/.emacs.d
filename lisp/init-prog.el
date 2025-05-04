@@ -117,7 +117,7 @@
 ;;                        Lisp Configurations
 ;; --------------------------------------------------------------
 (use-package elispfl
-  :load-path "~/.emacs.d/site-lisp/"
+  :load-path yilin/site-lisp-directory
   :hook (emacs-lisp-mode . elispfl-mode))
 
 ;; --------------------------------------------------------------

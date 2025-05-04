@@ -33,6 +33,8 @@ brew install ripgrep
    #+end_src
 **** nerd-icons
 Install nerd fonts in Emacs: =M-x nerd-icons-install-fonts=
+**** eglot-booster
+Follow the instruction in [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]].
 ** LSP
 | Language | Server                     |
 |----------+----------------------------|

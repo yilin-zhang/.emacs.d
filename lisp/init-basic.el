@@ -102,6 +102,8 @@
   (setq make-backup-files nil  ; disable backup file
         auto-save-default nil  ; disable auto-save
         )
+  ;; Warning handling
+  (setq warning-suppress-types '((emacs)))
 
   ;; Full Screen with Mode Line Time Display
   (defun yilin/toggle-frame-fullscreen ()

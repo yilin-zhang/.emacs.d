@@ -17,6 +17,64 @@
         gcmh-high-cons-threshold #x1000000)) ; 16MB
 
 ;; --------------------------------------------------------------
+;;                            Features
+;; --------------------------------------------------------------
+(use-package emacs
+  :ensure nil
+  :preface
+  (defun yilin/display-startup-time ()
+    (message "Emacs loaded in %s with %d garbage collections."
+             (format "%.2f seconds"
+                     (float-time
+                      (time-subtract after-init-time before-init-time)))
+             gcs-done))
+  :init
+  (tool-bar-mode -1)
+  (setq inhibit-splash-screen 1) ; disable welcome screen
+  ;; The setting of this variable must come before enable
+  ;; display-time-mode, or it will not work.
+  (setq display-time-24hr-format 1
+        display-time-string-forms
+        '((propertize (concat 24-hours ":" minutes " ")
+                      'face 'font-lock-constant-face)))
+  ;; UI
+  (setq window-divider-default-places t
+        window-divider-default-bottom-width 1
+        window-divider-default-right-width 1)
+  ;; Confirmation
+  (fset 'yes-or-no-p 'y-or-n-p) ; change yes or no to y or n
+  (setq confirm-kill-emacs 'yes-or-no-p)
+  ;; Editing
+  (setq-default major-mode 'text-mode
+                fill-column 80
+                truncate-lines t)
+  (setq ring-bell-function 'ignore) ; disable ring-bell-function
+  ;; Enable indentation+completion using the TAB key.
+  ;; `completion-at-point' is often bound to M-TAB.
+  (setq tab-always-indent 'complete)
+  ;; Cursor and scrolling
+  (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)) ; one line at a time
+        mouse-wheel-progressive-speed nil            ; don't accelerate scrolling
+        mouse-wheel-follow-mouse 't                  ; scroll window under mouse
+        scroll-step 1
+        scroll-conservatively 100000                 ; keyboard scroll one line at a time
+        scroll-preserve-screen-position 'always      ; lock cursor position when scrolling
+        )
+  ;; File saving
+  (setq make-backup-files nil  ; disable backup file
+        auto-save-default nil  ; disable auto-save
+        )
+  ;; Warning handling
+  (setq warning-suppress-types '((emacs)))
+  :hook
+  (after-init . global-so-long-mode)
+  (after-init . delete-selection-mode)
+  (after-init . global-hl-line-mode) ; highlight the current line
+  (window-setup . window-divider-mode)
+  (emacs-startup . yilin/display-startup-time)
+  )
+
+;; --------------------------------------------------------------
 ;;                        Theme and Modeline
 ;; --------------------------------------------------------------
 ;; doom-themes-visual-bell-config must be loaded after setting
@@ -48,63 +106,15 @@
 ;; --------------------------------------------------------------
 ;;                            Server
 ;; --------------------------------------------------------------
-;; Start server
 (use-package server
   :ensure nil
   :hook after-init)
 
 ;; --------------------------------------------------------------
-;;                            Features
+;;                            Window
 ;; --------------------------------------------------------------
-;; Set some basic features
 (use-package emacs
-  :ensure nil
-  :init
-  (tool-bar-mode -1)
-  (setq inhibit-splash-screen 1) ; disable welcome screen
-  ;; The setting of this variable must come before enable
-  ;; display-time-mode, or it will not work.
-  (setq display-time-24hr-format 1
-        display-time-string-forms
-        '((propertize (concat 24-hours ":" minutes " ")
-                      'face 'font-lock-constant-face)))
-  ;; UI
-  (setq window-divider-default-places t
-        window-divider-default-bottom-width 1
-        window-divider-default-right-width 1)
-  :hook
-  (after-init . global-so-long-mode)
-  (after-init . delete-selection-mode)
-  (after-init . global-hl-line-mode) ; highlight the current line
-  (window-setup . window-divider-mode)
-  (emacs-startup . yilin/display-startup-time)
-  (emacs-startup . yilin/pixel-scroll-precision-mode)
-  :config
-  ;; Confirmation
-  (fset 'yes-or-no-p 'y-or-n-p) ; change yes or no to y or n
-  (setq confirm-kill-emacs 'yes-or-no-p)
-  ;; Editing
-  (setq-default major-mode 'text-mode
-                fill-column 80)
-  (setq-default truncate-lines t)
-  (setq ring-bell-function 'ignore) ; disable ring-bell-function
-  ;; Enable indentation+completion using the TAB key.
-  ;; `completion-at-point' is often bound to M-TAB.
-  (setq tab-always-indent 'complete)
-  ;; Cursor and scrolling
-  (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; one line at a time
-  (setq mouse-wheel-progressive-speed nil) ; don't accelerate scrolling
-  (setq mouse-wheel-follow-mouse 't) ; scroll window under mouse
-  (setq scroll-step 1
-        scroll-conservatively 100000) ; keyboard scroll one line at a time
-  (setq scroll-preserve-screen-position 'always) ; lock cursor position when scrolling
-  ;; File saving
-  (setq make-backup-files nil  ; disable backup file
-        auto-save-default nil  ; disable auto-save
-        )
-  ;; Warning handling
-  (setq warning-suppress-types '((emacs)))
-
+  :preface
   ;; Full Screen with Mode Line Time Display
   (defun yilin/toggle-frame-fullscreen ()
     "toggle-frame-fullscreen plus display-time-mode."
@@ -134,8 +144,8 @@
                (splitter
                 (if (= (car this-win-edges)
                        (car (window-edges (next-window))))
-                    'split-window-horizontally
-                  'split-window-vertically)))
+                    'split-window-right
+                  'split-window-below)))
           (delete-other-windows)
           (let ((first-win (selected-window)))
             (funcall splitter)
@@ -144,23 +154,10 @@
             (set-window-buffer (next-window) next-win-buffer)
             (select-window first-win)
             (if this-win-2nd (other-window 1))))))
-
-  (defun yilin/display-startup-time ()
-    (message "Emacs loaded in %s with %d garbage collections."
-             (format "%.2f seconds"
-                     (float-time
-                      (time-subtract after-init-time before-init-time)))
-             gcs-done))
-
-  (defun yilin/pixel-scroll-precision-mode ()
-    ;; emacs-mac has it built-in, no need to enable it
-    (unless (eq system-type 'darwin)
-      (pixel-scroll-precision-mode 1)))
-
   :bind
   ;; Focus on the new window after splitting
-  ("C-x 2" . (lambda () (interactive) (split-window-vertically) (other-window 1)))
-  ("C-x 3" . (lambda () (interactive) (split-window-horizontally) (other-window 1)))
+  ([remap split-window-right] . (lambda () (interactive) (split-window-right) (other-window 1)))
+  ([remap split-window-below] . (lambda () (interactive) (split-window-below) (other-window 1)))
   ("<f12>" . yilin/toggle-frame-fullscreen)
   ("C-x |" . yilin/toggle-window-split)
   )
@@ -173,7 +170,7 @@
 ;; --------------------------------------------------------------
 (use-package lazy-revert
   :load-path "~/.emacs.d/site-lisp/"
-  :hook (after-init . lazy-revert-mode)
+  :hook after-init
   :config
   (setq auto-revert-verbose t ; let us know when it happens
         auto-revert-use-notify nil

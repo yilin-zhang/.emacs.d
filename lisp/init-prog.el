@@ -77,6 +77,15 @@
       (find-file filepath)
       (eglot-reconnect (eglot--current-server-or-lose)))))
 
+;; `https://github.com/jdtsmith/eglot-booster'
+(use-package eglot-booster
+  :ensure nil
+  :quelpa (eglot-booster :fetcher github
+                         :repo "jdtsmith/eglot-booster")
+  :if (executable-find "emacs-lsp-booster")
+  :after eglot
+  :config (eglot-booster-mode))
+
 ;; Config reference: `https://github.com/svaante/dape?tab=readme-ov-file#configuration'
 (use-package dape
   :hook

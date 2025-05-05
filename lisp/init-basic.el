@@ -72,6 +72,11 @@
   )
 
 ;; --------------------------------------------------------------
+;;                              Icons
+;; --------------------------------------------------------------
+(use-package nerd-icons)
+
+;; --------------------------------------------------------------
 ;;                        Theme and Modeline
 ;; --------------------------------------------------------------
 ;; doom-themes-visual-bell-config must be loaded after setting
@@ -91,6 +96,34 @@
   (doom-modeline-support-imenu t)
   (doom-modeline-modal-icon nil)
   (find-file-visit-truename t))
+
+;; --------------------------------------------------------------
+;;                            Dashbord
+;; --------------------------------------------------------------
+(use-package dashboard
+  :init
+  ;; add instruction
+  (setq initial-scratch-message
+        (concat initial-scratch-message
+                ";; Press <f6> to open the dashboard\n\n"))
+  ;; layout
+  (setq dashboard-center-content t)
+  ;; icons
+  (setq dashboard-display-icons-p t)
+  (setq dashboard-icon-type 'nerd-icons)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-set-heading-icons t)
+  :bind
+  ("<f6>" . dashboard-open)
+  :config
+  (dashboard-setup-startup-hook)
+  :custom
+  (dashboard-items '((bookmarks . 10)
+                     (projects  . 10)
+                     (agenda    . 5)
+                     (recents   . 5)
+                     (registers . 5)))
+  )
 
 ;; --------------------------------------------------------------
 ;;                            Paths
@@ -191,11 +224,6 @@
   :hook after-init
   :custom
   (recentf-max-saved-items 50))
-
-;; --------------------------------------------------------------
-;;                          Icons and Emoji
-;; --------------------------------------------------------------
-(use-package nerd-icons)
 
 ;; --------------------------------------------------------------
 ;;                             Buffer

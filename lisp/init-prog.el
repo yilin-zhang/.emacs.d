@@ -258,6 +258,17 @@ Requires `project-current' to identify the project."
 ;; --------------------------------------------------------------
 (use-package dockerfile-mode)
 
+;; --------------------------------------------------------------
+;;                            Copilot
+;; --------------------------------------------------------------
+(use-package copilot
+  :quelpa (copilot :fetcher github
+                   :repo "copilot-emacs/copilot.el"
+                   :branch "main"
+                   :files ("*.el"))
+  :bind
+  (:map copilot-completion-map
+        ("TAB" . copilot-accept-completion)))
 
 (provide 'init-prog)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

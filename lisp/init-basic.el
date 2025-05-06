@@ -115,15 +115,12 @@
   (setq dashboard-set-heading-icons t)
   :bind
   ("<f6>" . dashboard-open)
-  :config
-  (dashboard-setup-startup-hook)
   :custom
   (dashboard-items '((bookmarks . 10)
                      (projects  . 10)
                      (agenda    . 5)
                      (recents   . 5)
-                     (registers . 5)))
-  )
+                     (registers . 5))))
 
 ;; --------------------------------------------------------------
 ;;                            Paths

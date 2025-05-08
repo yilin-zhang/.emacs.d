@@ -116,6 +116,7 @@
   :bind
   ("<f6>" . dashboard-open)
   :custom
+  (dashboard-agenda-prefix-format " %i %-12:c%?-12t% s %b") ; same as the agenda format in `org-agenad-prefix-format'
   (dashboard-items '((bookmarks . 10)
                      (projects  . 10)
                      (agenda    . 5)

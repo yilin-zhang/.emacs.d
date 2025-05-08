@@ -89,7 +89,7 @@ The buffer's major mode should be `org-mode'."
         org-format-latex-options (plist-put org-format-latex-options :scale 2.3)
         org-latex-compiler "xelatex") ; Set XeLaTeX as the default LaTeX compiler
   ;; Set my org agenda file
-  (setq org-agenda-files '("~/agenda.org" "~/inbox.org")
+  (setq org-agenda-files '("~/agenda.org")
         org-agenda-log-mode-items '(closed clock state)) ; show when things get done in the log mode
   ;; Custom agenda views
   (setq org-agenda-block-separator nil)
@@ -135,7 +135,7 @@ The buffer's major mode should be `org-mode'."
         ;; Each item only belongs to one category, one key stroke is sufficient
         org-fast-tag-selection-single-key t)
   ;; Org capture
-  (setq org-default-notes-file "~/inbox.org"
+  (setq org-default-notes-file "~/agenda.org"
         org-capture-templates
         '(("l" "Log" entry (file org-default-notes-file) "* %?\n")))
   ;; Keywords

@@ -18,11 +18,19 @@
 ;;                         Tree Sitter
 ;; --------------------------------------------------------------
 ;; `https://archive.casouri.cc/note/2023/tree-sitter-in-emacs-29/index.html'
-(setq major-mode-remap-alist
-      '((python-mode . python-ts-mode)
-        (js-mode . js-ts-mode)
-        (json-mode . json-ts-mode)
-        (css-mode . css-ts-mode)))
+;; (setq major-mode-remap-alist
+;;       '((python-mode . python-ts-mode)
+;;         (js-mode . js-ts-mode)
+;;         (json-mode . json-ts-mode)
+;;         (css-mode . css-ts-mode)))
+
+(use-package treesit-auto
+  :demand t
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
 
 ;; --------------------------------------------------------------
 ;;                             LSP

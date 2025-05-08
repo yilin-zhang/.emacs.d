@@ -145,6 +145,19 @@
   :commands trashcat)
 
 ;; --------------------------------------------------------------
+;;                         Terminal
+;; --------------------------------------------------------------
+(use-package vterm
+  :commands vterm
+  :hook (vterm-mode . (lambda ()
+                        (setq-local global-hl-line-mode nil)
+                        (meow-mode -1))))
+
+(use-package multi-vterm
+  :commands multi-vterm
+  :after vterm)
+
+;; --------------------------------------------------------------
 ;;                            Custom
 ;; --------------------------------------------------------------
 

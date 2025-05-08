@@ -439,6 +439,7 @@ This function handles three distinct cases:
                     "3 - Good"
                     "4 - Easy"
                     "Press 'l' to look up this word in browser"
+                    "Press 'n' to skip the current word"
                     ""
                     ""
                     ""))
@@ -473,50 +474,63 @@ This function handles three distinct cases:
 (defun spamemo-review-next-word ()
   "Review the next due word.
 When current list is empty, re-check for due words and continue if any exist."
+  (interactive)
   (if (or spamemo-due-words (setq spamemo-due-words (spamemo-get-due-words)))
       (let ((word (pop spamemo-due-words)))
         (setq spamemo-current-word word)
         (spamemo--display-current-word))
     (progn
+      (setq spamemo-current-word nil)
       (message "Review finished!")
       (quit-window))))
 
-(defun spamemo--handle-lookup ()
-  (message "lookup word %s" spamemo-current-word)
-  (spamemo--lookup-word spamemo-current-word))
+(defun spamemo-lookup-current-word ()
+  (interactive)
+  (if (null spamemo-current-word)
+      (message "No current word to look up")
+    (progn
+      (message "lookup word %s" spamemo-current-word)
+      (spamemo--lookup-word spamemo-current-word))))
 
-(defun spamemo--handle-exit ()
+(defun spamemo-quit ()
+  "Quit the SpaMemo window."
+  (interactive)
   (message "Exiting review")
   (quit-window))
 
 (defun spamemo--handle-grade (grade)
   "Handle user grading of a card with GRADE (1-4)."
-  (let ((rating-text (cond
-                      ((= grade 1) "Forgot")
-                      ((= grade 2) "Hard")
-                      ((= grade 3) "Good")
-                      ((= grade 4) "Easy"))))
-    (message "Rated '%s' as (%s)" spamemo-current-word rating-text)
-    (spamemo-update-word spamemo-current-word grade)
-    (spamemo-review-next-word)))
+  (if (null spamemo-current-word)
+      (message "No current word to rate")
+    (progn
+      (let ((rating-text (cond
+                          ((= grade 1) "Forgot")
+                          ((= grade 2) "Hard")
+                          ((= grade 3) "Good")
+                          ((= grade 4) "Easy"))))
+        (message "Rated '%s' as (%s)" spamemo-current-word rating-text)
+        (spamemo-update-word spamemo-current-word grade))))
+  (spamemo-review-next-word))
 
-(defvar spamemo-review-mode-map
-  (let ((map (make-sparse-keymap)))
-    ;; NOTE: only give the user 4 points
-    (define-key map (kbd "1") (lambda () (interactive) (spamemo--handle-grade 1)))
-    (define-key map (kbd "2") (lambda () (interactive) (spamemo--handle-grade 2)))
-    (define-key map (kbd "3") (lambda () (interactive) (spamemo--handle-grade 3)))
-    (define-key map (kbd "4") (lambda () (interactive) (spamemo--handle-grade 4)))
-    (define-key map (kbd "l") (lambda () (interactive) (spamemo--handle-lookup)))
-    (define-key map (kbd "e") (lambda () (interactive) (spamemo--handle-exit)))
-    (define-key map (kbd "q") (lambda () (interactive) (spamemo--handle-exit)))
-    map)
-  "Keymap for `spamemo-review-mode'.")
+(defun spamemo-rate-forgot ()
+  "Rate the current word as 'forgot' (score=1)"
+  (interactive)
+  (spamemo--handle-grade 1))
 
-(define-derived-mode spamemo-review-mode special-mode "SpaMemo"
-  "Major mode for reviewing vocabulary with FSRS algorithm."
-  (setq buffer-read-only t)
-  (buffer-disable-undo))
+(defun spamemo-rate-hard ()
+  "Rate the current word as 'hard' (score=2)"
+  (interactive)
+  (spamemo--handle-grade 2))
+
+(defun spamemo-rate-good ()
+  "Rate the current word as 'good' (score=3)"
+  (interactive)
+  (spamemo--handle-grade 3))
+
+(defun spamemo-rate-easy ()
+  "Rate the current word as 'easy' (score=4)"
+  (interactive)
+  (spamemo--handle-grade 4))
 
 ;;;###autoload
 (defun spamemo-review ()
@@ -534,8 +548,7 @@ When current list is empty, re-check for due words and continue if any exist."
 (defun spamemo-review-refresh ()
   "Refresh the review window."
   (interactive)
-  (if (null spamemo-due-words)
-      (message "No words to review")
+  (when spamemo-current-word
     (let ((buffer (spamemo--setup-review-buffer)))
       (switch-to-buffer buffer)
       (spamemo--display-current-word))))
@@ -578,6 +591,24 @@ Use this command after you changed the vocab file."
   "Open the vocab file."
   (interactive)
   (find-file spamemo-vocab-file))
+
+(defvar spamemo-review-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "1") #'spamemo-rate-forgot)
+    (define-key map (kbd "2") #'spamemo-rate-hard)
+    (define-key map (kbd "3") #'spamemo-rate-good)
+    (define-key map (kbd "4") #'spamemo-rate-easy)
+    (define-key map (kbd "l") #'spamemo-lookup-current-word)
+    (define-key map (kbd "q") #'spamemo-quit)
+    (define-key map (kbd "n") #'spamemo-review-next-word)
+    (define-key map (kbd "g") #'spamemo-review-refresh)
+    map)
+  "Keymap for `spamemo-review-mode'.")
+
+(define-derived-mode spamemo-review-mode special-mode "SpaMemo"
+  "Major mode for reviewing vocabulary with FSRS algorithm."
+  (setq buffer-read-only t)
+  (buffer-disable-undo))
 
 (provide 'spamemo)
 ;;; spamemo.el ends here

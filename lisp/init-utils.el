@@ -131,6 +131,25 @@
   :load-path yilin/site-lisp-directory
   :hook (after-init . spamemo-calendar-mode))
 
+(defun yilin/lookup-thesaurus (&optional arg)
+  "Look up the word on an online thesaurus.
+If a region is active, use the text in that region (whitespaces stripped).
+If no region is active, use the word at point.
+If no word is at point, prompt for a word, using prefix arg as default if provided."
+  (interactive "P")
+  (let ((word
+         (cond
+          ;; If region is active, use the region text and strip whitespace
+          ((use-region-p)
+           (string-trim (buffer-substring-no-properties (region-beginning) (region-end))))
+          ;; If there's a word at point, use it
+          ((thing-at-point 'word)
+           (thing-at-point 'word t))
+          ;; Otherwise, prompt for a word
+          (t
+           (read-string "Word for thesaurus: " (when arg (format "%s" arg)))))))
+    (browse-url (format "https://www.merriam-webster.com/thesaurus/%s" word))))
+
 ;; --------------------------------------------------------------
 ;;                            Calc
 ;; --------------------------------------------------------------
@@ -196,7 +215,6 @@
     (when filename
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
-
 
 (provide 'init-utils)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -52,6 +52,54 @@
          . treemacs-magit--schedule-update))
 
 ;; --------------------------------------------------------------
+;;                            Dashbord
+;; --------------------------------------------------------------
+(use-package dashboard
+  :init
+  ;; add instruction
+  (setq initial-scratch-message
+        (concat initial-scratch-message
+                ";; Press <f6> to open the dashboard\n\n"))
+  ;; layout
+  (setq dashboard-center-content t)
+  ;; icons
+  (setq dashboard-display-icons-p t)
+  (setq dashboard-icon-type 'nerd-icons)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-set-heading-icons t)
+  :bind
+  ("<f6>" . dashboard-open)
+  :custom
+  ;; only show names, not paths
+  (dashboard-agenda-prefix-format " %i %-12:c%?-12t% s %b") ; same as the agenda format in `org-agenad-prefix-format'
+  (dashboard-agenda-time-string-format "%m-%d %a") ; add an abbreviated weekday name
+  (dashboard-bookmarks-item-format "%s") ; no need to show file paths
+  (dashboard-recentf-show-base t)
+  (dashboard-recentf-item-format "%s") ; only show file names, not whole paths
+  ;; minimalist layout
+  (dashboard-startup-banner 'ascii)
+  (dashboard-banner-logo-title nil)
+  (dashboard-footer-messages
+   '(
+     "Wake up to find out that you are the eyes of the world"
+     "Nothing left to do but smile, smile, smile"
+     "If you get confused, listen to the music play"
+     "Momma, momma, many worlds I've come since I first left home"
+     "You just gotta poke around"
+     "The sky was yellow and the sun was blue"
+     "Walking along in the Mission in the rain"
+     "All the years combine, they melt into a dream"
+     )) ; BUG: dashboard doesn't allow centering vertically without any footer message
+  (dashboard-init-info "")
+  (dashboard-vertically-center-content t)
+  ;; limited items
+  (dashboard-items '((bookmarks . 10)
+                     (projects  . 10)
+                     (agenda    . 5)
+                     (recents   . 5)
+                     (registers . 5))))
+
+;; --------------------------------------------------------------
 ;;                         Better Writing
 ;; --------------------------------------------------------------
 (use-package olivetti

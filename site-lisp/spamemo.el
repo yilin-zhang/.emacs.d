@@ -255,6 +255,10 @@ Uses the formula I = (S/F) * (R^(1/C) - 1) where:
   (setf (spamemo-word-meta-interval meta)
         (spamemo--get-new-interval meta)))
 
+(defun spamemo--reset-interval (meta)
+  "Set the interval to be 0.0."
+  (setf (spamemo-word-meta-interval meta) 0.0))
+
 (defun spamemo--update-repetitions (meta)
   "Increment the repetition count for META by 1."
   (let ((rep (spamemo-word-meta-repetitions meta)))
@@ -310,10 +314,12 @@ This function handles three distinct cases:
         (spamemo--update-word-failure meta grade)  ; forgot
         )))
 
-  (spamemo--update-last-review meta)
   ;; Update interval only if grade > 1 or if enforce-success is off
+  (spamemo--update-last-review meta)
   (unless (and spamemo-enforce-success (= grade 1))
-    (spamemo--update-interval meta))
+    ;; instead of calculating a new interval by the algorithm
+    ;; reset it to zero to enforce an immediate review
+    (spamemo--reset-interval meta))
   ;; Always increment repetition count
   (spamemo--update-repetitions meta)
   meta)

@@ -215,10 +215,12 @@ If no word is at point, prompt for a word, using prefix arg as default if provid
 ;;                         Terminal
 ;; --------------------------------------------------------------
 (use-package vterm
+  :after meow
   :commands vterm
-  :hook (vterm-mode . (lambda ()
-                        (setq-local global-hl-line-mode nil)
-                        (meow-mode -1))))
+  :hook
+  (vterm-mode . (lambda () (meow-mode -1)))
+  (vterm-mode . (lambda () (setq-local global-hl-line-mode nil)))
+  )
 
 (use-package multi-vterm
   :commands multi-vterm
@@ -250,9 +252,12 @@ If no word is at point, prompt for a word, using prefix arg as default if provid
         (shell-command (concat "open " (shell-quote-argument dired-file)))
       (shell-command (concat "open " (yilin/expand-and-quote-default-directory))))))
 
-(meow-leader-define-key
- '("t" . yilin/open-with-terminal)
- '("e" . yilin/open-with-finder-or-default-app))
+(use-package emacs
+  :after meow
+  :config
+  (meow-leader-define-key
+   '("t" . yilin/open-with-terminal)
+   '("e" . yilin/open-with-finder-or-default-app)))
 
 ;; **************************************************************
 ;; Copy file path and name

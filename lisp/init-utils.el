@@ -231,19 +231,28 @@ If no word is at point, prompt for a word, using prefix arg as default if provid
 ;; **************************************************************
 ;; Open in finder and terminal (Mac)
 ;; **************************************************************
-(defun yilin/open-in-finder ()
-  "Open the current dir in Finder."
-  (interactive)
-  (shell-command (format "open \"%s\"" default-directory)))
 
-(defun yilin/open-in-terminal ()
-  "Open the current dir in a new terminal window."
+(defun yilin/expand-and-quote-default-directory ()
+  (shell-quote-argument (expand-file-name default-directory)))
+
+(defun yilin/open-with-terminal ()
+  "Open the current dir in a new iTerm window."
   (interactive)
-  (shell-command (format "open -a iTerm.app \"%s\"" default-directory)))
+  (shell-command (concat "open -a iTerm.app " (yilin/expand-and-quote-default-directory))))
+
+(defun yilin/open-with-finder-or-default-app ()
+  "Open the current dir with Finder or open the current file with a default app"
+  (interactive)
+  (let ((dired-file (condition-case nil
+                        (dired-get-filename)
+                      (error nil))))
+    (if dired-file
+        (shell-command (concat "open " (shell-quote-argument dired-file)))
+      (shell-command (concat "open " (yilin/expand-and-quote-default-directory))))))
 
 (meow-leader-define-key
- '("t" . yilin/open-in-terminal)
- '("e" . yilin/open-in-finder))
+ '("t" . yilin/open-with-terminal)
+ '("e" . yilin/open-with-finder-or-default-app))
 
 ;; **************************************************************
 ;; Copy file path and name

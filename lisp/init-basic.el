@@ -98,32 +98,6 @@
   (find-file-visit-truename t))
 
 ;; --------------------------------------------------------------
-;;                            Dashbord
-;; --------------------------------------------------------------
-(use-package dashboard
-  :init
-  ;; add instruction
-  (setq initial-scratch-message
-        (concat initial-scratch-message
-                ";; Press <f6> to open the dashboard\n\n"))
-  ;; layout
-  (setq dashboard-center-content t)
-  ;; icons
-  (setq dashboard-display-icons-p t)
-  (setq dashboard-icon-type 'nerd-icons)
-  (setq dashboard-set-file-icons t)
-  (setq dashboard-set-heading-icons t)
-  :bind
-  ("<f6>" . dashboard-open)
-  :custom
-  (dashboard-agenda-prefix-format " %i %-12:c%?-12t% s %b") ; same as the agenda format in `org-agenad-prefix-format'
-  (dashboard-items '((bookmarks . 10)
-                     (projects  . 10)
-                     (agenda    . 5)
-                     (recents   . 5)
-                     (registers . 5))))
-
-;; --------------------------------------------------------------
 ;;                            Paths
 ;; --------------------------------------------------------------
 (use-package exec-path-from-shell

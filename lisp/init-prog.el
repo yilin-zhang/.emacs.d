@@ -96,7 +96,9 @@
 
 ;; Config reference: `https://github.com/svaante/dape?tab=readme-ov-file#configuration'
 (use-package dape
+  :after meow
   :hook
+  (dape-repl-mode . (lambda () (meow-mode -1)))
   ;; Save breakpoints on quit
   (kill-emacs . dape-breakpoint-save)
   ;; Load breakpoints on startup

@@ -405,6 +405,7 @@ Supports *, =, +, / and properly pairs (, [, {."
 ;; --------------------------------------------------------------
 
 (use-package which-key
+  :ensure nil
   :diminish (which-key-mode)
   :hook after-init)
 
@@ -622,9 +623,7 @@ Supports *, =, +, / and properly pairs (, [, {."
   :hook vertico-mode)
 
 (use-package color-rg
-  :ensure nil
-  :quelpa (color-rg :fetcher github
-                    :repo "manateelazycat/color-rg")
+  :vc (:url "https://github.com/manateelazycat/color-rg.git")
   :after meow
   :hook (color-rg-mode . (lambda () (meow-mode -1)))
   :commands (color-rg-search-input
@@ -639,9 +638,7 @@ Supports *, =, +, / and properly pairs (, [, {."
              color-rg-search-project-rails-with-type))
 
 (use-package breadcrumb
-  :ensure nil
-  :quelpa (breadcrumb :fetcher github
-                      :repo "joaotavora/breadcrumb")
+  :vc (:url "https://github.com/joaotavora/breadcrumb.git")
   :hook (prog-mode . breadcrumb-local-mode))
 
 ;; A collection of user interfaces for various built-in Emacs modes.

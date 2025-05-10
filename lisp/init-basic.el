@@ -57,6 +57,8 @@
         scroll-conservatively 100000                 ; keyboard scroll one line at a time
         scroll-preserve-screen-position 'always      ; lock cursor position when scrolling
         )
+  ;; Frame
+  (setq frame-resize-pixelwise t)
   ;; File saving
   (setq make-backup-files nil  ; disable backup file
         auto-save-default nil  ; disable auto-save
@@ -67,6 +69,7 @@
   (after-init . global-so-long-mode)
   (after-init . delete-selection-mode)
   (after-init . global-hl-line-mode) ; highlight the current line
+  (after-init . pixel-scroll-precision-mode)
   (window-setup . window-divider-mode)
   (emacs-startup . yilin/display-startup-time)
   )

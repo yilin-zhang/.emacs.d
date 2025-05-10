@@ -48,11 +48,6 @@
 
 (package-initialize)
 
-;; Bootstrap use-package
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
 ;; Should set before loading `use-package'
 (setq use-package-always-defer t
       use-package-always-ensure t
@@ -60,11 +55,6 @@
       use-package-enable-imenu-support t)
 
 (require 'use-package)
-
-(use-package quelpa-use-package
-  :init
-  (setq quelpa-update-melpa-p nil)
-  :demand t)
 
 ;; the key word ":diminish" only works when we have diminish
 (use-package diminish)

@@ -151,9 +151,7 @@
 ;;                           File
 ;; --------------------------------------------------------------
 (use-package auto-save
-  :ensure nil
-  :quelpa (auto-save :repo "manateelazycat/auto-save"
-                     :fetcher github)
+  :vc (:url "https://github.com/manateelazycat/auto-save.git")
   :hook (after-init . auto-save-enable)
   :config
   (setq auto-save-silent t)             ; quietly save

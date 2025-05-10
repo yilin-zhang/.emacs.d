@@ -87,9 +87,7 @@
 
 ;; `https://github.com/jdtsmith/eglot-booster'
 (use-package eglot-booster
-  :ensure nil
-  :quelpa (eglot-booster :fetcher github
-                         :repo "jdtsmith/eglot-booster")
+  :vc (:url "https://github.com/jdtsmith/eglot-booster.git")
   :if (executable-find "emacs-lsp-booster")
   :after eglot
   :config (eglot-booster-mode))
@@ -242,11 +240,7 @@ Requires `project-current' to identify the project."
                           (1- (point)))))))
 
 (use-package pico8-mode
-  :ensure nil
-  :quelpa (pico8-mode :fetcher github
-                      :repo "Kaali/pico8-mode"
-                      :branch "master"
-                      :files ("dist" "*.el"))
+  :vc (:url "https://github.com/Kaali/pico8-mode.git")
   :mode "\\.p8\\'"
   :hook
   (pico8-mode . (lambda () (setq-local lua-indent-level 1)))
@@ -272,10 +266,7 @@ Requires `project-current' to identify the project."
 ;;                            Copilot
 ;; --------------------------------------------------------------
 (use-package copilot
-  :quelpa (copilot :fetcher github
-                   :repo "copilot-emacs/copilot.el"
-                   :branch "main"
-                   :files ("*.el"))
+  :vc (:url "https://github.com/copilot-emacs/copilot.el.git")
   :bind
   (:map copilot-completion-map
         ("TAB" . copilot-accept-completion)))

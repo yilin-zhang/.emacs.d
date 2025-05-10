@@ -316,10 +316,11 @@ This function handles three distinct cases:
 
   ;; Update interval only if grade > 1 or if enforce-success is off
   (spamemo--update-last-review meta)
-  (unless (and spamemo-enforce-success (= grade 1))
-    ;; instead of calculating a new interval by the algorithm
-    ;; reset it to zero to enforce an immediate review
-    (spamemo--reset-interval meta))
+  (if (and spamemo-enforce-success (= grade 1))
+      ;; instead of calculating a new interval by the algorithm
+      ;; reset it to zero to enforce an immediate review
+      (spamemo--reset-interval meta)
+    (spamemo--update-interval meta))
   ;; Always increment repetition count
   (spamemo--update-repetitions meta)
   meta)

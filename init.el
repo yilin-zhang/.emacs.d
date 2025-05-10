@@ -19,12 +19,12 @@
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
 ;; Custom directories
-(setq yilin/site-lisp-directory
-      (expand-file-name "site-lisp" user-emacs-directory))
-(setq yilin/config-lisp-directory
-      (expand-file-name "lisp" user-emacs-directory))
-(setq yilin/custom-lisp-directory
-      (expand-file-name "custom" user-emacs-directory))
+(defvar yilin/site-lisp-directory
+  (expand-file-name "site-lisp" user-emacs-directory) "Directory for local Emacs packages.")
+(defvar yilin/config-lisp-directory
+  (expand-file-name "lisp" user-emacs-directory) "Directory for local Emacs configuration.")
+(defvar yilin/custom-lisp-directory
+  (expand-file-name "custom" user-emacs-directory) "Directory for custom Emacs configuration.")
 
 ;; Add directories to load-path
 (push yilin/config-lisp-directory load-path)

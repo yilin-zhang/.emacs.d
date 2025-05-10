@@ -14,7 +14,7 @@
         gcmh-high-cons-threshold #x1000000)) ; 16MB
 
 ;; --------------------------------------------------------------
-;;                            Features
+;;                        Basic Features
 ;; --------------------------------------------------------------
 (use-package emacs
   :ensure nil
@@ -216,22 +216,62 @@
 ;;                              Fonts
 ;; --------------------------------------------------------------
 
-(defvar yilin/default-font-size 15 "The default font size")
+(use-package emacs
+  :ensure nil
+  :preface
+  (defvar yilin/default-font-size 15 "The default font size")
+  (defvar yilin/fixed-pitch-font "Sarasa Mono SC" "The fixed pitch font")
+  ;; (defvar yilin/fixed-pitch-font "Fira Code" "The fixed pitch font")
+  (defvar yilin/variable-pitch-font "Noto Serif CJK SC" "The fixed pitch font")
 
-(defun yilin/set-fonts (&optional font-size)
-  (interactive (list (read-number "Enter size: " yilin/default-font-size)))
-  (let ((-font-size (if (and font-size (< 0 font-size))
-                        font-size
-                      yilin/default-font-size)))
-    (set-face-attribute 'default nil :font (font-spec :family "Sarasa Mono SC" :size -font-size))
-    (set-face-attribute 'fixed-pitch nil :font (font-spec :family "Sarasa Mono SC" :size -font-size))
-    (set-face-attribute 'variable-pitch nil :font (font-spec :family "Noto Serif CJK SC" :size -font-size))))
+  (defun yilin/set-fonts (&optional font-size)
+    "Set fonts with the given FONT-SIZE."
+    (interactive (list (read-number "Enter size: " yilin/default-font-size)))
+    (let ((actual-font-size (if (and font-size (< 0 font-size))
+                                font-size
+                              yilin/default-font-size)))
+      (set-face-attribute 'default nil :font (font-spec :family yilin/fixed-pitch-font :size actual-font-size))
+      (set-face-attribute 'fixed-pitch nil :font (font-spec :family yilin/fixed-pitch-font :size actual-font-size))
+      (set-face-attribute 'variable-pitch nil :font (font-spec :family yilin/variable-pitch-font :size actual-font-size))))
 
-(defun yilin/set-variable-pitch ()
-  (buffer-face-set 'variable-pitch))
+  ;; `https://github.com/d12frosted/homebrew-emacs-plus/issues/276'
+  (defun yilin/setup-fira-code()
+    "Set up ligatures for Fira Code"
+    (let ((alist '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
+                   (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
+                   (36 . ".\\(?:>\\)")
+                   (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
+                   (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
+                   (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
+                   (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
+                   (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
+                   (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
+                   (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
+                   (48 . ".\\(?:x[a-zA-Z]\\)")
+                   (58 . ".\\(?:::\\|[:=]\\)")
+                   (59 . ".\\(?:;;\\|;\\)")
+                   (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
+                   (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
+                   (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
+                   (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
+                   (91 . ".\\(?:]\\)")
+                   (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
+                   (94 . ".\\(?:=\\)")
+                   (119 . ".\\(?:ww\\)")
+                   (123 . ".\\(?:-\\)")
+                   (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
+                   (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
+      (dolist (char-regexp alist)
+        (set-char-table-range composition-function-table (car char-regexp)
+                              `([,(cdr char-regexp) 0 font-shape-gstring])))))
 
-(if (display-graphic-p)
+  :init
+  (when (display-graphic-p)
     (yilin/set-fonts))
+
+  :config
+  (when (equal yilin/fixed-pitch-font "Fira Code")
+    (yilin/setup-fira-code)))
 
 (provide 'init-basic)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

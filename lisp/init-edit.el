@@ -638,8 +638,7 @@ Supports *, =, +, / and properly pairs (, [, {."
              color-rg-search-project-rails-with-type))
 
 (use-package breadcrumb
-  :vc (:url "https://github.com/joaotavora/breadcrumb.git")
-  :hook (prog-mode . breadcrumb-local-mode))
+  :hook ((prog-mode org-mode) . breadcrumb-local-mode))
 
 ;; A collection of user interfaces for various built-in Emacs modes.
 ;; Keybinding reference:

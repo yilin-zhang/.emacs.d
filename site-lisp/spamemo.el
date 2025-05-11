@@ -429,11 +429,12 @@ This function handles three distinct cases:
     buffer))
 
 (defun spamemo--center-text (text)
-  "Center TEXT in the current window width."
-  (let* ((window-width (window-width))
-         (text-length (length text))
-         (padding (max 0 (/ (- window-width text-length) 2))))
-    (concat (make-string padding ?\s) text)))
+  "Center TEXT in the current window width, accounting for different text faces."
+  (let* ((wpw (window-pixel-width))
+         (text-pixel-width (string-pixel-width text))
+         (padding-pixels (max 0 (/ (- wpw text-pixel-width) 2)))
+         (padding-string (propertize " " 'display `(space :width (,padding-pixels)))))
+    (concat padding-string text)))
 
 (defun spamemo--insert-instructions ()
   "Insert the instructions in the review buffer with centered text."

@@ -269,7 +269,7 @@ Requires `project-current' to identify the project."
   :vc (:url "https://github.com/copilot-emacs/copilot.el.git")
   :bind
   (:map copilot-completion-map
-        ("TAB" . copilot-accept-completion)))
+        ("C-M-<return>" . copilot-accept-completion)))
 
 (provide 'init-prog)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -95,10 +95,11 @@ Looks up to `spamemo-calendar-days-ahead' days into the future."
   (unless spamemo-deck
     (setq spamemo-deck (spamemo--load-deck)))
 
-  (let ((due-counts (make-hash-table :test 'equal))
-        (now (current-time))
-        (cutoff (time-add (current-time)
-                          (seconds-to-time (* 86400 spamemo-calendar-days-ahead)))))
+  (let* ((due-counts (make-hash-table :test 'equal))
+         (now (current-time))
+         (now-date (spamemo-calendar--time-to-date now))
+         (cutoff (time-add (current-time)
+                           (seconds-to-time (* 86400 spamemo-calendar-days-ahead)))))
 
     ;; Go through all words in the deck
     (maphash (lambda (_word meta)
@@ -110,7 +111,12 @@ Looks up to `spamemo-calendar-days-ahead' days into the future."
                             (time-less-p due-time cutoff))
                    ;; Increment the count for this date
                    (let ((count (gethash due-date due-counts 0)))
-                     (puthash due-date (1+ count) due-counts)))))
+                     (puthash due-date (1+ count) due-counts)))
+
+                 ;; If the card is already due, count it for today
+                 (unless (time-less-p now due-time)
+                   (let ((count (gethash now-date due-counts 0)))
+                     (puthash now-date (1+ count) due-counts)))))
              spamemo-deck)
     due-counts))
 
@@ -118,8 +124,17 @@ Looks up to `spamemo-calendar-days-ahead' days into the future."
   "Mark calendar dates with due cards using appropriate faces."
   (let ((due-counts (spamemo-calendar--get-due-cards-by-date)))
     (maphash (lambda (date count)
-               (let ((face (spamemo-calendar--get-face-for-count count)))
-                 (calendar-mark-visible-date date face)))
+               (let* ((due-month (nth 0 date))
+                      (due-year (nth 2 date))
+                      (due-n-month (+ due-month (* 12 due-year)))
+                      (max-n-month (+ (1+ displayed-month) (* 12 displayed-year)))
+                      (min-n-month (+ (1- displayed-month) (* 12 displayed-year)))
+                      )
+                 ;; filter out dates that are not currently displayed
+                 (when (and (<= due-n-month max-n-month)
+                            (<= min-n-month due-n-month))
+                   (let ((face (spamemo-calendar--get-face-for-count count)))
+                     (calendar-mark-visible-date date face)))))
              due-counts)))
 
 ;;;###autoload
@@ -155,8 +170,10 @@ When enabled, dates with due cards are highlighted in the calendar."
   (if spamemo-calendar-mode
       (progn
         (add-hook 'calendar-today-visible-hook 'spamemo-calendar-mark-due-dates)
+        (add-hook 'calendar-today-invisible-hook 'spamemo-calendar-mark-due-dates)
         (add-hook 'calendar-move-hook 'spamemo-calendar-show-due-count-at-date))
     (remove-hook 'calendar-today-visible-hook 'spamemo-calendar-mark-due-dates)
+    (remove-hook 'calendar-today-invisible-hook 'spamemo-calendar-mark-due-dates)
     (remove-hook 'calendar-move-hook 'spamemo-calendar-show-due-count-at-date)))
 
 (provide 'spamemo-calendar)

@@ -472,6 +472,7 @@ This function handles three distinct cases:
       (let ((propertized-word (propertize spamemo-current-word 'face 'spamemo-word-face)))
         ;; Then center and insert this propertized word
         (insert (spamemo--center-text propertized-word)))
+      (goto-char 0)
       ))
   )
 

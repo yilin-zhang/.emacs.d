@@ -33,10 +33,9 @@
   :group 'spamemo-calendar)
 
 (defcustom spamemo-calendar-thresholds
-  '(1 5 10 20)
+  '(1 10 20 40)
   "List of thresholds for highlighting calendar dates with due cards.
-Each value represents the minimum number of cards for a new color level.
-Default levels: 1-4 cards (level 1), 5-9 (level 2), 10-19 (level 3), 20+ (level 4)."
+Each value represents the minimum number of cards for a new color level."
   :type '(repeat integer)
   :group 'spamemo-calendar)
 

@@ -478,7 +478,24 @@ This function handles three distinct cases:
 
 (defun spamemo--lookup-word (word)
   "Look up WORD in an online dictionary."
-  (browse-url (format "https://www.merriam-webster.com/dictionary/%s" word)))
+  (browse-url (format "https://www.merriam-webster.com/dictionary/%s" word))
+  (cond
+   ;; macOS
+   ((eq system-type 'darwin)
+    (start-process "activate-emacs" nil "osascript" "-e" "tell application \"Emacs\" to activate"))
+
+   ;; Linux with X11 - try external tools first
+   ((and (eq system-type 'gnu/linux) (getenv "DISPLAY"))
+    (cond
+     ((executable-find "wmctrl")
+      (start-process "activate-emacs" nil "wmctrl" "-a" "Emacs"))
+     ((executable-find "xdotool")
+      (start-process "activate-emacs" nil "xdotool" "search" "--name" "Emacs" "windowactivate"))
+     ;; Fallback (may not work)
+     (t (raise-frame))))
+
+   ;; Fallback for all other systems
+   (t (raise-frame))))
 
 (defun spamemo-review-next-word ()
   "Review the next due word.

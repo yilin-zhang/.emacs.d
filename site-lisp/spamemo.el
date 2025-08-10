@@ -27,6 +27,8 @@
 (require 'cl-lib)
 (require 'subr-x)
 (require 'seq)
+(require 'url)
+
 
 (defgroup spamemo nil
   "A spaced repetition system using the FSRS algorithm."
@@ -34,6 +36,16 @@
 
 (defcustom spamemo-vocab-file (expand-file-name "spamemo/vocab.json" user-emacs-directory)
   "Path to the vocabulary file."
+  :type 'file
+  :group 'spamemo)
+
+(defcustom spamemo-cache-file (expand-file-name "spamemo/cache.json" user-emacs-directory)
+  "Path to the cache file."
+  :type 'file
+  :group 'spamemo)
+
+(defcustom spamemo-audio-cache-dir (expand-file-name "spamemo/audio-cache" user-emacs-directory)
+  "Audio cache directory."
   :type 'file
   :group 'spamemo)
 
@@ -75,6 +87,13 @@ This forces users to repeat difficult cards until they are learned."
 
 (defvar spamemo-review-buffer-name "*SpaMemo Review*"
   "Name of the buffer used for reviews.")
+
+;; Variable to cache API results
+(defvar spamemo--api-result nil
+  "Cached result from the Dictionary API.")
+
+(defvar spamemo--last-word nil
+  "Last word that was looked up.")
 
 (defconst spamemo-weights
   [
@@ -396,6 +415,13 @@ This function handles three distinct cases:
       (let ((json-encoding-pretty-print t))
         (insert (json-encode json-data))))))
 
+(defun spamemo--clean-up ()
+  (setq spamemo-current-word nil)
+  (setq spamemo-deck nil)
+  (setq spamemo-due-words nil)
+  (setq spamemo--api-result nil)
+  (setq spamemo--last-word nil))
+
 ;; Core functionality
 
 (defun spamemo-get-due-words ()
@@ -429,35 +455,50 @@ This function handles three distinct cases:
     buffer))
 
 (defun spamemo--center-text (text)
-  "Center TEXT in the current window width, accounting for different text faces."
-  (let* ((wpw (window-pixel-width))
-         (text-pixel-width (string-pixel-width text))
-         (padding-pixels (max 0 (/ (- wpw text-pixel-width) 2)))
+  "Center TEXT in the current window width, accounting for different text faces.
+For multi-line text, centers the text block while keeping lines left-aligned within the block."
+  (let* ((lines (split-string text "\n"))
+         (wpw (window-pixel-width))
+         (max-line-width (apply 'max (mapcar 'string-pixel-width lines)))
+         (padding-pixels (max 0 (/ (- wpw max-line-width) 2)))
          (padding-string (propertize " " 'display `(space :width (,padding-pixels)))))
-    (concat padding-string text)))
+    (mapconcat (lambda (line)
+                 (concat padding-string line))
+               lines
+               "\n")))
+
+(defun spamemo--get-key-for-command (command)
+  "Get the key binding for COMMAND in `spamemo-review-mode-map'."
+  (let ((keys (where-is-internal command (list spamemo-review-mode-map))))
+    (if keys
+        (key-description (car keys))
+      nil)))
 
 (defun spamemo--insert-instructions ()
-  "Insert the instructions in the review buffer with centered text."
+  "Insert the instructions in the review buffer with centered text and dynamic key bindings."
   (let ((inhibit-read-only t)
         (separator (make-string 30 ?═)))
     (erase-buffer)
-    (let* ((lines '("How well do you know this word?"
-                    "1 - Forgot"
-                    "2 - Hard"
-                    "3 - Good"
-                    "4 - Easy"
-                    "Press 'l' to look up this word in browser"
-                    "Press 'n' to skip the current word"
+    (let* ((lines `("How well do you know this word?"
+                    ,(format "%s - Forgot" (spamemo--get-key-for-command 'spamemo-rate-forgot))
+                    ,(format "%s - Hard" (spamemo--get-key-for-command 'spamemo-rate-hard))
+                    ,(format "%s - Good" (spamemo--get-key-for-command 'spamemo-rate-good))
+                    ,(format "%s - Easy" (spamemo--get-key-for-command 'spamemo-rate-easy))
+                    ""
+                    ,(format "%s - look up this word in browser" (spamemo--get-key-for-command 'spamemo-lookup-current-word))
+                    ,(format "%s - skip the current word" (spamemo--get-key-for-command 'spamemo-review-next-word))
+                    ,(format "%s - hear pronunciation" (spamemo--get-key-for-command 'spamemo-speak-current-word))
+                    ,(format "%s - show definition" (spamemo--get-key-for-command 'spamemo-define-current-word))
+                    ,(format "%s - define word at point" (spamemo--get-key-for-command 'spamemo-define-at-point))
+                    ,(format "%s - quit" (spamemo--get-key-for-command 'spamemo-quit))
                     ""
                     ""
                     ""))
            (text-n-lines (+ (length lines) 1)) ; another line for word
-           (top-n-lines (max 0 (- (floor (window-height) 2) (+ text-n-lines 5)))) ; 5 is an arbitrary number to bring the text up a little
-           )
+           (top-n-lines (max 0 (- (floor (window-height) 2) (+ text-n-lines 5))))) ; 5 is an arbitrary number to bring the text up a little
       (insert (make-string top-n-lines ?\n))
-      (dolist (line lines)
-        (insert (spamemo--center-text line))
-        (insert "\n")))))
+      (insert (spamemo--center-text (string-join lines "\n")))
+      (insert "\n"))))
 
 (defun spamemo--display-current-word ()
   "Display WORD in the review buffer."
@@ -472,9 +513,7 @@ This function handles three distinct cases:
       (let ((propertized-word (propertize spamemo-current-word 'face 'spamemo-word-face)))
         ;; Then center and insert this propertized word
         (insert (spamemo--center-text propertized-word)))
-      (goto-char 0)
-      ))
-  )
+      (goto-char 0))))
 
 (defun spamemo--lookup-word (word)
   "Look up WORD in an online dictionary."
@@ -506,7 +545,7 @@ When current list is empty, re-check for due words and continue if any exist."
         (setq spamemo-current-word word)
         (spamemo--display-current-word))
     (progn
-      (setq spamemo-current-word nil)
+      (spamemo--clean-up)
       (message "Review finished!")
       (quit-window))))
 
@@ -521,6 +560,7 @@ When current list is empty, re-check for due words and continue if any exist."
 (defun spamemo-quit ()
   "Quit the SpaMemo window."
   (interactive)
+  (spamemo--clean-up)
   (message "Exiting review")
   (quit-window))
 
@@ -557,6 +597,193 @@ When current list is empty, re-check for due words and continue if any exist."
   "Rate the current word as 'easy' (score=4)"
   (interactive)
   (spamemo--handle-grade 4))
+
+;; =================================================================
+;;                     Dictionary API handling
+;; =================================================================
+
+(defun spamemo--fetch-definition (word)
+  "Fetch definition for WORD from Dictionary API.
+Returns parsed JSON data or nil if error.
+Uses cache file to avoid repeated API calls."
+  (let ((cache-data (if (file-exists-p spamemo-cache-file)
+                        (condition-case err
+                            (with-temp-buffer
+                              (let ((coding-system-for-read 'utf-8))
+                                (insert-file-contents spamemo-cache-file))
+                              (json-parse-string (buffer-string) :object-type 'alist))
+                          (error
+                           (message "Error reading cache: %s" (error-message-string err))
+                           nil))
+                      nil)))
+
+    ;; Check if word exists in cache
+    (if-let ((cached-result (alist-get (intern word) cache-data)))
+        cached-result
+
+      ;; Fetch from API
+      (let* ((url (format "https://api.dictionaryapi.dev/api/v2/entries/en/%s"
+                          (url-hexify-string word)))
+             (buffer (condition-case err
+                         (url-retrieve-synchronously url t nil 10)
+                       (error
+                        (message "Error fetching definition: %s" (error-message-string err))
+                        nil))))
+        (when buffer
+          (with-current-buffer buffer
+            (goto-char (point-min))
+            (when (re-search-forward "^$" nil t)
+              (let ((json-string (buffer-substring-no-properties (point) (point-max))))
+                (kill-buffer buffer)
+                (condition-case err
+                    (let ((parsed-data (json-parse-string json-string :object-type 'alist)))
+                      ;; Update cache
+                      (let ((updated-cache (or cache-data '())))
+                        (setf (alist-get (intern word) updated-cache) parsed-data)
+                        (condition-case cache-err
+                            (let ((coding-system-for-write 'utf-8)
+                                  (json-encoding-pretty-print t))
+                              (with-temp-file spamemo-cache-file
+                                (insert (json-encode updated-cache))))
+                          (error
+                           (message "Error saving to cache: %s" (error-message-string cache-err)))))
+                      parsed-data)
+                  (error
+                   (message "Error parsing JSON: %s" (error-message-string err))
+                   nil))))))))))
+
+(defun spamemo--get-api-result (word)
+  "Get API result for WORD, using cache if same word."
+  (unless (and spamemo--last-word
+               (string-equal word spamemo--last-word)
+               spamemo--api-result)
+    (setq spamemo--api-result (spamemo--fetch-definition word)
+          spamemo--last-word word))
+  spamemo--api-result)
+
+(defun spamemo--format-phonetics (phonetics)
+  "Format PHONETICS data into a readable string."
+  (when phonetics
+    (let ((phonetic-texts (delq nil (mapcar (lambda (p) (alist-get 'text p)) phonetics))))
+      (when phonetic-texts
+        (format "Pronunciation: %s\n" (string-join phonetic-texts ", "))))))
+
+(defun spamemo--format-meanings (meanings)
+  "Format MEANINGS data into a readable string."
+  (mapconcat
+   (lambda (meaning)
+     (let ((part-of-speech (alist-get 'partOfSpeech meaning))
+           (definitions (alist-get 'definitions meaning)))
+       (concat
+        (format "\n%s:\n" (capitalize part-of-speech))
+        (mapconcat
+         (lambda (def)
+           (let ((definition (alist-get 'definition def))
+                 (example (alist-get 'example def)))
+             (concat
+              (format "  • %s" definition)
+              (when example
+                (format "\n    Example: \"%s\"" example)))))
+         definitions
+         "\n"))))
+   meanings
+   "\n"))
+
+(defun spamemo-define (word &optional popup)
+  "Define WORD using Dictionary API and return formatted result.
+Ignores audio links and focuses on definitions and phonetics."
+  (interactive "sEnter word to define: ")
+  (let ((result (spamemo--get-api-result word))
+        (popup (or popup (called-interactively-p 'any))))
+    (if (not result)
+        (let ((error-msg (format "No definition found for '%s'" word)))
+          (when popup
+            (message "%s" error-msg))
+          error-msg)
+      (let* ((entry (aref result 0))  ; Get first entry
+             (word-text (alist-get 'word entry))
+             (phonetics (alist-get 'phonetics entry))
+             (meanings (alist-get 'meanings entry))
+             (formatted-result
+              (concat
+               (when popup
+                 (format "Word: %s\n" (capitalize word-text)))
+               (or (spamemo--format-phonetics phonetics) "")
+               (spamemo--format-meanings meanings))))
+        (when popup
+          (with-output-to-temp-buffer "*Dictionary Definition*"
+            (princ formatted-result)))
+        formatted-result))))
+
+(defun spamemo--get-audio-url (phonetics)
+  "Extract first available audio URL from PHONETICS data."
+  (when phonetics
+    (catch 'found
+      (mapc (lambda (phonetic)
+              (let ((audio (alist-get 'audio phonetic)))
+                (when (and audio (not (string-empty-p audio)))
+                  (throw 'found audio))))
+            phonetics)
+      nil)))
+
+(defun spamemo-speak (word &optional audio-player)
+  "Play pronunciation audio for WORD using Dictionary API.
+Downloads and caches audio files locally for better compatibility.
+AUDIO-PLAYER specifies the command to play audio (defaults to system default)."
+  (interactive "sEnter word to pronounce: ")
+  (let ((result (spamemo--get-api-result word)))
+    (if (not result)
+        (message "No pronunciation found for '%s'" word)
+      (let* ((entry (aref result 0))
+             (phonetics (alist-get 'phonetics entry))
+             (audio-url (spamemo--get-audio-url phonetics)))
+        (if (not audio-url)
+            (message "No audio pronunciation available for '%s'" word)
+          (let* ((file-extension (or (file-name-extension audio-url) "mp3"))
+                 (cache-file (expand-file-name (format "%s.%s" word file-extension) spamemo-audio-cache-dir))
+                 (player (or audio-player
+                             (cond ((executable-find "afplay") "afplay")     ; macOS
+                                   ((executable-find "mpv") "mpv")           ; Cross-platform
+                                   ((eq system-type 'windows-nt) "start")    ; Windows
+                                   (t "mpv")))))
+
+            ;; Create cache directory if it doesn't exist
+            (unless (file-directory-p spamemo-audio-cache-dir)
+              (make-directory spamemo-audio-cache-dir t))
+
+            ;; Download file if not cached
+            (unless (file-exists-p cache-file)
+              (message "Downloading pronunciation for '%s'..." word)
+              (condition-case err
+                  (url-copy-file audio-url cache-file t)
+                (error
+                 (message "Failed to download audio: %s" (error-message-string err))
+                 (setq cache-file nil))))
+
+            ;; Play the cached file
+            (when cache-file
+              (message "Playing pronunciation of '%s'..." word)
+              (start-process "spamemo-audio" nil player cache-file))))))))
+
+(defun spamemo-speak-current-word ()
+  "Pronounce the current word."
+  (interactive)
+  (spamemo-speak spamemo-current-word))
+
+(defun spamemo-define-current-word ()
+  "Display definition of the current word."
+  (interactive)
+  (spamemo--display-current-word)
+  ;; insert the word's definition below
+  (with-current-buffer (get-buffer spamemo-review-buffer-name)
+    (let ((inhibit-read-only t))
+      (goto-char (point-max))
+      (insert "\n\n\n\n" (spamemo--center-text (spamemo-define spamemo-current-word))))
+    (goto-char 0)))
+
+;; =================================================================
+;;                       Entry Point Commands
+;; =================================================================
 
 ;;;###autoload
 (defun spamemo-review ()
@@ -618,6 +845,35 @@ Use this command after you changed the vocab file."
   (interactive)
   (find-file spamemo-vocab-file))
 
+;;;###autoload
+(defun spamemo-define-at-point ()
+  "Define the word at point."
+  (interactive)
+  (let ((word (thing-at-point 'word t)))
+    (if word
+        (spamemo-define word t)
+      (message "No word at point"))))
+
+;;;###autoload
+(defun spamemo-clear-audio-cache ()
+  "Clear the audio cache directory."
+  (interactive)
+  (when (file-directory-p spamemo-audio-cache-dir)
+    (delete-directory spamemo-audio-cache-dir t)
+    (message "Audio cache cleared"))
+  (unless (file-directory-p spamemo-audio-cache-dir)
+    (message "Audio cache was already empty")))
+
+;;;###autoload
+(defun spamemo-clear-api-cache ()
+  "Clear both in-memory and file dictionary cache."
+  (interactive)
+  (setq spamemo--api-result nil
+        spamemo--last-word nil)
+  (when (file-exists-p spamemo-cache-file)
+    (delete-file spamemo-cache-file))
+  (message "Dictionary cache cleared"))
+
 (defvar spamemo-review-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "1") #'spamemo-rate-forgot)
@@ -628,6 +884,9 @@ Use this command after you changed the vocab file."
     (define-key map (kbd "q") #'spamemo-quit)
     (define-key map (kbd "n") #'spamemo-review-next-word)
     (define-key map (kbd "g") #'spamemo-review-refresh)
+    (define-key map (kbd "s") #'spamemo-speak-current-word)
+    (define-key map (kbd "d") #'spamemo-define-current-word)
+    (define-key map (kbd "w") #'spamemo-define-at-point)
     map)
   "Keymap for `spamemo-review-mode'.")
 

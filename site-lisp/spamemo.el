@@ -71,6 +71,12 @@ This forces users to repeat difficult cards until they are learned."
   :type 'boolean
   :group 'spamemo)
 
+(defcustom spamemo-quit-hook nil
+  "Hook run when spamemo quits/cleans up.
+Each function is called with no arguments."
+  :type 'hook
+  :group 'spamemo)
+
 (defface spamemo-word-face
   '((t :inherit font-lock-keyword-face :weight bold :height 1.5))
   "Face for displaying the current word."
@@ -420,7 +426,8 @@ This function handles three distinct cases:
   (setq spamemo-deck nil)
   (setq spamemo-due-words nil)
   (setq spamemo--api-result nil)
-  (setq spamemo--last-word nil))
+  (setq spamemo--last-word nil)
+  (run-hooks 'spamemo-quit-hook))
 
 ;; Core functionality
 

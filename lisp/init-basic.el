@@ -234,6 +234,10 @@
       (set-face-attribute 'fixed-pitch nil :font (font-spec :family yilin/fixed-pitch-font :size actual-font-size))
       (set-face-attribute 'variable-pitch nil :font (font-spec :family yilin/variable-pitch-font :size actual-font-size))))
 
+  (defun yilin/set-variable-pitch ()
+    "Set current buffer's font to variable-pitch"
+    (buffer-face-set 'variable-pitch))
+
   ;; `https://github.com/d12frosted/homebrew-emacs-plus/issues/276'
   (defun yilin/setup-fira-code()
     "Set up ligatures for Fira Code"

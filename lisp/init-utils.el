@@ -264,6 +264,18 @@ If no word is at point, prompt for a word, using prefix arg as default if provid
 ;; **************************************************************
 ;; Copy file path and name
 ;; **************************************************************
+(defun yilin/-copy-file-path ()
+  "Return the file path of the current buffer or file under cursor.
+Returns nil if the buffer is not visiting a file and no file is under cursor."
+  (cond
+   ;; If buffer is visiting a file, return its path
+   ((buffer-file-name) (buffer-file-name))
+   ;; If in dired mode, return the full path of file under cursor
+   ((eq major-mode 'dired-mode)
+    (ignore-errors (dired-get-filename)))
+   ;; Otherwise return nil
+   (t nil)))
+
 (defun yilin/copy-file-path ()
   "Copy the current buffer file path to the clipboard."
   (interactive)

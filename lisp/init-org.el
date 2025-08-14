@@ -103,7 +103,7 @@ The buffer's major mode should be `org-mode'."
                   ((org-agenda-overriding-header "\nTo-do\n")))
             (agenda ""
                     ((org-agenda-span 'day)
-                     (org-agenda-entry-types '(:scheduled :timestamp))
+                     (org-agenda-entry-types '(:scheduled))
                      (org-agenda-format-date "")
                      (org-agenda-skip-function
                       '(org-agenda-skip-entry-if 'todo '("TODO" "DOING" "WAITING" "DONE" "CANCEL")))
@@ -117,7 +117,12 @@ The buffer's major mode should be `org-mode'."
                       '(org-agenda-skip-entry-if 'todo 'done))
                      (org-agenda-overriding-header "\nDeadlines")))
             (tags "CLOSED>=\"<today>\""
-                  ((org-agenda-overriding-header "\nCompleted\n")))))
+                  ((org-agenda-overriding-header "\nCompleted\n")))
+            (agenda ""
+                    ((org-agenda-span 'day)
+                     (org-agenda-entry-types '(:timestamp))
+                     (org-agenda-format-date "")
+                     (org-agenda-overriding-header "\nNotes")))))
           ("l" "Low priority tasks"
            ((alltodo ""
                      ((org-agenda-skip-function

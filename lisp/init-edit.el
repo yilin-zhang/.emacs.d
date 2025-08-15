@@ -142,6 +142,10 @@ Supports *, =, +, / and properly pairs (, [, {."
   (interactive)
   (yilin/surround-region ?_))
 
+(defun yilin/surround-region-tilde ()
+  (interactive)
+  (yilin/surround-region ?~))
+
 (use-package meow
   :demand t
   :preface
@@ -186,6 +190,7 @@ Supports *, =, +, / and properly pairs (, [, {."
      '("\"" . yilin/surround-region-dquote)
      '("/" . yilin/surround-region-slash)
      '("_" . yilin/surround-region-underscore)
+     '("~" . yilin/surround-region-tilde)
      ;; Custom leader bindings
      '("f" . find-file)
      '("b" . consult-buffer)

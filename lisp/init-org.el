@@ -96,18 +96,19 @@ The buffer's major mode should be `org-mode'."
   (setq org-agenda-custom-commands
         '(("g" "Daily review"
            ((todo "DOING"
-                  ((org-agenda-overriding-header "In Progress\n")))
-            (todo "WAITING"
-                  ((org-agenda-overriding-header "\nBlocked\n")))
+                  ((org-agenda-overriding-header "⏳ In Progress\n")))
             (todo "TODO"
-                  ((org-agenda-overriding-header "\nTo-do\n")))
+                  ((org-agenda-overriding-header "\n⭐ To-do\n")))
             (agenda ""
                     ((org-agenda-span 'day)
                      (org-agenda-entry-types '(:scheduled))
                      (org-agenda-format-date "")
                      (org-agenda-skip-function
+                      ;; these entires are included in other categories
                       '(org-agenda-skip-entry-if 'todo '("TODO" "DOING" "WAITING" "DONE" "CANCEL")))
-                     (org-agenda-overriding-header "\nScheduled")))
+                     (org-agenda-overriding-header "\n📅 Scheduled")))
+            (todo "WAITING"
+                  ((org-agenda-overriding-header "\n🚧 Blocked\n")))
             (agenda ""
                     ((org-agenda-span 'day)
                      (org-agenda-entry-types '(:deadline))
@@ -115,24 +116,25 @@ The buffer's major mode should be `org-mode'."
                      ;; (org-deadline-warning-days 7)
                      (org-agenda-skip-function
                       '(org-agenda-skip-entry-if 'todo 'done))
-                     (org-agenda-overriding-header "\nDeadlines")))
+                     (org-agenda-overriding-header "\n⏰ Deadlines")))
             (tags "CLOSED>=\"<today>\""
-                  ((org-agenda-overriding-header "\nCompleted\n")))
+                  ((org-agenda-overriding-header "\n✅ Completed\n")))
             (agenda ""
                     ((org-agenda-span 'day)
                      (org-agenda-entry-types '(:timestamp))
                      (org-agenda-format-date "")
-                     (org-agenda-overriding-header "\nNotes")))))
+                     (org-agenda-overriding-header "\n💭 Notes")))))
           ("l" "Low priority tasks"
            ((alltodo ""
                      ((org-agenda-skip-function
                        '(org-agenda-skip-if nil '(scheduled deadline)))
-                      (org-agenda-overriding-header "\nLow Priority Tasks\n")))))))
-  (setq org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s %b")
-                                   (todo . " %i %-12:c %b")
-                                   (tags . " %i %-12:c")
-                                   (search . " %i %-12:c")))
-  (setq org-agenda-breadcrumbs-separator " » ")
+                      (org-agenda-overriding-header "📚 Not Scheduled Tasks\n")))))))
+  ;; uncomment the 2 settings below to enable breadcrumbs
+  ;; (setq org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s %b")
+  ;;                                  (todo . " %i %-12:c %b")
+  ;;                                  (tags . " %i %-12:c")
+  ;;                                  (search . " %i %-12:c")))
+  ;; (setq org-agenda-breadcrumbs-separator " » ")
   ;; Tags (adapt from Bullet Journal)
   (setq org-tag-alist '(("event" . ?e)
                         ("task" . ?t)

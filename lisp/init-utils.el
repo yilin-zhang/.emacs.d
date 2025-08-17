@@ -74,7 +74,7 @@
   (dashboard-startupify-list '(dashboard-insert-items))
   (dashboard-vertically-center-content t)
   ;; only show names, not paths
-  (dashboard-agenda-prefix-format " %i %-12:c%?-12t% s %b") ; same as the agenda format in `org-agenad-prefix-format'
+  (dashboard-agenda-prefix-format " %i %?-12t% s") ; same as the agenda format in `org-agenad-prefix-format'
   (dashboard-agenda-time-string-format "%m-%d %a") ; add an abbreviated weekday name
   (dashboard-bookmarks-item-format "%s") ; no need to show file paths
   (dashboard-recentf-show-base t)

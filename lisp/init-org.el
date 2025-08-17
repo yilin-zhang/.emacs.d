@@ -129,12 +129,19 @@ The buffer's major mode should be `org-mode'."
                      ((org-agenda-skip-function
                        '(org-agenda-skip-if nil '(scheduled deadline)))
                       (org-agenda-overriding-header "📚 Not Scheduled Tasks\n")))))))
+
   ;; uncomment the 2 settings below to enable breadcrumbs
   ;; (setq org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s %b")
   ;;                                  (todo . " %i %-12:c %b")
   ;;                                  (tags . " %i %-12:c")
   ;;                                  (search . " %i %-12:c")))
   ;; (setq org-agenda-breadcrumbs-separator " » ")
+
+  ;; Remove the category prefix for a clearer view ("%c")
+  (setq org-agenda-prefix-format '((agenda . " %i %?-12t% s")
+                                   (todo . " %i")
+                                   (tags . " %i")
+                                   (search . " %i")))
   ;; Tags (adapt from Bullet Journal)
   (setq org-tag-alist '(("event" . ?e)
                         ("task" . ?t)

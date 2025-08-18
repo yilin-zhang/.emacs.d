@@ -117,8 +117,12 @@ The buffer's major mode should be `org-mode'."
                      (org-agenda-skip-function
                       '(org-agenda-skip-entry-if 'todo 'done))
                      (org-agenda-overriding-header "\n⏰ Deadlines")))
-            (tags "CLOSED>=\"<today>\""
-                  ((org-agenda-overriding-header "\n✅ Completed\n")))
+            (agenda ""
+                    ((org-agenda-span 'day)
+                     (org-agenda-entry-types '(:closed :state))
+                     (org-agenda-format-date "")
+                     (org-agenda-use-time-grid nil)
+                     (org-agenda-overriding-header "\n✅ Completed")))
             (agenda ""
                     ((org-agenda-span 'day)
                      (org-agenda-entry-types '(:timestamp))

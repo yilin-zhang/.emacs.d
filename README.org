@@ -12,7 +12,7 @@ cd ~/.emacs.d
 *** Global
 #+begin_src sh
 brew tap homebrew/cask-fonts
-brew install coreutils font-sarasa-gothic font-noto-serif-cjk-sc
+brew install coreutils font-sarasa-gothic font-noto-serif
 #+end_src
 *** Package
 **** color-rg

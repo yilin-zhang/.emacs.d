@@ -101,9 +101,9 @@ The buffer's major mode should be `org-mode'."
                     ((org-agenda-span 'day)
                      (org-agenda-entry-types '(:scheduled))
                      (org-agenda-format-date "")
-                     (org-agenda-skip-function
-                      ;; these entires are included in other categories
-                      '(org-agenda-skip-entry-if 'todo '("TODO" "DOING" "WAITING" "DONE" "CANCEL")))
+                     ;; (org-agenda-skip-function
+                     ;;  ;; these entires are included in other categories
+                     ;;  '(org-agenda-skip-entry-if 'todo '("TODO" "DOING" "WAITING" "DONE" "CANCEL")))
                      (org-agenda-overriding-header "\n📅 Scheduled")))
             (todo "TODO"
                   ((org-agenda-overriding-header "\n⭐ To-do\n")))

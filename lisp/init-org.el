@@ -70,6 +70,8 @@ The buffer's major mode should be `org-mode'."
   :config
   (setq system-time-locale "C")       ; make sure the time stamps are in English
   (setq org-log-done 'time            ; add time stamp after an item is DONE
+        org-log-into-drawer t         ; put log notes into drawer by default
+        org-log-reschedule 'time      ; log reschedule by default
         org-src-fontify-natively t    ; fontify code in code blocks
         org-startup-indented t        ; indent at startup
         org-hide-emphasis-markers t   ; hide emphasis markers

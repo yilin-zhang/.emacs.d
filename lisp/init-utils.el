@@ -228,6 +228,11 @@ If no word is at point, prompt for a word, using prefix arg as default if provid
   :commands multi-vterm
   :after vterm)
 
+(use-package vterm-toggle
+  :after vterm
+  :config
+  (global-set-key (kbd "s-j") 'vterm-toggle))
+
 ;; --------------------------------------------------------------
 ;;                            Custom
 ;; --------------------------------------------------------------

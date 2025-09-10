@@ -56,6 +56,20 @@ The buffer's major mode should be `org-mode'."
               (setq colors (cdr colors))
               (overlay-put ov 'line-height line-height)
               (overlay-put ov 'line-spacing (1- line-height))))))))
+
+  :init
+  (defvar yilin/org-agenda-files
+    '("~/agenda.org")
+    "Basic org agenda files. The first one is the default file.
+The reason to keep a separate variable is to allow denote to update `org-agenda-files'
+without worrying about the original agenda files.")
+
+  (defun yilin/init-org-agenda-files ()
+    "Initialize `org-agenda-files' and `org-default-notes-file' based on `yilin/org-agenda-files'"
+    (interactive)
+    (setq org-agenda-files (copy-sequence yilin/org-agenda-files))
+    (setq org-default-notes-file (nth 0 yilin/org-agenda-files)))
+
   :bind
   ("C-c a" . org-agenda)
   ("C-c b" . org-switchb)
@@ -91,8 +105,8 @@ The buffer's major mode should be `org-mode'."
         org-format-latex-options (plist-put org-format-latex-options :scale 2.3)
         org-latex-compiler "xelatex") ; Set XeLaTeX as the default LaTeX compiler
   ;; Set my org agenda file
-  (setq org-agenda-files '("~/agenda.org")
-        org-agenda-log-mode-items '(closed clock state)) ; show when things get done in the log mode
+  (yilin/init-org-agenda-files)
+  (setq org-agenda-log-mode-items '(closed clock state)) ; show when things get done in the log mode
   ;; Custom agenda views
   (setq org-agenda-block-separator nil)
   (setq org-agenda-custom-commands

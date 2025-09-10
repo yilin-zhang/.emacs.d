@@ -110,9 +110,50 @@
 ;; --------------------------------------------------------------
 ;;                        Note Taking
 ;; --------------------------------------------------------------
+
 (use-package denote
   :custom
   (denote-org-store-link-to-heading 'id))
+
+(use-package denote
+  :after org
+  :init
+  ;; `https://baty.net/posts/2022/11/keeping-my-org-agenda-updated/'
+  (defvar yilin/denote-agenda-keyword "agenda"
+    "Denote files with this keyword will be considered as agenda files")
+  (defun yilin/denote-init-org-agenda-files ()
+    "Append list of files containing `yilin/denote-agenda-keyword' to org-agenda-files"
+    (interactive)
+    (yilin/init-org-agenda-files)
+    (let ((keyword (concat "_" yilin/denote-agenda-keyword)))
+      (setq org-agenda-files
+            (append org-agenda-files
+                    (directory-files denote-directory t keyword)))))
+  (yilin/denote-init-org-agenda-files)
+
+  (defun yilin/denote-random-review ()
+    "Jump to a random location in Denote notes containing the :review: tag."
+    (interactive)
+    (let ((files (denote-directory-files))
+          matches)
+      ;; Collect all occurrences of :review: across notes
+      (dolist (f files)
+        (with-temp-buffer
+          (insert-file-contents f)
+          (goto-char (point-min))
+          (while (re-search-forward ":review:" nil t)
+            (push (list f (line-number-at-pos) (point)) matches))))
+      ;; Jump to a random match
+      (if matches
+          (let* ((choice (nth (random (length matches)) matches))
+                 (file (nth 0 choice))
+                 (line (nth 1 choice))
+                 (pos  (nth 2 choice)))
+            (find-file file)
+            (goto-char pos)
+            (message "Jumped to %s at line %d"
+                     (file-name-nondirectory file) line))
+        (message "No notes with :review: tag found.")))))
 
 (use-package annotate)
 

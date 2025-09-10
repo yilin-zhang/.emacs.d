@@ -110,7 +110,9 @@
 ;; --------------------------------------------------------------
 ;;                        Note Taking
 ;; --------------------------------------------------------------
-(use-package denote)
+(use-package denote
+  :custom
+  (denote-org-store-link-to-heading 'id))
 
 (use-package annotate)
 

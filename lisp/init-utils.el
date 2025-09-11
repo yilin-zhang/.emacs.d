@@ -113,27 +113,12 @@
 
 (use-package denote
   :custom
-  (denote-org-store-link-to-heading 'id))
-
-(use-package denote
-  :after org
-  :init
-  ;; `https://baty.net/posts/2022/11/keeping-my-org-agenda-updated/'
-  (defvar yilin/denote-agenda-keyword "agenda"
-    "Denote files with this keyword will be considered as agenda files")
-  (defun yilin/denote-init-org-agenda-files ()
-    "Append list of files containing `yilin/denote-agenda-keyword' to org-agenda-files"
-    (interactive)
-    (yilin/init-org-agenda-files)
-    (let ((keyword (concat "_" yilin/denote-agenda-keyword)))
-      (setq org-agenda-files
-            (append org-agenda-files
-                    (directory-files denote-directory t keyword)))))
-  (yilin/denote-init-org-agenda-files)
-
+  (denote-org-store-link-to-heading 'id)
+  :preface
   (defun yilin/denote-random-review ()
     "Jump to a random location in Denote notes containing the :review: tag."
     (interactive)
+    (require 'denote)
     (let ((files (denote-directory-files))
           matches)
       ;; Collect all occurrences of :review: across notes
@@ -153,7 +138,24 @@
             (goto-char pos)
             (message "Jumped to %s at line %d"
                      (file-name-nondirectory file) line))
-        (message "No notes with :review: tag found.")))))
+        (message "No notes with :review: tag found."))))
+  :commands yilin/denote-random-review)
+
+(use-package denote
+  :after org
+  :init
+  ;; `https://baty.net/posts/2022/11/keeping-my-org-agenda-updated/'
+  (defvar yilin/denote-agenda-keyword "agenda"
+    "Denote files with this keyword will be considered as agenda files")
+  (defun yilin/denote-init-org-agenda-files ()
+    "Append list of files containing `yilin/denote-agenda-keyword' to org-agenda-files"
+    (interactive)
+    (yilin/init-org-agenda-files)
+    (let ((keyword (concat "_" yilin/denote-agenda-keyword)))
+      (setq org-agenda-files
+            (append org-agenda-files
+                    (directory-files denote-directory t keyword)))))
+  (yilin/denote-init-org-agenda-files))
 
 (use-package annotate)
 

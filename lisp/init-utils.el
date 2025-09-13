@@ -93,7 +93,10 @@
   :bind
   ("<f7>" . olivetti-mode)
   :hook
-  (org-mode . olivetti-mode))
+  (org-mode . olivetti-mode)
+  :custom
+  ;; use a wider body width than default
+  (olivetti-body-width (+ fill-column 5)))
 
 ;; --------------------------------------------------------------
 ;;                         Better Doc

@@ -486,7 +486,10 @@ For multi-line text, centers the text block while keeping lines left-aligned wit
   (let ((inhibit-read-only t)
         (separator (make-string 30 ?═)))
     (erase-buffer)
-    (let* ((lines `("How well do you know this word?"
+    (let* ((lines `(,(format "%s word(s) remaining" (length spamemo-due-words))
+                    "-------------------------------"
+                    ""
+                    "How well do you know this word?"
                     ,(format "%s - Forgot" (spamemo--get-key-for-command 'spamemo-rate-forgot))
                     ,(format "%s - Hard" (spamemo--get-key-for-command 'spamemo-rate-hard))
                     ,(format "%s - Good" (spamemo--get-key-for-command 'spamemo-rate-good))

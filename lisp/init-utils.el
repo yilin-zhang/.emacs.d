@@ -266,6 +266,7 @@
 ;; **************************************************************
 ;; Copy file path and name
 ;; **************************************************************
+
 (defun yilin/-copy-file-path ()
   "Return the file path of the current buffer or file under cursor.
 Returns nil if the buffer is not visiting a file and no file is under cursor."
@@ -294,6 +295,88 @@ Returns nil if the buffer is not visiting a file and no file is under cursor."
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
 
+;; **************************************************************
+;; Dictionary
+;; **************************************************************
+
+(defun yilin/lookup-thesaurus (&optional arg)
+  "Look up the word on an online thesaurus.
+If a region is active, use the text in that region (whitespaces stripped).
+If no region is active, use the word at point.
+If no word is at point, prompt for a word, using prefix arg as default if provided."
+  (interactive "P")
+  (let ((word
+         (cond
+          ;; If region is active, use the region text and strip whitespace
+          ((use-region-p)
+           (string-trim (buffer-substring-no-properties (region-beginning) (region-end))))
+          ;; If there's a word at point, use it
+          ((thing-at-point 'word)
+           (thing-at-point 'word t))
+          ;; Otherwise, prompt for a word
+          (t
+           (read-string "Word for thesaurus: " (when arg (format "%s" arg)))))))
+    (browse-url (format "https://www.merriam-webster.com/thesaurus/%s" word))))
+
+;; **************************************************************
+;; Paper Reading
+;; **************************************************************
+
+(defun yilin/arxiv-get-paper-id ()
+  "Get arXiv paper ID from user input or selected region.
+Returns the paper ID as a trimmed string."
+  (let* ((region-text (when (use-region-p)
+                        (string-trim (buffer-substring-no-properties
+                                      (region-beginning) (region-end)))))
+         (looks-like-arxiv-id (when region-text
+                                (string-match-p "^\\([0-9]+\\.[0-9]+\\|[a-z-]+\\.[A-Z]+/[0-9]+\\)$" region-text)))
+         (prompt (if looks-like-arxiv-id
+                     (format "Enter arXiv paper ID (%s): " region-text)
+                   "Enter arXiv paper ID: "))
+         (user-input (read-string prompt)))
+    (cond
+     ;; If user just pressed enter and we have a valid region ID, use it
+     ((and looks-like-arxiv-id (string-empty-p user-input))
+      (when (use-region-p) (delete-region (region-beginning) (region-end)))
+      region-text)
+     ;; If user entered something, use that
+     ((not (string-empty-p user-input))
+      (when (use-region-p) (delete-region (region-beginning) (region-end)))
+      (string-trim user-input))
+     ;; If we have selected text that looks like an ID and user pressed enter
+     (looks-like-arxiv-id
+      (when (use-region-p) (delete-region (region-beginning) (region-end)))
+      region-text)
+     ;; Fallback: use whatever the user typed
+     (t (string-trim user-input)))))
+
+(defun yilin/arxiv-insert-org-link (paper-id)
+  "Insert an org-mode link for an arXiv paper given its ID.
+If called interactively, prompts for paper ID or uses selected text.
+PAPER-ID should be in format like '2301.07041' or 'math.GT/0309136'."
+  (interactive (list (yilin/arxiv-get-paper-id)))
+  (require 'url) ; simple lazy load
+  (let* ((paper-id paper-id)
+         (url (format "https://arxiv.org/abs/%s" paper-id))
+         (title (condition-case nil
+                    (let ((buffer (url-retrieve-synchronously url t nil 10)))
+                      (when buffer
+                        (unwind-protect
+                            (with-current-buffer buffer
+                              (goto-char (point-min))
+                              (when (re-search-forward "<title>\\[.*?\\]\\s-*\\(.*?\\)</title>" nil t)
+                                (string-trim (match-string 1))))
+                          (kill-buffer buffer))))
+                  (error nil))))
+    (insert (format "[[%s][%s]]" url (or title (format "arXiv:%s" paper-id))))
+    (message "Inserted link for %s" (or title paper-id))))
+
+(defun yilin/arxiv-open-paper (paper-id)
+  "Open an arXiv paper in the default browser.
+If called interactively, prompts for paper ID or uses selected text.
+PAPER-ID should be in format like '2301.07041' or 'math.GT/0309136'."
+  (interactive (list (yilin/arxiv-get-paper-id)))
+  (browse-url (format "https://arxiv.org/abs/%s" paper-id)))
 
 (provide 'init-utils)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

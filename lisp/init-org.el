@@ -57,6 +57,11 @@ The buffer's major mode should be `org-mode'."
               (overlay-put ov 'line-height line-height)
               (overlay-put ov 'line-spacing (1- line-height))))))))
 
+  (defun yilin/org-remove-priority-when-done-or-cancel ()
+    "Remove priority from current heading when state becomes DONE or CANCEL."
+    (when (member org-state '("DONE" "CANCEL"))
+      (org-priority 'remove)))
+
   :init
   (defvar yilin/org-agenda-files
     '("~/agenda.org")
@@ -81,6 +86,7 @@ without worrying about the original agenda files.")
   (org-mode . (lambda () (setq truncate-lines nil)))
   (org-mode . yilin/prettify-org-buffer)
   (org-agenda-finalize . yilin/org-agenda-time-grid-spacing)
+  (org-after-todo-state-change . yilin/org-remove-priority-when-done-or-cancel)
   :config
   (setq system-time-locale "C")       ; make sure the time stamps are in English
   (setq org-log-done 'time            ; add time stamp after an item is DONE

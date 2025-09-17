@@ -154,12 +154,7 @@ without worrying about the original agenda files.")
                     ((org-agenda-span 'day)
                      (org-agenda-entry-types '(:timestamp))
                      (org-agenda-format-date "")
-                     (org-agenda-overriding-header "\n💭 Notes")))))
-          ("l" "Low priority tasks"
-           ((alltodo ""
-                     ((org-agenda-skip-function
-                       '(org-agenda-skip-if nil '(scheduled deadline)))
-                      (org-agenda-overriding-header "📚 Not Scheduled Tasks\n")))))))
+                     (org-agenda-overriding-header "\n💭 Notes")))))))
 
   ;; uncomment the 2 settings below to enable breadcrumbs
   ;; (setq org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s %b")

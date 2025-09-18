@@ -58,8 +58,9 @@ The buffer's major mode should be `org-mode'."
               (overlay-put ov 'line-spacing (1- line-height))))))))
 
   (defun yilin/org-remove-priority-when-done-or-cancel ()
-    "Remove priority from current heading when state becomes DONE or CANCEL."
-    (when (member org-state '("DONE" "CANCEL"))
+    "Remove priority from non-repeating tasks when state becomes DONE or CANCEL."
+    (when (and (member org-state '("DONE" "CANCEL"))
+               (not (org-get-repeat)))  ;; skip repeating tasks
       (org-priority 'remove)))
 
   :init

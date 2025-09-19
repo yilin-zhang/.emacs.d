@@ -319,7 +319,7 @@ If no word is at point, prompt for a word, using prefix arg as default if provid
     (browse-url (format "https://www.merriam-webster.com/thesaurus/%s" word))))
 
 ;; **************************************************************
-;; Paper Reading
+;; arXiv
 ;; **************************************************************
 
 (defun yilin/arxiv-get-paper-id ()
@@ -377,6 +377,47 @@ If called interactively, prompts for paper ID or uses selected text.
 PAPER-ID should be in format like '2301.07041' or 'math.GT/0309136'."
   (interactive (list (yilin/arxiv-get-paper-id)))
   (browse-url (format "https://arxiv.org/abs/%s" paper-id)))
+
+;; **************************************************************
+;; org link
+;; **************************************************************
+
+(defun yilin/org-insert-link-with-html-title (url)
+  "Asynchronously fetch URL and insert an Org link with the page title at point."
+  (interactive "sEnter URL: ")
+  ;; Capture the buffer and point where we should insert later
+  (let ((target-buf (current-buffer))
+        (target-pos (point)))
+    (url-retrieve
+     url
+     #'yilin/org--insert-link-callback
+     (list url target-buf target-pos))))
+
+(defun yilin/org--insert-link-callback (status url target-buf target-pos)
+  "Callback for `yilin/org-insert-link-with-title-async'.
+STATUS is the retrieval status. URL is the original URL.
+TARGET-BUF and TARGET-POS are where to insert the link."
+  (require 'url)
+  (require 'dom)
+  (if (plist-get status :error)
+      (message "Error fetching URL: %s" (plist-get status :error))
+    (goto-char (point-min))
+    ;; Skip HTTP headers
+    (re-search-forward "\n\n" nil 'move)
+    (let* ((dom (libxml-parse-html-region (point) (point-max)))
+           (title-node (car (dom-by-tag dom 'title)))
+           (title (when title-node (string-trim (dom-text title-node)))))
+      ;; Clean up this temporary buffer
+      (kill-buffer (current-buffer))
+      ;; Insert into the original buffer at original position
+      (when (buffer-live-p target-buf)
+        (with-current-buffer target-buf
+          (save-excursion
+            (goto-char target-pos)
+            (insert (if title
+                        (format "[[%s][%s]]" url title)
+                      (format "[[%s]]" url))))
+          (message "Inserted link for %s" url))))))
 
 (provide 'init-utils)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -20,8 +20,9 @@
 
 ;;; Code:
 
-(require 'spamemo)
+(require 'ansi-color)
 (require 'calendar)
+(require 'spamemo)
 
 (defgroup spamemo-calendar nil
   "Calendar integration for spamemo."
@@ -33,31 +34,35 @@
   :group 'spamemo-calendar)
 
 (defcustom spamemo-calendar-thresholds
-  '(1 10 20 40)
-  "List of thresholds for highlighting calendar dates with due cards.
-Each value represents the minimum number of cards for a new color level."
+  '(10 25 40)
+  "List of 3 thresholds for highlighting calendar dates with due cards.
+Each value represents the maximum number of cards for a new color level."
   :type '(repeat integer)
   :group 'spamemo-calendar)
 
 (defface spamemo-calendar-level-1-face
-  '((t :inherit (success bold) :inverse-video t))
-  "Face for dates with few due cards (level 1)."
-  :group 'spamemo-calendar)
+  `((t :background ,(face-attribute 'ansi-color-green :foreground)
+       :foreground ,(face-attribute 'ansi-color-black :foreground)
+       :weight bold))
+  "Face for dates with few due cards (level 1).")
 
 (defface spamemo-calendar-level-2-face
-  '((t :inherit (warning bold) :inverse-video t))
-  "Face for dates with some due cards (level 2)."
-  :group 'spamemo-calendar)
+  `((t :background ,(face-attribute 'ansi-color-yellow :foreground)
+       :foreground ,(face-attribute 'ansi-color-black :foreground)
+       :weight bold))
+  "Face for dates with some due cards (level 2).")
 
 (defface spamemo-calendar-level-3-face
-  '((t :inherit (font-lock-keyword-face bold) :inverse-video t))
-  "Face for dates with many due cards (level 3)."
-  :group 'spamemo-calendar)
+  `((t :background ,(face-attribute 'ansi-color-red :foreground)
+       :foreground ,(face-attribute 'ansi-color-black :foreground)
+       :weight bold))
+  "Face for dates with many due cards (level 3).")
 
 (defface spamemo-calendar-level-4-face
-  '((t :inherit (error bold) :inverse-video t))
-  "Face for dates with very many due cards (level 4)."
-  :group 'spamemo-calendar)
+  `((t :background ,(face-attribute 'ansi-color-magenta :foreground)
+       :foreground ,(face-attribute 'ansi-color-black :foreground)
+       :weight bold))
+  "Face for dates with very many due cards (level 4).")
 
 ;; Internal functions
 
@@ -65,9 +70,9 @@ Each value represents the minimum number of cards for a new color level."
   "Return the appropriate face for COUNT due cards."
   (let ((thresholds spamemo-calendar-thresholds))
     (cond
-     ((< count (nth 1 thresholds)) 'spamemo-calendar-level-1-face)
-     ((< count (nth 2 thresholds)) 'spamemo-calendar-level-2-face)
-     ((< count (nth 3 thresholds)) 'spamemo-calendar-level-3-face)
+     ((< count (nth 0 thresholds)) 'spamemo-calendar-level-1-face)
+     ((< count (nth 1 thresholds)) 'spamemo-calendar-level-2-face)
+     ((< count (nth 2 thresholds)) 'spamemo-calendar-level-3-face)
      (t 'spamemo-calendar-level-4-face))))
 
 (defun spamemo-calendar--get-due-date (meta)

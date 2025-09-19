@@ -847,7 +847,8 @@ After adding a word, prompts if you want to add another."
 Use this command after you changed the vocab file."
   (interactive)
   (setq spamemo-deck (spamemo--load-deck))
-  (message "Reloaded SpaMemo deck"))
+  (message "Reloaded SpaMemo deck (%s cards in total)"
+           (hash-table-count spamemo-deck)))
 
 ;;;###autoload
 (defun spamemo-open-vocab-file ()

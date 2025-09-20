@@ -14,6 +14,15 @@
   (LaTeX-mode . outline-minor-mode))
 
 ;; --------------------------------------------------------------
+;;                     Typst Mode Configurations
+;; --------------------------------------------------------------
+(use-package typst-ts-mode
+  :vc (:url "https://git.sr.ht/~meow_king/typst-ts-mode"))
+
+(use-package ox-typst
+  :after org)
+
+;; --------------------------------------------------------------
 ;;                     Markdown Mode Configurations
 ;; --------------------------------------------------------------
 (use-package markdown-mode

@@ -232,7 +232,7 @@
                               yilin/default-font-size)))
       (set-face-attribute 'default nil :font (font-spec :family yilin/fixed-pitch-font :size actual-font-size))
       (set-face-attribute 'fixed-pitch nil :font (font-spec :family yilin/fixed-pitch-font :size actual-font-size))
-      (set-face-attribute 'variable-pitch nil :font (font-spec :family yilin/variable-pitch-font :size actual-font-size))))
+      (set-face-attribute 'variable-pitch nil :font (font-spec :family yilin/variable-pitch-font :size (+ 2 actual-font-size)))))
 
   (defun yilin/set-variable-pitch ()
     "Set current buffer's font to variable-pitch"

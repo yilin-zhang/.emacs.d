@@ -439,12 +439,16 @@ This function handles three distinct cases:
   (unless spamemo-deck
     (setq spamemo-deck (spamemo--load-deck)))
 
-  (let (due-words)
+  ;; put the words that have been reviewed at least once to the front
+  (let (due-words new-words)
     (maphash (lambda (word meta)
-               (when (spamemo--is-due meta)
-                 (push word due-words)))
+               (if (spamemo--is-due meta)
+                   (if (= (spamemo-word-meta-repetitions meta) 0)
+                       (push word new-words)
+                     (push word due-words))))
              spamemo-deck)
-    (spamemo--shuffle-list due-words)))
+    (append (spamemo--shuffle-list due-words)
+            (spamemo--shuffle-list new-words))))
 
 (defun spamemo-update-grade (word grade)
   "Update WORD with review GRADE (1-4)."
@@ -468,6 +472,12 @@ This function handles three distinct cases:
   (when (and spamemo-deck (gethash word spamemo-deck))
     (let ((meta (gethash word spamemo-deck)))
       (spamemo-word-meta-comment meta))))
+
+(defun spamemo-delete-word (word)
+  "Delete WORD from the deck."
+  (when (and spamemo-deck (gethash word spamemo-deck))
+    (remhash word spamemo-deck)
+    (spamemo--save-deck spamemo-deck)))
 
 ;; UI functions
 
@@ -520,6 +530,8 @@ For multi-line text, centers the text block while keeping lines left-aligned wit
                     ,(format "%s - show definition" (spamemo--get-key-for-command 'spamemo-define-current-word))
                     ,(format "%s - define word at point" (spamemo--get-key-for-command 'spamemo-define-at-point))
                     ,(format "%s - update comment of the current word" (spamemo--get-key-for-command 'spamemo-add-comment))
+                    ,(format "%s - rename the current word" (spamemo--get-key-for-command 'spamemo-rename-current-word))
+                    ,(format "%s - delete the current word" (spamemo--get-key-for-command 'spamemo-delete-current-word))
                     ,(format "%s - quit" (spamemo--get-key-for-command 'spamemo-quit))
                     ""
                     ""
@@ -896,6 +908,41 @@ After adding a word, prompts if you want to add another."
                    (call-interactively #'spamemo-add-word)))))))))
 
 ;;;###autoload
+(defun spamemo-delete-current-word ()
+  "Delete the current word from the deck."
+  (interactive)
+  (if (null spamemo-current-word)
+      (message "No current word to delete")
+    (when (yes-or-no-p (format "Are you sure you want to delete '%s' from the deck? " spamemo-current-word))
+      (spamemo-delete-word spamemo-current-word)
+      (message "Deleted '%s' from the deck." spamemo-current-word)
+      (setq spamemo-current-word nil)
+      (when (eq major-mode 'spamemo-review-mode)
+        (spamemo-review-next-word)))))
+
+;;;###autoload
+(defun spamemo-rename-current-word ()
+  "Edit the name of the current word."
+  (interactive)
+  (if (null spamemo-current-word)
+      (message "No current word to edit")
+    (let ((new-word (read-string (format "New name for '%s': " spamemo-current-word) spamemo-current-word)))
+      (if (string-empty-p new-word)
+          (message "Word name cannot be empty")
+        (if (string-equal new-word spamemo-current-word)
+            (message "Word name unchanged")
+          (if (gethash new-word spamemo-deck)
+              (message "Word '%s' already exists in the deck. Choose a different name." new-word)
+            (let ((meta (gethash spamemo-current-word spamemo-deck)))
+              (remhash spamemo-current-word spamemo-deck)
+              (puthash new-word meta spamemo-deck)
+              (spamemo--save-deck spamemo-deck)
+              (setq spamemo-current-word new-word)
+              (message "Renamed word to '%s'." new-word)
+              (when (eq major-mode 'spamemo-review-mode)
+                (spamemo-review-refresh)))))))))
+
+;;;###autoload
 (defun spamemo-reload-deck ()
   "Reload the vocab file to spamemo-deck.
 Use this command after you changed the vocab file."
@@ -953,6 +1000,8 @@ Use this command after you changed the vocab file."
     (define-key map (kbd "d") #'spamemo-define-current-word)
     (define-key map (kbd "w") #'spamemo-define-at-point)
     (define-key map (kbd "c") #'spamemo-add-comment)
+    (define-key map (kbd "D") #'spamemo-delete-current-word)
+    (define-key map (kbd "e") #'spamemo-rename-current-word)
     map)
   "Keymap for `spamemo-review-mode'.")
 

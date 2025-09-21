@@ -863,7 +863,9 @@ AUDIO-PLAYER specifies the command to play audio (defaults to system default)."
 (defun spamemo-add-word (word)
   "Add WORD to the vocabulary deck.
 After adding a word, prompts if you want to add another."
-  (interactive "sWord to add: ")
+  (interactive
+   (list
+    (read-string "Word to add: " (thing-at-point 'word))))
   (when (string-empty-p word)
     (error "Word cannot be empty"))
 
@@ -879,18 +881,19 @@ After adding a word, prompts if you want to add another."
              (setq spamemo-current-word word)
              (format "Added '%s' to the deck. " word)))))
 
-    (let ((choice (read-char-choice
-                   (concat status-msg "Add another word? (y/n, ENTER for yes, c for comment): ")
-                   '(?y ?n ?\r ?c))))
-      (cond ((or (eq choice ?y) (eq choice ?\r))
-             (call-interactively #'spamemo-add-word))
-            ((eq choice ?c)
-             (let* ((status-msg (call-interactively #'spamemo-add-comment))
-                    (choice (read-char-choice
-                             (concat status-msg "Add another word? (y/n, ENTER for yes): ")
-                             '(?y ?n ?\r))))
-               (when (or (eq choice ?y) (eq choice ?\r))
-                 (call-interactively #'spamemo-add-word))))))))
+    (when (called-interactively-p 'any)
+      (let ((choice (read-char-choice
+                     (concat status-msg "Add another word? (y/n, ENTER for yes, c for comment): ")
+                     '(?y ?n ?\r ?c))))
+        (cond ((or (eq choice ?y) (eq choice ?\r))
+               (call-interactively #'spamemo-add-word))
+              ((eq choice ?c)
+               (let* ((status-msg (call-interactively #'spamemo-add-comment))
+                      (choice (read-char-choice
+                               (concat status-msg "Add another word? (y/n, ENTER for yes): ")
+                               '(?y ?n ?\r))))
+                 (when (or (eq choice ?y) (eq choice ?\r))
+                   (call-interactively #'spamemo-add-word)))))))))
 
 ;;;###autoload
 (defun spamemo-reload-deck ()

@@ -439,7 +439,8 @@ This function handles three distinct cases:
   (unless spamemo-deck
     (setq spamemo-deck (spamemo--load-deck)))
 
-  ;; put the words that have been reviewed at least once to the front
+  ;; Put the words that have been reviewed at least once to the front
+  ;; Shuffle reviewed words, sort unreviewed words by time (latest to earliest)
   (let (due-words new-words)
     (maphash (lambda (word meta)
                (if (spamemo--is-due meta)
@@ -448,7 +449,15 @@ This function handles three distinct cases:
                      (push word due-words))))
              spamemo-deck)
     (append (spamemo--shuffle-list due-words)
-            (spamemo--shuffle-list new-words))))
+            (seq-sort (lambda (w1 w2)
+                        (let* ((d1 (spamemo--parse-iso-date
+                                    (spamemo-word-meta-added-date
+                                     (gethash w1 spamemo-deck))))
+                               (d2 (spamemo--parse-iso-date
+                                    (spamemo-word-meta-added-date
+                                     (gethash w2 spamemo-deck)))))
+                          (time-less-p d2 d1))) ; latest to earliest
+                      new-words))))
 
 (defun spamemo-update-grade (word grade)
   "Update WORD with review GRADE (1-4)."

@@ -134,6 +134,7 @@ Each function is called with no arguments."
 (cl-defstruct (spamemo-word-meta)
   (added-date (format-time-string "%Y-%m-%dT%H:%M:%S%z"))
   (last-review (format-time-string "%Y-%m-%dT%H:%M:%S%z"))
+  (comment nil)
   (stability 0)
   (difficulty 0.0)
   (interval 0)
@@ -384,6 +385,7 @@ This function handles three distinct cases:
                          (let ((meta (make-spamemo-word-meta
                                       :added-date (gethash "added_date" meta-json)
                                       :last-review (gethash "last_review" meta-json)
+                                      :comment (gethash "comment" meta-json)
                                       :stability (gethash "stability" meta-json)
                                       :difficulty (gethash "difficulty" meta-json)
                                       :interval (gethash "interval" meta-json)
@@ -408,6 +410,7 @@ This function handles three distinct cases:
                (let ((meta-json (make-hash-table :test 'equal)))
                  (puthash "added_date" (spamemo-word-meta-added-date meta) meta-json)
                  (puthash "last_review" (spamemo-word-meta-last-review meta) meta-json)
+                 (puthash "comment" (spamemo-word-meta-comment meta) meta-json)
                  (puthash "stability" (spamemo-word-meta-stability meta) meta-json)
                  (puthash "difficulty" (spamemo-word-meta-difficulty meta) meta-json)
                  (puthash "interval" (spamemo-word-meta-interval meta) meta-json)
@@ -443,12 +446,28 @@ This function handles three distinct cases:
              spamemo-deck)
     (spamemo--shuffle-list due-words)))
 
-(defun spamemo-update-word (word grade)
+(defun spamemo-update-grade (word grade)
   "Update WORD with review GRADE (1-4)."
   (when (and spamemo-deck (gethash word spamemo-deck))
     (let ((meta (gethash word spamemo-deck)))
       (puthash word (spamemo--update-word meta grade) spamemo-deck)
       (spamemo--save-deck spamemo-deck))))
+
+(defun spamemo-update-comment (word comment)
+  "Update WORD's comment with COMMENT."
+  (when (and spamemo-deck (gethash word spamemo-deck))
+    (let ((meta (gethash word spamemo-deck)))
+      (puthash word (progn
+                      (setf (spamemo-word-meta-comment meta) comment)
+                      meta)
+               spamemo-deck)
+      (spamemo--save-deck spamemo-deck))))
+
+(defun spamemo-get-comment (word)
+  "Get WORD's comment."
+  (when (and spamemo-deck (gethash word spamemo-deck))
+    (let ((meta (gethash word spamemo-deck)))
+      (spamemo-word-meta-comment meta))))
 
 ;; UI functions
 
@@ -500,6 +519,7 @@ For multi-line text, centers the text block while keeping lines left-aligned wit
                     ,(format "%s - hear pronunciation" (spamemo--get-key-for-command 'spamemo-speak-current-word))
                     ,(format "%s - show definition" (spamemo--get-key-for-command 'spamemo-define-current-word))
                     ,(format "%s - define word at point" (spamemo--get-key-for-command 'spamemo-define-at-point))
+                    ,(format "%s - update comment of the current word" (spamemo--get-key-for-command 'spamemo-add-comment))
                     ,(format "%s - quit" (spamemo--get-key-for-command 'spamemo-quit))
                     ""
                     ""
@@ -509,6 +529,13 @@ For multi-line text, centers the text block while keeping lines left-aligned wit
       (insert (make-string top-n-lines ?\n))
       (insert (spamemo--center-text (string-join lines "\n")))
       (insert "\n"))))
+
+(defun spamemo--insert-comment ()
+  "Insert the word's comment in the review buffer."
+  (let ((comment (spamemo-get-comment spamemo-current-word)))
+    (when comment
+      (insert "\n\n")
+      (insert (spamemo--center-text comment)))))
 
 (defun spamemo--display-current-word ()
   "Display WORD in the review buffer."
@@ -523,6 +550,7 @@ For multi-line text, centers the text block while keeping lines left-aligned wit
       (let ((propertized-word (propertize spamemo-current-word 'face 'spamemo-word-face)))
         ;; Then center and insert this propertized word
         (insert (spamemo--center-text propertized-word)))
+      (spamemo--insert-comment)
       (goto-char 0))))
 
 (defun spamemo--lookup-word (word)
@@ -585,7 +613,7 @@ When current list is empty, re-check for due words and continue if any exist."
                           ((= grade 3) "Good")
                           ((= grade 4) "Easy"))))
         (message "Rated '%s' as (%s)" spamemo-current-word rating-text)
-        (spamemo-update-word spamemo-current-word grade))))
+        (spamemo-update-grade spamemo-current-word grade))))
   (spamemo-review-next-word))
 
 (defun spamemo-rate-forgot ()
@@ -817,6 +845,21 @@ AUDIO-PLAYER specifies the command to play audio (defaults to system default)."
       (spamemo--display-current-word))))
 
 ;;;###autoload
+(defun spamemo-add-comment (comment)
+  "Add COMMENT to SPAMEMO-CURRENT-WORD."
+  (interactive
+   (progn
+     (unless spamemo-current-word
+       (user-error "No current word to add a comment to"))
+     (list
+      (read-string (format "Comment for %s: " spamemo-current-word)
+                   (spamemo-get-comment spamemo-current-word)))))
+  (spamemo-update-comment spamemo-current-word comment)
+  (when (eq major-mode 'spamemo-review-mode)
+    (spamemo-review-refresh))
+  (format "Updated the comment of '%s'. " spamemo-current-word))
+
+;;;###autoload
 (defun spamemo-add-word (word)
   "Add WORD to the vocabulary deck.
 After adding a word, prompts if you want to add another."
@@ -833,13 +876,21 @@ After adding a word, prompts if you want to add another."
            (let ((meta (make-spamemo-word-meta)))
              (puthash word meta spamemo-deck)
              (spamemo--save-deck spamemo-deck)
+             (setq spamemo-current-word word)
              (format "Added '%s' to the deck. " word)))))
 
     (let ((choice (read-char-choice
-                   (concat status-msg "Add another word? (y/n or ENTER for yes): ")
-                   '(?y ?n ?\r))))
-      (when (or (eq choice ?y) (eq choice ?\r))
-        (call-interactively #'spamemo-add-word)))))
+                   (concat status-msg "Add another word? (y/n, ENTER for yes, c for comment): ")
+                   '(?y ?n ?\r ?c))))
+      (cond ((or (eq choice ?y) (eq choice ?\r))
+             (call-interactively #'spamemo-add-word))
+            ((eq choice ?c)
+             (let* ((status-msg (call-interactively #'spamemo-add-comment))
+                    (choice (read-char-choice
+                             (concat status-msg "Add another word? (y/n, ENTER for yes): ")
+                             '(?y ?n ?\r))))
+               (when (or (eq choice ?y) (eq choice ?\r))
+                 (call-interactively #'spamemo-add-word))))))))
 
 ;;;###autoload
 (defun spamemo-reload-deck ()
@@ -898,6 +949,7 @@ Use this command after you changed the vocab file."
     (define-key map (kbd "s") #'spamemo-speak-current-word)
     (define-key map (kbd "d") #'spamemo-define-current-word)
     (define-key map (kbd "w") #'spamemo-define-at-point)
+    (define-key map (kbd "c") #'spamemo-add-comment)
     map)
   "Keymap for `spamemo-review-mode'.")
 

@@ -109,18 +109,19 @@ Looks up to `spamemo-calendar-days-ahead' days into the future."
     (maphash (lambda (_word meta)
                (let* ((due-time (spamemo-calendar--get-due-date meta))
                       (due-date (spamemo-calendar--time-to-date due-time)))
+                 ;; Skip words that are never reviewed
+                 (unless (= (spamemo-word-meta-repetitions meta) 0)
+                   ;; Only include dates that are in the future and before cutoff
+                   (when (and (time-less-p now due-time)
+                              (time-less-p due-time cutoff))
+                     ;; Increment the count for this date
+                     (let ((count (gethash due-date due-counts 0)))
+                       (puthash due-date (1+ count) due-counts)))
 
-                 ;; Only include dates that are in the future and before cutoff
-                 (when (and (time-less-p now due-time)
-                            (time-less-p due-time cutoff))
-                   ;; Increment the count for this date
-                   (let ((count (gethash due-date due-counts 0)))
-                     (puthash due-date (1+ count) due-counts)))
-
-                 ;; If the card is already due, count it for today
-                 (unless (time-less-p now due-time)
-                   (let ((count (gethash now-date due-counts 0)))
-                     (puthash now-date (1+ count) due-counts)))))
+                   ;; If the card is already due, count it for today
+                   (unless (time-less-p now due-time)
+                     (let ((count (gethash now-date due-counts 0)))
+                       (puthash now-date (1+ count) due-counts))))))
              spamemo-deck)
     due-counts))
 

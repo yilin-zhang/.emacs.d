@@ -176,6 +176,20 @@ Returns a float if less than 1 day has passed."
         days-diff  ; Return the float directly if less than 1 day
       (floor days-diff))))
 
+(defun spamemo-word-meta-is-new (meta)
+  "Check if the item with metadata META is new (never reviewed)."
+  (= (spamemo-word-meta-repetitions meta) 0))
+
+(defun spamemo-word-meta-is-due (meta)
+  "Check if a word with metadata META is due for review."
+  (let* ((last-review-time (spamemo--parse-iso-date
+                            (spamemo-word-meta-last-review meta)))
+         (interval-days (spamemo-word-meta-interval meta))
+         (due-time (time-add last-review-time
+                             (seconds-to-time (* interval-days 86400))))
+         (current-time (current-time)))
+    (time-less-p due-time current-time)))
+
 (defun spamemo-word-meta-days-since (meta)
   "Calculate days since last review for item with metadata META."
   (spamemo--days-since (spamemo-word-meta-last-review meta)))
@@ -335,9 +349,9 @@ This function handles three distinct cases:
 2. Short-term (same-day) review (interval < 1 day)
 3. Regular review, which is further split into success (grade > 1) or failure"
 
-  (let ((is-new (= (spamemo-word-meta-repetitions meta) 0)))
+  (let ((is-new (spamemo-word-meta-is-new meta)))
     ;; Update stability and difficulty based on performance
-    (if (= (spamemo-word-meta-repetitions meta) 0) ; first time
+    (if is-new ; first time
         (spamemo--update-word-first-time meta grade)
       (if (< (spamemo-word-meta-interval meta) 1) ; same-day (short-term)
           (spamemo--update-word-short-term meta grade)
@@ -357,39 +371,37 @@ This function handles three distinct cases:
     (spamemo--update-repetitions meta)
 
     ;; Update counter
-    (let* ((reviewed (plist-get spamemo--counter :reviewed))
-           (due (plist-get spamemo--counter :due))
-           (new (plist-get spamemo--counter :new)))
-      ;; reviewed: +1 if the due date is later than today
-      ;; due: spamemo--is-due
-      ;; new: -1 if it was new before this review
-      (setq spamemo--counter
-            `(:reviewed ,(if (< (spamemo-word-meta-days-since meta)
-                                (spamemo-word-meta-interval meta))
-                             (1+ reviewed)
-                           reviewed)
-                        :due ,(cond ((and (> (spamemo-word-meta-repetitions meta) 0)
-                                          (not (spamemo--is-due meta)))
-                                     (max 0 (1- due)))
-                                    ((and is-new
-                                          (> (spamemo-word-meta-repetitions meta) 0)
-                                          (spamemo--is-due meta))
-                                     (1+ due))
-                                    (t due))
-                        :new ,(if is-new
-                                  (max 0 (1- new))
-                                new)))))
-  meta)
+    (let ((reviewed (plist-get spamemo--counter :reviewed))
+          (due (plist-get spamemo--counter :due))
+          (new (plist-get spamemo--counter :new))
+          (updated-is-new (spamemo-word-meta-is-new meta))
+          (updated-is-due (spamemo-word-meta-is-due meta)))
 
-(defun spamemo--is-due (meta)
-  "Check if a word with metadata META is due for review."
-  (let* ((last-review-time (spamemo--parse-iso-date
-                            (spamemo-word-meta-last-review meta)))
-         (interval-days (spamemo-word-meta-interval meta))
-         (due-time (time-add last-review-time
-                             (seconds-to-time (* interval-days 86400))))
-         (current-time (current-time)))
-    (time-less-p due-time current-time)))
+      (setq spamemo--counter
+            `(
+              ;; +1 to reviewed if the due date is later than today
+              :reviewed
+              ,(if (< (spamemo-word-meta-days-since meta)
+                      (spamemo-word-meta-interval meta))
+                   (1+ reviewed)
+                 reviewed)
+              ;; -1 if the word was due but is no longer due
+              ;; +1 if the word was new but is no longer new and is due
+              :due
+              ,(cond ((and (not updated-is-new)
+                           (not updated-is-due))
+                      (max 0 (1- due)))
+                     ((and is-new
+                           (not updated-is-new)
+                           updated-is-due)
+                      (1+ due))
+                     (t due))
+              ;; -1 if it was new before this review
+              :new
+              ,(if is-new
+                   (max 0 (1- new))
+                 new)))))
+  meta)
 
 ;; File operations
 
@@ -474,8 +486,8 @@ This function handles three distinct cases:
   ;; Shuffle reviewed words, sort unreviewed words by time (latest to earliest)
   (let (due-words new-words)
     (maphash (lambda (word meta)
-               (if (spamemo--is-due meta)
-                   (if (= (spamemo-word-meta-repetitions meta) 0)
+               (if (spamemo-word-meta-is-due meta)
+                   (if (spamemo-word-meta-is-new meta)
                        (push word new-words)
                      (push word due-words))))
              spamemo-deck)
@@ -500,12 +512,12 @@ This function handles three distinct cases:
       ;; 1. spamemo-word-meta-last-review is today
       ;; 2. spamemo-word-meta-last-review + interval > today
       (maphash (lambda (_word meta)
-                 (let* ((last-review-date (substring (spamemo-word-meta-last-review meta) 0 10))
-                        (days-since (spamemo-word-meta-days-since meta))
-                        (interval (spamemo-word-meta-interval meta)))
-                   (when (and (> (spamemo-word-meta-repetitions meta) 0) ; reviewed at least once
-                              (or (string-equal last-review-date today)
-                                  (> days-since interval)))
+                 (let ((last-review-date (substring (spamemo-word-meta-last-review meta) 0 10))
+                       (days-since (spamemo-word-meta-days-since meta))
+                       (interval (spamemo-word-meta-interval meta)))
+                   (when (and (not (spamemo-word-meta-is-new meta)) ; reviewed at least once
+                              (string-equal last-review-date today)
+                              (> days-since interval))
                      (cl-incf count))))
                spamemo-deck)
       )
@@ -516,8 +528,8 @@ This function handles three distinct cases:
   (let ((count 0))
     (when spamemo-deck
       (maphash (lambda (_word meta)
-                 (when (and (> (spamemo-word-meta-repetitions meta) 0) ; reviewed at least once
-                            (spamemo--is-due meta))
+                 (when (and (not (spamemo-word-meta-is-new meta)) ; reviewed at least once
+                            (spamemo-word-meta-is-due meta))
                    (cl-incf count)))
                spamemo-deck))
     count))
@@ -527,7 +539,7 @@ This function handles three distinct cases:
   (let ((count 0))
     (when spamemo-deck
       (maphash (lambda (_word meta)
-                 (when (= (spamemo-word-meta-repetitions meta) 0)
+                 (when (spamemo-word-meta-is-new meta)
                    (cl-incf count)))
                spamemo-deck))
     count))
@@ -633,8 +645,8 @@ For multi-line text, centers the text block while keeping lines left-aligned wit
       (insert (make-string top-n-lines ?\n))
       (insert (spamemo--center-text
                (if (and spamemo-current-word
-                        (= (spamemo-word-meta-repetitions
-                            (gethash spamemo-current-word spamemo-deck)) 0))
+                        (spamemo-word-meta-is-new
+                         (gethash spamemo-current-word spamemo-deck)))
                    "LEARNING"
                  "REVIEWING")))
       (insert "\n")
@@ -985,13 +997,19 @@ After adding a word, prompts if you want to add another."
     (setq spamemo-deck (spamemo--load-deck)))
 
   (let ((status-msg
-         (if (gethash word spamemo-deck)
-             (format "Word '%s' already exists in the deck. " word)
-           (let ((meta (make-spamemo-word-meta)))
-             (puthash word meta spamemo-deck)
-             (spamemo--save-deck spamemo-deck)
-             (setq spamemo-current-word word)
-             (format "Added '%s' to the deck. " word)))))
+         (let* ((meta (gethash word spamemo-deck))
+                (existed-and-is-new (and meta (spamemo-word-meta-is-new meta))))
+           (if (and meta (not existed-and-is-new))
+               ;; card exists and has been reviewed at least once
+               (format "Word '%s' already exists in the deck. " word)
+             ;; create a new card if it doesn't exist or refresh the added date if it's new
+             (let ((meta (make-spamemo-word-meta)))
+               (puthash word meta spamemo-deck)
+               (spamemo--save-deck spamemo-deck)
+               (setq spamemo-current-word word)
+               (if existed-and-is-new
+                   (format "Refreshed the added date of existing new word '%s'. " word)
+                 (format "Added '%s' to the deck. " word)))))))
 
     (when (called-interactively-p 'any)
       (let ((choice (read-char-choice

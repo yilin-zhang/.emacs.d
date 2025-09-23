@@ -82,6 +82,16 @@ Each function is called with no arguments."
   "Face for displaying the current word."
   :group 'spamemo)
 
+(defface spamemo-status-learn-face
+  '((t :inherit font-lock-function-name-face :weight bold :height 1.2 :underline t))
+  "Face for displaying the 'LEARNING' status."
+  :group 'spamemo)
+
+(defface spamemo-status-review-face
+  '((t :inherit font-lock-variable-name-face :weight bold :height 1.2 :underline t))
+  "Face for displaying the 'REVIEWING' status."
+  :group 'spamemo)
+
 (defvar spamemo-deck nil
   "The current deck of words with their metadata.")
 
@@ -576,6 +586,17 @@ This function handles three distinct cases:
 (defun spamemo-delete-word (word)
   "Delete WORD from the deck."
   (when (and spamemo-deck (gethash word spamemo-deck))
+    ;; Update counter if necessary
+    (let ((is-new (spamemo-word-meta-is-new (gethash word spamemo-deck)))
+          (is-due (spamemo-word-meta-is-due (gethash word spamemo-deck))))
+      (setq spamemo--counter
+            `(:reviewed ,(plist-get spamemo--counter :reviewed)
+                        :due ,(if is-due
+                                  (max 0 (1- (plist-get spamemo--counter :due)))
+                                (plist-get spamemo--counter :due))
+                        :new ,(if is-new
+                                  (max 0 (1- (plist-get spamemo--counter :new)))
+                                (plist-get spamemo--counter :new)))))
     (remhash word spamemo-deck)
     (spamemo--save-deck spamemo-deck)))
 
@@ -646,8 +667,8 @@ For multi-line text, centers the text block while keeping lines left-aligned wit
                (if (and spamemo-current-word
                         (spamemo-word-meta-is-new
                          (gethash spamemo-current-word spamemo-deck)))
-                   "LEARNING"
-                 "REVIEWING")))
+                   (propertize "LEARNING" 'face 'spamemo-status-learn-face)
+                 (propertize "REVIEWING" 'face 'spamemo-status-review-face))))
       (insert "\n")
       (insert (spamemo--center-text (string-join lines "\n")))
       (insert "\n"))))

@@ -101,6 +101,10 @@ Each function is called with no arguments."
 (defvar spamemo--last-word nil
   "Last word that was looked up.")
 
+;; Cache
+(defvar spamemo--counter '(:reviewed 0 :due 0 :new 0)
+  "Counter for number of words reviewed, number of words due, number of words new.")
+
 (defconst spamemo-weights
   [
    0.40255  ; grade 1 (forgot)
@@ -330,25 +334,51 @@ This function handles three distinct cases:
 1. First time review (repetitions = 0)
 2. Short-term (same-day) review (interval < 1 day)
 3. Regular review, which is further split into success (grade > 1) or failure"
-  ;; Update stability and difficulty based on performance
-  (if (= (spamemo-word-meta-repetitions meta) 0) ; first time
-      (spamemo--update-word-first-time meta grade)
-    (if (< (spamemo-word-meta-interval meta) 1) ; same-day (short-term)
-        (spamemo--update-word-short-term meta grade)
-      (if (< 1 grade)
-          (spamemo--update-word-success meta grade) ; success
-        (spamemo--update-word-failure meta grade)  ; forgot
-        )))
 
-  ;; Update interval only if grade > 1 or if enforce-success is off
-  (spamemo--update-last-review meta)
-  (if (and spamemo-enforce-success (= grade 1))
-      ;; instead of calculating a new interval by the algorithm
-      ;; reset it to zero to enforce an immediate review
-      (spamemo--reset-interval meta)
-    (spamemo--update-interval meta))
-  ;; Always increment repetition count
-  (spamemo--update-repetitions meta)
+  (let ((is-new (= (spamemo-word-meta-repetitions meta) 0)))
+    ;; Update stability and difficulty based on performance
+    (if (= (spamemo-word-meta-repetitions meta) 0) ; first time
+        (spamemo--update-word-first-time meta grade)
+      (if (< (spamemo-word-meta-interval meta) 1) ; same-day (short-term)
+          (spamemo--update-word-short-term meta grade)
+        (if (< 1 grade)
+            (spamemo--update-word-success meta grade) ; success
+          (spamemo--update-word-failure meta grade)  ; forgot
+          )))
+
+    ;; Update interval only if grade > 1 or if enforce-success is off
+    (spamemo--update-last-review meta)
+    (if (and spamemo-enforce-success (= grade 1))
+        ;; instead of calculating a new interval by the algorithm
+        ;; reset it to zero to enforce an immediate review
+        (spamemo--reset-interval meta)
+      (spamemo--update-interval meta))
+    ;; Always increment repetition count
+    (spamemo--update-repetitions meta)
+
+    ;; Update counter
+    (let* ((reviewed (plist-get spamemo--counter :reviewed))
+           (due (plist-get spamemo--counter :due))
+           (new (plist-get spamemo--counter :new)))
+      ;; reviewed: +1 if the due date is later than today
+      ;; due: spamemo--is-due
+      ;; new: -1 if it was new before this review
+      (setq spamemo--counter
+            `(:reviewed ,(if (< (spamemo-word-meta-days-since meta)
+                                (spamemo-word-meta-interval meta))
+                             (1+ reviewed)
+                           reviewed)
+                        :due ,(cond ((and (> (spamemo-word-meta-repetitions meta) 0)
+                                          (not (spamemo--is-due meta)))
+                                     (max 0 (1- due)))
+                                    ((and is-new
+                                          (> (spamemo-word-meta-repetitions meta) 0)
+                                          (spamemo--is-due meta))
+                                     (1+ due))
+                                    (t due))
+                        :new ,(if is-new
+                                  (max 0 (1- new))
+                                new)))))
   meta)
 
 (defun spamemo--is-due (meta)
@@ -437,7 +467,8 @@ This function handles three distinct cases:
 (defun spamemo-get-due-words ()
   "Get list of words that are due for review."
   (unless spamemo-deck
-    (setq spamemo-deck (spamemo--load-deck)))
+    (setq spamemo-deck (spamemo--load-deck))
+    (spamemo-initialize-counter))
 
   ;; Put the words that have been reviewed at least once to the front
   ;; Shuffle reviewed words, sort unreviewed words by time (latest to earliest)
@@ -458,6 +489,55 @@ This function handles three distinct cases:
                                      (gethash w2 spamemo-deck)))))
                           (time-less-p d2 d1))) ; latest to earliest
                       new-words))))
+
+(defun spamemo-get-num-reviewed-words-today ()
+  "Get the number of words reviewed today."
+  (let ((count 0)
+        (today (format-time-string "%Y-%m-%d")))
+    (when spamemo-deck
+      ;; make sure the word is reviewed, but the due time is later than today
+      ;; due time is last review + interval
+      ;; 1. spamemo-word-meta-last-review is today
+      ;; 2. spamemo-word-meta-last-review + interval > today
+      (maphash (lambda (_word meta)
+                 (let* ((last-review-date (substring (spamemo-word-meta-last-review meta) 0 10))
+                        (days-since (spamemo-word-meta-days-since meta))
+                        (interval (spamemo-word-meta-interval meta)))
+                   (when (and (> (spamemo-word-meta-repetitions meta) 0) ; reviewed at least once
+                              (or (string-equal last-review-date today)
+                                  (> days-since interval)))
+                     (cl-incf count))))
+               spamemo-deck)
+      )
+    count))
+
+(defun spamemo-get-num-due-words ()
+  "Get the number of words that are due and have been reviewed at least once."
+  (let ((count 0))
+    (when spamemo-deck
+      (maphash (lambda (_word meta)
+                 (when (and (> (spamemo-word-meta-repetitions meta) 0) ; reviewed at least once
+                            (spamemo--is-due meta))
+                   (cl-incf count)))
+               spamemo-deck))
+    count))
+
+(defun spamemo-get-num-words-new ()
+  "Get the number of new words (never reviewed)."
+  (let ((count 0))
+    (when spamemo-deck
+      (maphash (lambda (_word meta)
+                 (when (= (spamemo-word-meta-repetitions meta) 0)
+                   (cl-incf count)))
+               spamemo-deck))
+    count))
+
+(defun spamemo-initialize-counter ()
+  "Initialize the counter for reviewed, due, and new words."
+  (setq spamemo--counter
+        `(:reviewed ,(spamemo-get-num-reviewed-words-today)
+                    :due ,(spamemo-get-num-due-words)
+                    :new ,(spamemo-get-num-words-new))))
 
 (defun spamemo-update-grade (word grade)
   "Update WORD with review GRADE (1-4)."
@@ -524,9 +604,12 @@ For multi-line text, centers the text block while keeping lines left-aligned wit
   (let ((inhibit-read-only t)
         (separator (make-string 30 ?═)))
     (erase-buffer)
-    (let* ((lines `(,(format "%s word(s) remaining" (length spamemo-due-words))
-                    "-------------------------------"
-                    ""
+    (let* ((lines `("-------------------------------------------------"
+                    ,(format "%s words reviewed / %s words due / %s words new"
+                             (plist-get spamemo--counter :reviewed)
+                             (plist-get spamemo--counter :due)
+                             (plist-get spamemo--counter :new))
+                    "-------------------------------------------------"
                     "How well do you know this word?"
                     ,(format "%s - Forgot" (spamemo--get-key-for-command 'spamemo-rate-forgot))
                     ,(format "%s - Hard" (spamemo--get-key-for-command 'spamemo-rate-hard))
@@ -548,6 +631,13 @@ For multi-line text, centers the text block while keeping lines left-aligned wit
            (text-n-lines (+ (length lines) 1)) ; another line for word
            (top-n-lines (max 0 (- (floor (window-height) 2) (+ text-n-lines 5))))) ; 5 is an arbitrary number to bring the text up a little
       (insert (make-string top-n-lines ?\n))
+      (insert (spamemo--center-text
+               (if (and spamemo-current-word
+                        (= (spamemo-word-meta-repetitions
+                            (gethash spamemo-current-word spamemo-deck)) 0))
+                   "LEARNING"
+                 "REVIEWING")))
+      (insert "\n")
       (insert (spamemo--center-text (string-join lines "\n")))
       (insert "\n"))))
 
@@ -854,6 +944,7 @@ AUDIO-PLAYER specifies the command to play audio (defaults to system default)."
       (message "No words to review")
     (let ((buffer (spamemo--setup-review-buffer)))
       (switch-to-buffer buffer)
+      (spamemo-initialize-counter)
       (spamemo-review-next-word))))
 
 ;;;###autoload

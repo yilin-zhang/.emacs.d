@@ -517,10 +517,9 @@ This function handles three distinct cases:
                        (interval (spamemo-word-meta-interval meta)))
                    (when (and (not (spamemo-word-meta-is-new meta)) ; reviewed at least once
                               (string-equal last-review-date today)
-                              (> days-since interval))
+                              (< days-since interval))
                      (cl-incf count))))
-               spamemo-deck)
-      )
+               spamemo-deck))
     count))
 
 (defun spamemo-get-num-due-words ()
@@ -996,28 +995,37 @@ After adding a word, prompts if you want to add another."
   (unless spamemo-deck
     (setq spamemo-deck (spamemo--load-deck)))
 
-  (let ((status-msg
-         (let* ((meta (gethash word spamemo-deck))
-                (existed-and-is-new (and meta (spamemo-word-meta-is-new meta))))
-           (if (and meta (not existed-and-is-new))
-               ;; card exists and has been reviewed at least once
-               (format "Word '%s' already exists in the deck. " word)
-             ;; create a new card if it doesn't exist or refresh the added date if it's new
-             (let ((meta (make-spamemo-word-meta)))
-               (puthash word meta spamemo-deck)
-               (spamemo--save-deck spamemo-deck)
-               (setq spamemo-current-word word)
-               (if existed-and-is-new
-                   (format "Refreshed the added date of existing new word '%s'. " word)
-                 (format "Added '%s' to the deck. " word)))))))
+  (let* ((in-review (eq major-mode 'spamemo-review-mode))
+         (status-msg
+          (let* ((meta (gethash word spamemo-deck))
+                 (existed-and-is-new (and meta (spamemo-word-meta-is-new meta))))
+            (if (and meta (not existed-and-is-new))
+                ;; card exists and has been reviewed at least once
+                (format "Word '%s' already exists in the deck. " word)
+              ;; create a new card if it doesn't exist or refresh the added date if it's new
+              (let ((meta (make-spamemo-word-meta)))
+                (puthash word meta spamemo-deck)
+                (spamemo--save-deck spamemo-deck)
+                (unless in-review
+                  ;; only set current word when not in review mode
+                  ;; otherwise it will interfere with the review session
+                  (setq spamemo-current-word word))
+                (if existed-and-is-new
+                    (format "Refreshed the added date of existing new word '%s'. " word)
+                  (format "Added '%s' to the deck. " word)))))))
 
     (when (called-interactively-p 'any)
-      (let ((choice (read-char-choice
-                     (concat status-msg "Add another word? (y/n, ENTER for yes, c for comment): ")
-                     '(?y ?n ?\r ?c))))
-        (cond ((or (eq choice ?y) (eq choice ?\r))
+      (let ((choice (if in-review
+                        ;; don't offer comment option in review mode
+                        (read-char-choice
+                         (concat status-msg "Add another word? (y/n, ENTER for yes): ")
+                         '(?y ?n ?\r))
+                      (read-char-choice
+                       (concat status-msg "Add another word? (y/n, ENTER for yes, c for comment): ")
+                       '(?y ?n ?\r ?c)))))
+        (cond ((or (eq choice ?y) (eq choice ?\r)) ; continue adding
                (call-interactively #'spamemo-add-word))
-              ((eq choice ?c)
+              ((eq choice ?c) ; add comment then continue adding
                (let* ((status-msg (call-interactively #'spamemo-add-comment))
                       (choice (read-char-choice
                                (concat status-msg "Add another word? (y/n, ENTER for yes): ")

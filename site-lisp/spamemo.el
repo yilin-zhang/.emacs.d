@@ -23,6 +23,7 @@
 
 ;;; Code:
 
+(require 'ansi-color)
 (require 'json)
 (require 'cl-lib)
 (require 'subr-x)
@@ -78,18 +79,39 @@ Each function is called with no arguments."
   :group 'spamemo)
 
 (defface spamemo-word-face
-  '((t :inherit font-lock-keyword-face :weight bold :height 1.5))
+  `((t :foreground ,(face-attribute 'ansi-color-red :foreground)
+       :weight bold :height 1.5))
   "Face for displaying the current word."
   :group 'spamemo)
 
 (defface spamemo-status-learn-face
-  '((t :inherit font-lock-function-name-face :weight bold :height 1.2 :underline t))
+  `((t :foreground ,(face-attribute 'ansi-color-magenta :foreground)
+       :weight bold :height 1.2))
   "Face for displaying the 'LEARNING' status."
   :group 'spamemo)
 
 (defface spamemo-status-review-face
-  '((t :inherit font-lock-variable-name-face :weight bold :height 1.2 :underline t))
+  `((t :foreground ,(face-attribute 'ansi-color-yellow :foreground)
+       :weight bold :height 1.2))
   "Face for displaying the 'REVIEWING' status."
+  :group 'spamemo)
+
+(defface spamemo-counter-learn-face
+  `((t :foreground ,(face-attribute 'ansi-color-magenta :foreground)
+       :weight bold :underline t))
+  "Face for displaying the number of new words."
+  :group 'spamemo)
+
+(defface spamemo-counter-review-face
+  `((t :foreground ,(face-attribute 'ansi-color-green :foreground)
+       :weight bold :underline t))
+  "Face for displaying the number of due words."
+  :group 'spamemo)
+
+(defface spamemo-counter-due-face
+  `((t :foreground ,(face-attribute 'ansi-color-yellow :foreground)
+       :weight bold :underline t))
+  "Face for displaying the number of reviewed words today."
   :group 'spamemo)
 
 (defvar spamemo-deck nil
@@ -638,9 +660,9 @@ For multi-line text, centers the text block while keeping lines left-aligned wit
     (erase-buffer)
     (let* ((lines `("-------------------------------------------------"
                     ,(format "%s words reviewed / %s words due / %s words new"
-                             (plist-get spamemo--counter :reviewed)
-                             (plist-get spamemo--counter :due)
-                             (plist-get spamemo--counter :new))
+                             (propertize (number-to-string (plist-get spamemo--counter :reviewed)) 'face 'spamemo-counter-review-face)
+                             (propertize (number-to-string (plist-get spamemo--counter :due)) 'face 'spamemo-counter-due-face)
+                             (propertize (number-to-string (plist-get spamemo--counter :new)) 'face 'spamemo-counter-learn-face))
                     "-------------------------------------------------"
                     "How well do you know this word?"
                     ,(format "%s - Forgot" (spamemo--get-key-for-command 'spamemo-rate-forgot))

@@ -72,6 +72,11 @@ This forces users to repeat difficult cards until they are learned."
   :type 'boolean
   :group 'spamemo)
 
+(defcustom spamemo-daily-goal 100
+  "Number of words to review per day."
+  :type 'integer
+  :group 'spamemo)
+
 (defcustom spamemo-quit-hook nil
   "Hook run when spamemo quits/cleans up.
 Each function is called with no arguments."
@@ -112,6 +117,12 @@ Each function is called with no arguments."
   `((t :foreground ,(face-attribute 'ansi-color-yellow :foreground)
        :weight bold :underline t))
   "Face for displaying the number of reviewed words today."
+  :group 'spamemo)
+
+(defface spamemo-status-goal-face
+  `((t :foreground ,(face-attribute 'ansi-color-green :foreground)
+       :weight bold))
+  "Face for displaying the 'DAILY GOAL REACHED' status."
   :group 'spamemo)
 
 (defvar spamemo-deck nil
@@ -622,6 +633,12 @@ This function handles three distinct cases:
     (remhash word spamemo-deck)
     (spamemo--save-deck spamemo-deck)))
 
+(defun spamemo-is-daily-goal-reached ()
+  "Check if the daily review goal has been reached."
+  (or (>= (plist-get spamemo--counter :reviewed) spamemo-daily-goal)
+      (and (<= (plist-get spamemo--counter :due) 0)
+           (<= (plist-get spamemo--counter :new) 0))))
+
 ;; UI functions
 
 (defun spamemo--setup-review-buffer ()
@@ -716,6 +733,9 @@ For multi-line text, centers the text block while keeping lines left-aligned wit
         ;; Then center and insert this propertized word
         (insert (spamemo--center-text propertized-word)))
       (spamemo--insert-comment)
+      (when (spamemo-is-daily-goal-reached)
+        (insert "\n\n")
+        (insert (spamemo--center-text (propertize "👑 DAILY GOAL REACHED!" 'face 'spamemo-status-goal-face))))
       (goto-char 0))))
 
 (defun spamemo--lookup-word (word)

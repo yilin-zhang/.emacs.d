@@ -26,7 +26,6 @@
 (require 'ansi-color)
 (require 'json)
 (require 'cl-lib)
-(require 'subr-x)
 (require 'seq)
 (require 'url)
 
@@ -609,7 +608,7 @@ This function handles three distinct cases:
     (let ((status-reviewed (spamemo-word-meta-status-is-reviewed (gethash word spamemo-deck)))
           (status-due (spamemo-word-meta-status-is-due (gethash word spamemo-deck)))
           (status-new (spamemo-word-meta-status-is-new (gethash word spamemo-deck)))
-          (reviewd (plist-get spamemo--counter :reviewed))
+          (reviewed (plist-get spamemo--counter :reviewed))
           (due (plist-get spamemo--counter :due))
           (new (plist-get spamemo--counter :new)))
       (setq spamemo--counter

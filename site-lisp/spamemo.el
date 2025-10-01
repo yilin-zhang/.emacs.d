@@ -1037,7 +1037,12 @@ AUDIO-PLAYER specifies the command to play audio (defaults to system default)."
 After adding a word, prompts if you want to add another."
   (interactive
    (list
-    (read-string "Word to add: " (thing-at-point 'word))))
+    (read-string "Word to add: "
+                 (if (use-region-p)
+                     (string-trim (buffer-substring-no-properties
+                                   (region-beginning)
+                                   (region-end)))
+                   ""))))
   (when (string-empty-p word)
     (error "Word cannot be empty"))
 

@@ -957,6 +957,101 @@ is already narrowed."
     (flush-lines "^[ \t]*$")))
 
 ;; **************************************************************
+;; Greek letters and math symbols
+;; **************************************************************
+(defun yilin/insert-greek-or-math-symbol ()
+  "Replace region with corresponding Greek or math symbol, or prompt for one.
+If a region is active, trim whitespace around it and try to convert
+its contents into the corresponding Greek or math symbol. If successful,
+replace the region. If not, or if no region is active, prompt the user."
+  (interactive)
+  (let* ((greek-map
+          '(;; --- Greek letters (lowercase) ---
+            ("alpha" . "α") ("beta" . "β") ("gamma" . "γ") ("delta" . "δ")
+            ("epsilon" . "ε") ("zeta" . "ζ") ("eta" . "η") ("theta" . "θ")
+            ("iota" . "ι") ("kappa" . "κ") ("lambda" . "λ") ("mu" . "μ")
+            ("nu" . "ν") ("xi" . "ξ") ("omicron" . "ο") ("pi" . "π")
+            ("rho" . "ρ") ("sigma" . "σ") ("tau" . "τ") ("upsilon" . "υ")
+            ("phi" . "φ") ("chi" . "χ") ("psi" . "ψ") ("omega" . "ω")
+
+            ;; --- Greek letters (uppercase) ---
+            ("Alpha" . "Α") ("Beta" . "Β") ("Gamma" . "Γ") ("Delta" . "Δ")
+            ("Epsilon" . "Ε") ("Zeta" . "Ζ") ("Eta" . "Η") ("Theta" . "Θ")
+            ("Iota" . "Ι") ("Kappa" . "Κ") ("Lambda" . "Λ") ("Mu" . "Μ")
+            ("Nu" . "Ν") ("Xi" . "Ξ") ("Omicron" . "Ο") ("Pi" . "Π")
+            ("Rho" . "Ρ") ("Sigma" . "Σ") ("Tau" . "Τ") ("Upsilon" . "Υ")
+            ("Phi" . "Φ") ("Chi" . "Χ") ("Psi" . "Ψ") ("Omega" . "Ω")
+
+            ;; --- Logic ---
+            ("forall" . "∀") ("exists" . "∃") ("nexists" . "∄")
+            ("neg" . "¬") ("lnot" . "¬")
+            ("land" . "∧") ("lor" . "∨")
+            ("implies" . "⇒") ("iff" . "⇔")
+
+            ;; --- Sets ---
+            ("in" . "∈") ("notin" . "∉")
+            ("subset" . "⊂") ("subseteq" . "⊆") ("nsubseteq" . "⊈")
+            ("supset" . "⊃") ("supseteq" . "⊇") ("nsupseteq" . "⊉")
+            ("emptyset" . "∅")
+            ("cap" . "∩") ("cup" . "∪")
+            ("propto" . "∝")
+
+            ;; --- Relations ---
+            ("=" . "=") ("!=" . "≠") ("equiv" . "≡") ("neq" . "≠")
+            ("approx" . "≈") ("sim" . "∼") ("cong" . "≅")
+            ("<=" . "≤") (">=" . "≥") ("<<" . "≪") (">>" . "≫")
+
+            ;; --- Arithmetic ---
+            ("times" . "×") ("cdot" . "·") ("ast" . "∗")
+            ("pm" . "±") ("mp" . "∓")
+            ("div" . "÷")
+            ("sqrt" . "√") ("cbrt" . "∛") ("qdrt" . "∜")
+
+            ;; --- Calculus & Algebra ---
+            ("int" . "∫") ("iint" . "∬") ("iiint" . "∭")
+            ("oint" . "∮") ("oiint" . "∯")
+            ("sum" . "∑") ("prod" . "∏") ("lim" . "lim") ;; leave lim as text
+            ("infty" . "∞") ("infinity" . "∞")
+            ("nabla" . "∇") ("partial" . "∂")
+
+            ;; --- Arrows ---
+            ("->" . "→") ("=>" . "⇒") ("-->" . "⟶")
+            ("<-" . "←") ("<=" . "⇐") ("<--" . "⟵")
+            ("<->" . "↔") ("<=>" . "⇔")
+            ("uparrow" . "↑") ("downarrow" . "↓")
+            ("Uparrow" . "⇑") ("Downarrow" . "⇓")
+            ("leftrightarrow" . "↔") ("Rightarrow" . "⇒")
+            ("Leftarrow" . "⇐") ("Leftrightarrow" . "⇔")
+
+            ;; --- Geometry ---
+            ("angle" . "∠") ("measuredangle" . "∡") ("perp" . "⊥") ("parallel" . "∥")
+
+            ;; --- Miscellaneous ---
+            ("degree" . "°") ("prime" . "′")
+            ("ell" . "ℓ") ("hbar" . "ℏ") ("Re" . "ℜ") ("Im" . "ℑ")
+            ("aleph" . "ℵ")
+            ("top" . "⊤") ("bot" . "⊥")
+            ))
+         (text (if (use-region-p)
+                   (string-trim (buffer-substring-no-properties
+                                 (region-beginning) (region-end)))
+                 nil))
+         (replacement (assoc-default text greek-map)))
+    (if (and text replacement)
+        ;; Replace region
+        (progn
+          (delete-region (region-beginning) (region-end))
+          (insert replacement))
+      ;; Prompt for input
+      (let* ((name (completing-read "Greek letter: "
+                                    (mapcar #'car greek-map) nil t))
+             (symbol (assoc-default name greek-map)))
+        (when symbol
+          (if (use-region-p)
+              (delete-region (region-beginning) (region-end)))
+          (insert symbol))))))
+
+;; **************************************************************
 ;; Quote lines
 ;; `http://xahlee.info/emacs/emacs/emacs_quote_lines.html'
 ;; **************************************************************

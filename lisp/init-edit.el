@@ -1051,6 +1051,23 @@ replace the region. If not, or if no region is active, prompt the user."
               (delete-region (region-beginning) (region-end)))
           (insert symbol))))))
 
+(defun yilin/insert-accented (accent char)
+  "Insert CHAR with ACCENT. Uses combining marks when needed.
+ACCENT choices: ^ ` ' ~ \" ."
+  (interactive
+   (list
+    (read-char-choice "Accent (^ ` ' ~ \"): " '(?^ ?` ?' ?~ ?\" ?.))
+    (read-char "Character: ")))
+  (let* ((combining-map
+          '((?^ . ?\u0302)   ;; COMBINING CIRCUMFLEX
+            (?` . ?\u0300)   ;; COMBINING GRAVE
+            (?' . ?\u0301)   ;; COMBINING ACUTE
+            (?~ . ?\u0303)   ;; COMBINING TILDE
+            (?\" . ?\u0308)  ;; COMBINING DIAERESIS
+            (?. . ?\u0307))) ;; COMBINING DOT ABOVE
+         (combining (cdr (assoc accent combining-map))))
+    (insert (string char combining))))
+
 ;; **************************************************************
 ;; Quote lines
 ;; `http://xahlee.info/emacs/emacs/emacs_quote_lines.html'

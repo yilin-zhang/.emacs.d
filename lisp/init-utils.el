@@ -258,9 +258,8 @@
   :after vterm)
 
 (use-package vterm-toggle
-  :after vterm
-  :config
-  (global-set-key (kbd "s-j") 'vterm-toggle))
+  :commands vterm-toggle
+  :bind ("s-j" . vterm-toggle))
 
 ;; --------------------------------------------------------------
 ;;                            Custom

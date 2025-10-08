@@ -1026,7 +1026,7 @@ AUDIO-PLAYER specifies the command to play audio (defaults to system default)."
      (list
       (read-string (format "Comment for %s: " spamemo-current-word)
                    (spamemo-get-comment spamemo-current-word)))))
-  (spamemo-update-comment spamemo-current-word comment)
+  (spamemo-update-comment spamemo-current-word (string-trim comment))
   (when (eq major-mode 'spamemo-review-mode)
     (spamemo-review-refresh))
   (format "Updated the comment of '%s'. " spamemo-current-word))
@@ -1043,49 +1043,51 @@ After adding a word, prompts if you want to add another."
                                    (region-beginning)
                                    (region-end)))
                    ""))))
-  (when (string-empty-p word)
-    (error "Word cannot be empty"))
 
-  (unless spamemo-deck
-    (setq spamemo-deck (spamemo--load-deck)))
+  (let ((word (string-trim word)))
+    (when (string-empty-p word)
+      (error "Word cannot be empty"))
 
-  (let* ((in-review (eq major-mode 'spamemo-review-mode))
-         (status-msg
-          (let* ((meta (gethash word spamemo-deck))
-                 (existed-and-is-new (and meta (spamemo-word-meta-is-new meta))))
-            (if (and meta (not existed-and-is-new))
-                ;; card exists and has been reviewed at least once
-                (format "Word '%s' already exists in the deck. " word)
-              ;; create a new card if it doesn't exist or refresh the added date if it's new
-              (let ((meta (make-spamemo-word-meta)))
-                (puthash word meta spamemo-deck)
-                (spamemo--save-deck spamemo-deck)
-                (unless in-review
-                  ;; only set current word when not in review mode
-                  ;; otherwise it will interfere with the review session
-                  (setq spamemo-current-word word))
-                (if existed-and-is-new
-                    (format "Refreshed the added date of existing new word '%s'. " word)
-                  (format "Added '%s' to the deck. " word)))))))
+    (unless spamemo-deck
+      (setq spamemo-deck (spamemo--load-deck)))
 
-    (when (called-interactively-p 'any)
-      (let ((choice (if in-review
-                        ;; don't offer comment option in review mode
+    (let* ((in-review (eq major-mode 'spamemo-review-mode))
+           (status-msg
+            (let* ((meta (gethash word spamemo-deck))
+                   (existed-and-is-new (and meta (spamemo-word-meta-is-new meta))))
+              (if (and meta (not existed-and-is-new))
+                  ;; card exists and has been reviewed at least once
+                  (format "Word '%s' already exists in the deck. " word)
+                ;; create a new card if it doesn't exist or refresh the added date if it's new
+                (let ((meta (make-spamemo-word-meta)))
+                  (puthash word meta spamemo-deck)
+                  (spamemo--save-deck spamemo-deck)
+                  (unless in-review
+                    ;; only set current word when not in review mode
+                    ;; otherwise it will interfere with the review session
+                    (setq spamemo-current-word word))
+                  (if existed-and-is-new
+                      (format "Refreshed the added date of existing new word '%s'. " word)
+                    (format "Added '%s' to the deck. " word)))))))
+
+      (when (called-interactively-p 'any)
+        (let ((choice (if in-review
+                          ;; don't offer comment option in review mode
+                          (read-char-choice
+                           (concat status-msg "Add another word? (y/n, ENTER for yes): ")
+                           '(?y ?n ?\r))
                         (read-char-choice
-                         (concat status-msg "Add another word? (y/n, ENTER for yes): ")
-                         '(?y ?n ?\r))
-                      (read-char-choice
-                       (concat status-msg "Add another word? (y/n, ENTER for yes, c for comment): ")
-                       '(?y ?n ?\r ?c)))))
-        (cond ((or (eq choice ?y) (eq choice ?\r)) ; continue adding
-               (call-interactively #'spamemo-add-word))
-              ((eq choice ?c) ; add comment then continue adding
-               (let* ((status-msg (call-interactively #'spamemo-add-comment))
-                      (choice (read-char-choice
-                               (concat status-msg "Add another word? (y/n, ENTER for yes): ")
-                               '(?y ?n ?\r))))
-                 (when (or (eq choice ?y) (eq choice ?\r))
-                   (call-interactively #'spamemo-add-word)))))))))
+                         (concat status-msg "Add another word? (y/n, ENTER for yes, c for comment): ")
+                         '(?y ?n ?\r ?c)))))
+          (cond ((or (eq choice ?y) (eq choice ?\r)) ; continue adding
+                 (call-interactively #'spamemo-add-word))
+                ((eq choice ?c) ; add comment then continue adding
+                 (let* ((status-msg (call-interactively #'spamemo-add-comment))
+                        (choice (read-char-choice
+                                 (concat status-msg "Add another word? (y/n, ENTER for yes): ")
+                                 '(?y ?n ?\r))))
+                   (when (or (eq choice ?y) (eq choice ?\r))
+                     (call-interactively #'spamemo-add-word))))))))))
 
 ;;;###autoload
 (defun spamemo-delete-current-word ()

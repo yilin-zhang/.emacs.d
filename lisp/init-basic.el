@@ -220,7 +220,7 @@
   :ensure nil
   :preface
   (defvar yilin/default-font-size 15 "The default font size")
-  (defvar yilin/fixed-pitch-font "Sarasa Mono SC" "The fixed pitch font")
+  (defvar yilin/fixed-pitch-font "Sarasa Term SC" "The fixed pitch font")
   ;; (defvar yilin/fixed-pitch-font "Fira Code" "The fixed pitch font")
   (defvar yilin/variable-pitch-font "OpenDyslexic Nerd Font" "The fixed pitch font")
 

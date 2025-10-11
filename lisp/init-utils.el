@@ -198,38 +198,6 @@
              (file-name-extension (buffer-name)) t)))))
 
 ;; --------------------------------------------------------------
-;;                            Vocab
-;; --------------------------------------------------------------
-
-(defun yilin/spamemo-git-commit ()
-  "Git add and commit all changes in ~/.emacs.d/spamemo with timestamp."
-  (interactive)
-  (let ((default-directory (expand-file-name "~/.emacs.d/spamemo/"))
-        (timestamp (format-time-string "%Y%m%d%H%M%S")))
-    (if (file-directory-p default-directory)
-        (progn
-          (message "Adding files in %s..." default-directory)
-          (shell-command "git add .")
-          (message "Committing with timestamp: %s" timestamp)
-          (shell-command (format "git commit -m \"%s\"" timestamp))
-          (message "Git commit completed."))
-      (error "Directory %s does not exist" default-directory))))
-
-(use-package spamemo
-  :ensure nil
-  :load-path yilin/site-lisp-directory
-  :commands (spamemo-add-word
-             spamemo-review
-             spamemo-reload-deck
-             spamemo-open-vocab-file)
-  :hook (spamemo-quit . yilin/spamemo-git-commit))
-
-(use-package spamemo-calendar
-  :ensure nil
-  :load-path yilin/site-lisp-directory
-  :hook (after-init . spamemo-calendar-mode))
-
-;; --------------------------------------------------------------
 ;;                            Calc
 ;; --------------------------------------------------------------
 (use-package literate-calc-mode)

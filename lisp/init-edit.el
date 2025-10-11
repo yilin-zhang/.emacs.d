@@ -814,36 +814,23 @@ Supports *, =, +, / and properly pairs (, [, {."
   (defun yilin/diff-hl-dired-mode-unless-remote ()
     (unless (file-remote-p default-directory)
       (diff-hl-dired-mode)))
-  :custom-face
-  (diff-hl-change ((t (:inherit diff-changed :foreground unspecified :background unspecified))))
-  (diff-hl-insert ((t (:inherit diff-added :background unspecified))))
-  (diff-hl-delete ((t (:inherit diff-removed :background unspecified))))
   :bind (:map diff-hl-command-map
               ("SPC" . diff-hl-mark-hunk))
   :hook ((after-init . global-diff-hl-mode)
+         (diff-hl-mode . diff-hl-flydiff-mode)
          (dired-mode . yilin/diff-hl-dired-mode-unless-remote))
-  :init (setq diff-hl-draw-borders nil)
   :config
-  ;; Set fringe style
-  (setq-default fringes-outside-margins t)
-
+  (setq diff-hl-update-async t)
+  (set-face-attribute 'diff-hl-change nil
+                      :background (face-background 'warning)
+                      :foreground (face-foreground 'warning))
+  (set-face-attribute 'diff-hl-insert nil
+                      :background (face-background 'success)
+                      :foreground (face-foreground 'success))
+  (set-face-attribute 'diff-hl-delete nil
+                      :background (face-background 'error)
+                      :foreground (face-foreground 'error))
   (with-no-warnings
-    (defun my-diff-hl-fringe-bmp-function (_type _pos)
-      "Fringe bitmap function for use as `diff-hl-fringe-bmp-function'."
-      (define-fringe-bitmap 'my-diff-hl-bmp
-        (vector (if (eq system-type 'gnu/linux) #b11111100 #b11100000))
-        1 8
-        '(center t)))
-    (setq diff-hl-fringe-bmp-function #'my-diff-hl-fringe-bmp-function)
-
-    (unless (display-graphic-p)
-      ;; Fall back to the display margin since the fringe is unavailable in tty
-      (diff-hl-margin-mode 1)
-      ;; Avoid restoring `diff-hl-margin-mode'
-      (with-eval-after-load 'desktop
-        (add-to-list 'desktop-minor-mode-table
-                     '(diff-hl-margin-mode nil))))
-
     ;; Integration with magit
     (with-eval-after-load 'magit
       (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)

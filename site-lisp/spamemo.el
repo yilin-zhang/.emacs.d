@@ -549,9 +549,7 @@ This function handles three distinct cases:
 
 (defun spamemo--reset-states ()
   "Reset timer and UI states"
-  (when spamemo--hint-timer
-    (cancel-timer spamemo--hint-timer)
-    (setq spamemo--hint-timer nil))
+  (spamemo--cancel-hint-timer)
   (setq spamemo--state-display-hint nil)
   (setq spamemo--state-display-definition nil))
 
@@ -687,6 +685,22 @@ For multi-line text, centers the text block while keeping lines left-aligned wit
         (key-description (car keys))
       nil)))
 
+(defun spamemo--cancel-hint-timer ()
+  "Cancel `spamemo--hint-timer'."
+  (when spamemo--hint-timer
+    (cancel-timer spamemo--hint-timer)
+    (setq spamemo--hint-timer nil)))
+
+(defun spamemo--start-hint-timer ()
+  "Start `spamemo--hint-timer'."
+  (when (not spamemo--hint-timer)
+    (setq spamemo--hint-timer
+          (run-at-time spamemo-hint-delay
+                       nil
+                       (lambda ()
+                         (setq spamemo--state-display-hint t)
+                         (spamemo-review-refresh))))))
+
 (defun spamemo--insert-instructions ()
   "Insert the instructions in the review buffer with centered text and dynamic key bindings."
   (let ((separator (make-string 30 ?═)))
@@ -711,8 +725,6 @@ For multi-line text, centers the text block while keeping lines left-aligned wit
                     ,(format "%s - rename the current word" (spamemo--get-key-for-command 'spamemo-rename-current-word))
                     ,(format "%s - delete the current word" (spamemo--get-key-for-command 'spamemo-delete-current-word))
                     ,(format "%s - quit" (spamemo--get-key-for-command 'spamemo-quit))
-                    ""
-                    ""
                     ""))
            (text-n-lines (+ (length lines) 1)) ; another line for word
            (top-n-lines (max 0 (- (floor (window-height) 2) (+ text-n-lines 5))))) ; 5 is an arbitrary number to bring the text up a little
@@ -745,9 +757,8 @@ For multi-line text, centers the text block while keeping lines left-aligned wit
 (defun spamemo--insert-daily-goal-banner ()
   "Insert the daily goal banner in the review buffer."
   (when (spamemo-is-daily-goal-reached)
-    (insert "\n")
     (insert (spamemo--center-text (propertize "👑 DAILY GOAL REACHED!" 'face 'spamemo-status-goal-face)))
-    (insert "\n")))
+    (insert "\n\n\n")))
 
 (defun spamemo--insert-definition ()
   "Insert the current word's definition in the review buffer."
@@ -766,13 +777,7 @@ For multi-line text, centers the text block while keeping lines left-aligned wit
       (spamemo--insert-word)
       (spamemo--insert-hint)
       (spamemo--insert-definition)
-      ;; set up the timer
-      (setq spamemo--hint-timer
-            (run-at-time spamemo-hint-delay
-                         nil
-                         (lambda ()
-                           (setq spamemo--state-display-hint t)
-                           (spamemo-review-refresh))))
+      (spamemo--start-hint-timer)  ; set up timer only when there's no active timer
       (goto-char 0))))
 
 (defun spamemo--lookup-word (word)

@@ -822,13 +822,13 @@ Supports *, =, +, / and properly pairs (, [, {."
   :config
   (setq diff-hl-update-async t)
   (set-face-attribute 'diff-hl-change nil
-                      :background (face-background 'warning)
+                      :background 'unspecified
                       :foreground (face-foreground 'warning))
   (set-face-attribute 'diff-hl-insert nil
-                      :background (face-background 'success)
+                      :background 'unspecified
                       :foreground (face-foreground 'success))
   (set-face-attribute 'diff-hl-delete nil
-                      :background (face-background 'error)
+                      :background 'unspecified
                       :foreground (face-foreground 'error))
   (with-no-warnings
     ;; Integration with magit

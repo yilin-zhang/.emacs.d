@@ -14,7 +14,7 @@
   (blamer-min-offset 70)
   :custom-face
   (blamer-face ((t :foreground ,(face-foreground 'warning)
-                   :background nil
+                   :background unspecified
                    :height 140
                    :italic t))))
 

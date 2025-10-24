@@ -86,6 +86,7 @@ without worrying about the original agenda files.")
   (org-mode . (lambda () (diminish 'org-indent-mode)))
   (org-mode . (lambda () (setq truncate-lines nil)))
   (org-mode . yilin/prettify-org-buffer)
+  (org-mode . (lambda () (corfu-mode -1)))
   (org-agenda-finalize . yilin/org-agenda-time-grid-spacing)
   (org-after-todo-state-change . yilin/org-remove-priority-when-done-or-cancel)
   :config

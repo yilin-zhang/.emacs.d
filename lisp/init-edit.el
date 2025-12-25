@@ -47,6 +47,8 @@
          (indent-rigidly (region-beginning) (region-end) lua-indent-level))
         ((member major-mode '(ruby-mode ruby-ts-mode))
          (indent-rigidly (region-beginning) (region-end) ruby-indent-level))
+        ((member major-mode '(yaml-mode yaml-ts-mode))
+         (indent-rigidly (region-beginning) (region-end) yaml-indent-offset))
         (t (indent-rigidly-right-to-tab-stop (region-beginning) (region-end)))))
 
 (defun yilin/indent-left ()
@@ -62,6 +64,8 @@
          (indent-rigidly (region-beginning) (region-end) (- lua-indent-level)))
         ((member major-mode '(ruby-mode ruby-ts-mode))
          (indent-rigidly (region-beginning) (region-end) (- ruby-indent-level)))
+        ((member major-mode '(yaml-mode yaml-ts-mode))
+         (indent-rigidly (region-beginning) (region-end) (- yaml-indent-offset)))
         (t (indent-rigidly-left-to-tab-stop (region-beginning) (region-end)))))
 
 (defun yilin/surround-region (char)

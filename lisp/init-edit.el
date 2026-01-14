@@ -7,26 +7,29 @@
 ;; (global-set-key (kbd "M-l") (kbd "<backspace>"))
 
 ;; Key Modifiers
-(when (eq system-type 'darwin)
-  ;; Compatible with Emacs Mac port
-  (setq mac-option-modifier 'meta
-        mac-command-modifier 'super
-        mac-function-modifier 'hyper)
-  (bind-keys ([(super a)] . mark-whole-buffer)
-             ([(super c)] . kill-ring-save)
-             ([(super l)] . goto-line)
-             ([(super q)] . save-buffers-kill-emacs)
-             ([(super s)] . save-buffer)
-             ([(super v)] . yank)
-             ([(super w)] . kill-current-buffer)
-             ([(super z)] . undo)))
+(use-package emacs
+  :ensure nil
+  :init
+  (when (eq system-type 'darwin)
+    ;; Compatible with Emacs Mac port
+    (setq mac-option-modifier 'meta
+          mac-command-modifier 'super
+          mac-function-modifier 'hyper)
+    (bind-keys ([(super a)] . mark-whole-buffer)
+               ([(super c)] . kill-ring-save)
+               ([(super l)] . goto-line)
+               ([(super q)] . save-buffers-kill-emacs)
+               ([(super s)] . save-buffer)
+               ([(super v)] . yank)
+               ([(super w)] . kill-current-buffer)
+               ([(super z)] . undo))))
 
-(when (eq system-type 'gnu/linux)
-  (use-package fcitx
-    :init
-    (fcitx-aggressive-setup)
-    :config
-    (setq fcitx-use-dbus t)))
+(use-package fcitx
+  :if (eq system-type 'gnu/linux)
+  :init
+  (fcitx-aggressive-setup)
+  :config
+  (setq fcitx-use-dbus t))
 
 ;; --------------------------------------------------------------
 ;;                            Meow
@@ -34,121 +37,124 @@
 
 ;; indent-rigid-xxx-to-tab-stop has strange behaviour in python-mode
 ;; where the indentation is 8 spaces. Use python-indent-shift-xxx instead.
-(defun yilin/indent-right ()
-  (interactive)
-  (cond ((member major-mode '(python-mode python-ts-mode))
-         (python-indent-shift-right (region-beginning) (region-end)
-                                    python-indent-offset))
-        ((member major-mode '(json-mode json-ts-mode js-mode js-ts-mode))
-         (indent-rigidly (region-beginning) (region-end) js-indent-level))
-        ((member major-mode '(css-mode css-ts-mode))
-         (indent-rigidly (region-beginning) (region-end) css-indent-offset))
-        ((member major-mode '(lua-mode pico8-mode))
-         (indent-rigidly (region-beginning) (region-end) lua-indent-level))
-        ((member major-mode '(ruby-mode ruby-ts-mode))
-         (indent-rigidly (region-beginning) (region-end) ruby-indent-level))
-        ((member major-mode '(yaml-mode yaml-ts-mode))
-         (indent-rigidly (region-beginning) (region-end) yaml-indent-offset))
-        (t (indent-rigidly-right-to-tab-stop (region-beginning) (region-end)))))
+(use-package emacs
+  :ensure nil
+  :preface
+  (defun yilin/indent-right ()
+    (interactive)
+    (cond ((member major-mode '(python-mode python-ts-mode))
+           (python-indent-shift-right (region-beginning) (region-end)
+                                      python-indent-offset))
+          ((member major-mode '(json-mode json-ts-mode js-mode js-ts-mode))
+           (indent-rigidly (region-beginning) (region-end) js-indent-level))
+          ((member major-mode '(css-mode css-ts-mode))
+           (indent-rigidly (region-beginning) (region-end) css-indent-offset))
+          ((member major-mode '(lua-mode pico8-mode))
+           (indent-rigidly (region-beginning) (region-end) lua-indent-level))
+          ((member major-mode '(ruby-mode ruby-ts-mode))
+           (indent-rigidly (region-beginning) (region-end) ruby-indent-level))
+          ((member major-mode '(yaml-mode yaml-ts-mode))
+           (indent-rigidly (region-beginning) (region-end) yaml-indent-offset))
+          (t (indent-rigidly-right-to-tab-stop (region-beginning) (region-end)))))
 
-(defun yilin/indent-left ()
-  (interactive)
-  (cond ((member major-mode '(python-mode python-ts-mode))
-         (python-indent-shift-left (region-beginning) (region-end)
-                                   python-indent-offset))
-        ((member major-mode '(json-mode json-ts-mode js-mode js-ts-mode))
-         (indent-rigidly (region-beginning) (region-end) (- js-indent-level)))
-        ((member major-mode '(css-mode css-ts-mode))
-         (indent-rigidly (region-beginning) (region-end) (- css-indent-offset)))
-        ((member major-mode '(lua-mode pico8-mode))
-         (indent-rigidly (region-beginning) (region-end) (- lua-indent-level)))
-        ((member major-mode '(ruby-mode ruby-ts-mode))
-         (indent-rigidly (region-beginning) (region-end) (- ruby-indent-level)))
-        ((member major-mode '(yaml-mode yaml-ts-mode))
-         (indent-rigidly (region-beginning) (region-end) (- yaml-indent-offset)))
-        (t (indent-rigidly-left-to-tab-stop (region-beginning) (region-end)))))
+  (defun yilin/indent-left ()
+    (interactive)
+    (cond ((member major-mode '(python-mode python-ts-mode))
+           (python-indent-shift-left (region-beginning) (region-end)
+                                     python-indent-offset))
+          ((member major-mode '(json-mode json-ts-mode js-mode js-ts-mode))
+           (indent-rigidly (region-beginning) (region-end) (- js-indent-level)))
+          ((member major-mode '(css-mode css-ts-mode))
+           (indent-rigidly (region-beginning) (region-end) (- css-indent-offset)))
+          ((member major-mode '(lua-mode pico8-mode))
+           (indent-rigidly (region-beginning) (region-end) (- lua-indent-level)))
+          ((member major-mode '(ruby-mode ruby-ts-mode))
+           (indent-rigidly (region-beginning) (region-end) (- ruby-indent-level)))
+          ((member major-mode '(yaml-mode yaml-ts-mode))
+           (indent-rigidly (region-beginning) (region-end) (- yaml-indent-offset)))
+          (t (indent-rigidly-left-to-tab-stop (region-beginning) (region-end)))))
 
-(defun yilin/surround-region (char)
-  "Surround the selected region's non-whitespace content with CHAR.
+  (defun yilin/surround-region (char)
+    "Surround the selected region's non-whitespace content with CHAR.
 Supports *, =, +, / and properly pairs (, [, {."
-  (interactive "cEnter character to surround with: ")
-  (let* ((pairs '((?\( . ?\))
-                  (?\[ . ?\])
-                  (?\{ . ?\})
-                  (?\< . ?\>)))
-         (left-char char)
-         (right-char (or (cdr (assoc char pairs)) char)))
-    (if (use-region-p)
-        (let ((beg (region-beginning))
-              (end (region-end)))
-          (save-excursion
-            ;; Narrow to region to simplify handling
-            (save-restriction
-              (narrow-to-region beg end)
-              (goto-char (point-min))
-              (skip-chars-forward " \t\n")
-              (let ((left-pos (point)))
-                (goto-char (point-max))
-                (skip-chars-backward " \t\n")
-                (let ((right-pos (point)))
-                  ;; Insert in reverse to preserve positions
-                  (goto-char right-pos)
-                  (insert right-char)
-                  (goto-char left-pos)
-                  (insert left-char))))))
-      (message "No region selected"))))
+    (interactive "cEnter character to surround with: ")
+    (let* ((pairs '((?\( . ?\))
+                    (?\[ . ?\])
+                    (?\{ . ?\})
+                    (?\< . ?\>)))
+           (left-char char)
+           (right-char (or (cdr (assoc char pairs)) char)))
+      (if (use-region-p)
+          (let ((beg (region-beginning))
+                (end (region-end)))
+            (save-excursion
+              ;; Narrow to region to simplify handling
+              (save-restriction
+                (narrow-to-region beg end)
+                (goto-char (point-min))
+                (skip-chars-forward " \t\n")
+                (let ((left-pos (point)))
+                  (goto-char (point-max))
+                  (skip-chars-backward " \t\n")
+                  (let ((right-pos (point)))
+                    ;; Insert in reverse to preserve positions
+                    (goto-char right-pos)
+                    (insert right-char)
+                    (goto-char left-pos)
+                    (insert left-char))))))
+        (message "No region selected"))))
 
-(defun yilin/surround-region-equal ()
-  (interactive)
-  (yilin/surround-region ?=))
+  (defun yilin/surround-region-equal ()
+    (interactive)
+    (yilin/surround-region ?=))
 
-(defun yilin/surround-region-plus ()
-  (interactive)
-  (yilin/surround-region ?+))
+  (defun yilin/surround-region-plus ()
+    (interactive)
+    (yilin/surround-region ?+))
 
-(defun yilin/surround-region-asterisk ()
-  (interactive)
-  (yilin/surround-region ?*))
+  (defun yilin/surround-region-asterisk ()
+    (interactive)
+    (yilin/surround-region ?*))
 
-(defun yilin/surround-region-dash ()
-  (interactive)
-  (yilin/surround-region ?-))
+  (defun yilin/surround-region-dash ()
+    (interactive)
+    (yilin/surround-region ?-))
 
-(defun yilin/surround-region-paren ()
-  (interactive)
-  (yilin/surround-region ?\())
+  (defun yilin/surround-region-paren ()
+    (interactive)
+    (yilin/surround-region ?\())
 
-(defun yilin/surround-region-bracket ()
-  (interactive)
-  (yilin/surround-region ?\[))
+  (defun yilin/surround-region-bracket ()
+    (interactive)
+    (yilin/surround-region ?\[))
 
-(defun yilin/surround-region-curly ()
-  (interactive)
-  (yilin/surround-region ?\{))
+  (defun yilin/surround-region-curly ()
+    (interactive)
+    (yilin/surround-region ?\{))
 
-(defun yilin/surround-region-angle ()
-  (interactive)
-  (yilin/surround-region ?\<))
+  (defun yilin/surround-region-angle ()
+    (interactive)
+    (yilin/surround-region ?\<))
 
-(defun yilin/surround-region-quote ()
-  (interactive)
-  (yilin/surround-region ?\'))
+  (defun yilin/surround-region-quote ()
+    (interactive)
+    (yilin/surround-region ?\'))
 
-(defun yilin/surround-region-dquote ()
-  (interactive)
-  (yilin/surround-region ?\"))
+  (defun yilin/surround-region-dquote ()
+    (interactive)
+    (yilin/surround-region ?\"))
 
-(defun yilin/surround-region-slash ()
-  (interactive)
-  (yilin/surround-region ?/))
+  (defun yilin/surround-region-slash ()
+    (interactive)
+    (yilin/surround-region ?/))
 
-(defun yilin/surround-region-underscore ()
-  (interactive)
-  (yilin/surround-region ?_))
+  (defun yilin/surround-region-underscore ()
+    (interactive)
+    (yilin/surround-region ?_))
 
-(defun yilin/surround-region-tilde ()
-  (interactive)
-  (yilin/surround-region ?~))
+  (defun yilin/surround-region-tilde ()
+    (interactive)
+    (yilin/surround-region ?~)))
 
 (use-package meow
   :demand t
@@ -175,7 +181,7 @@ Supports *, =, +, / and properly pairs (, [, {."
      '("8" . meow-digit-argument)
      '("9" . meow-digit-argument)
      '("0" . meow-digit-argument)
-     '("/" . meow-keypad-describe-key)
+     '("h" . meow-keypad-describe-key)
      '("?" . meow-cheatsheet)
      ;; Surround
      '("=" . yilin/surround-region-equal)
@@ -348,9 +354,12 @@ Supports *, =, +, / and properly pairs (, [, {."
 
 ;; Tab and Space
 ;; Permanently indent with spaces, never with TABs
-(setq-default c-basic-offset   4
-              tab-width        4
-              indent-tabs-mode nil)
+(use-package emacs
+  :ensure nil
+  :init
+  (setq-default c-basic-offset 4
+                tab-width 4
+                indent-tabs-mode nil))
 
 ;; Visualize TAB, (HARD) SPACE, NEWLINE
 ;; `https://github.com/condy0919/emacs-newbie/blob/master/introduction-to-builtin-modes.md'
@@ -625,7 +634,6 @@ Supports *, =, +, / and properly pairs (, [, {."
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
   :after (embark consult)
-  :demand t ; only necessary if you have the hook below
   ;; if you want to have consult previews as you move around an
   ;; auto-updating embark collect buffer
   :hook
@@ -870,201 +878,188 @@ Supports *, =, +, / and properly pairs (, [, {."
 ;; Unfill paragraph (the reversed operation to auto-fill)
 ;; `https://www.emacswiki.org/emacs/UnfillParagraph'
 ;; **************************************************************
-(defun yilin/unfill-paragraph (&optional region)
-  "Takes a multi-line paragraph and makes it into a single line of text."
-  (interactive (progn (barf-if-buffer-read-only) '(t)))
-  (let ((fill-column (point-max))
-        ;; This would override `fill-column' if it's an integer.
-        (emacs-lisp-docstring-fill-column t))
-    (fill-paragraph nil region)))
-(define-key global-map (kbd "M-Q") 'yilin/unfill-paragraph)
+(use-package emacs
+  :ensure nil
+  :bind
+  (("M-Q" . yilin/unfill-paragraph)
+   :map ctl-x-map
+   ("n" . yilin/narrow-or-widen-dwim)
+   :map minibuffer-local-map
+   ("M-<backspace>" . yilin/delete-minibuffer-directory))
+  :preface
+  (defun yilin/unfill-paragraph (&optional region)
+    "Takes a multi-line paragraph and makes it into a single line of text."
+    (interactive (progn (barf-if-buffer-read-only) '(t)))
+    (let ((fill-column (point-max))
+          ;; This would override `fill-column' if it's an integer.
+          (emacs-lisp-docstring-fill-column t))
+      (fill-paragraph nil region)))
 
-;; **************************************************************
-;; Narrow and widen
-;; `https://endlessparentheses.com/emacs-narrow-or-widen-dwim.html'
-;; **************************************************************
-(defun yilin/narrow-or-widen-dwim (p)
-  "Widen if buffer is narrowed, narrow-dwim otherwise.
+  (defun yilin/narrow-or-widen-dwim (p)
+    "Widen if buffer is narrowed, narrow-dwim otherwise.
 Dwim means: region, org-src-block, org-subtree, or
 defun, whichever applies first. Narrowing to
 org-src-block actually calls `org-edit-src-code'.
 
 With prefix P, don't widen, just narrow even if buffer
 is already narrowed."
-  (interactive "P")
-  (declare (interactive-only))
-  (cond ((and (buffer-narrowed-p) (not p)) (widen))
-        ((region-active-p)
-         (narrow-to-region (region-beginning)
-                           (region-end)))
-        ((derived-mode-p 'org-mode)
-         ;; `org-edit-src-code' is not a real narrowing
-         ;; command. Remove this first conditional if
-         ;; you don't want it.
-         (cond ((ignore-errors (org-edit-src-code) t)
-                (delete-other-windows))
-               ((ignore-errors (org-narrow-to-block) t))
-               (t (org-narrow-to-subtree))))
-        ((derived-mode-p 'latex-mode)
-         (LaTeX-narrow-to-environment))
-        (t (narrow-to-defun))))
-;; This line replaces Emacs' entire narrowing keymap
-(define-key ctl-x-map "n" #'yilin/narrow-or-widen-dwim)
+    (interactive "P")
+    (declare (interactive-only))
+    (cond ((and (buffer-narrowed-p) (not p)) (widen))
+          ((region-active-p)
+           (narrow-to-region (region-beginning)
+                             (region-end)))
+          ((derived-mode-p 'org-mode)
+           ;; `org-edit-src-code' is not a real narrowing
+           ;; command. Remove this first conditional if
+           ;; you don't want it.
+           (cond ((ignore-errors (org-edit-src-code) t)
+                  (delete-other-windows))
+                 ((ignore-errors (org-narrow-to-block) t))
+                 (t (org-narrow-to-subtree))))
+          ((derived-mode-p 'latex-mode)
+           (LaTeX-narrow-to-environment))
+          (t (narrow-to-defun))))
 
-;; **************************************************************
-;; Press M-<backspace> to delete the entire file/directory name
-;; **************************************************************
-(defun yilin/delete-minibuffer-directory ()
-  "Delete the directory name before the last slash in the minibuffer."
-  (interactive)
-  (let* ((end (point))
-         (beg (save-excursion
-                (when (eq ?/ (char-before))
-                  (backward-char))
-                (if (search-backward "/" nil t)
-                    (1+ (point))
-                  (backward-word)
-                  (point)))))
-    (delete-region beg end)))
-(define-key minibuffer-local-map
-            (kbd "M-<backspace>")
-            'yilin/delete-minibuffer-directory)
+  (defun yilin/delete-minibuffer-directory ()
+    "Delete the directory name before the last slash in the minibuffer."
+    (interactive)
+    (let* ((end (point))
+           (beg (save-excursion
+                  (when (eq ?/ (char-before))
+                    (backward-char))
+                  (if (search-backward "/" nil t)
+                      (1+ (point))
+                    (backward-word)
+                    (point)))))
+      (delete-region beg end)))
 
-;; **************************************************************
-;; Insert time stamp
-;; **************************************************************
-(defun yilin/insert-timestamp ()
-  (interactive)
-  (insert (format-time-string "%Y%m%d%H%M%S")))
+  (defun yilin/insert-timestamp ()
+    (interactive)
+    (insert (format-time-string "%Y%m%d%H%M%S")))
 
-;; **************************************************************
-;; Remove empty lines
-;; **************************************************************
-(defun yilin/remove-empty-lines ()
-  "Remove all empty lines (containing only whitespace) in the current buffer."
-  (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (flush-lines "^[ \t]*$")))
+  (defun yilin/remove-empty-lines ()
+    "Remove all empty lines (containing only whitespace) in the current buffer."
+    (interactive)
+    (save-excursion
+      (goto-char (point-min))
+      (flush-lines "^[ \t]*$")))
 
-;; **************************************************************
-;; Greek letters and math symbols
-;; **************************************************************
-(defun yilin/insert-greek-or-math-symbol ()
-  "Replace region with corresponding Greek or math symbol, or prompt for one.
+  (defun yilin/insert-greek-or-math-symbol ()
+    "Replace region with corresponding Greek or math symbol, or prompt for one.
 If a region is active, trim whitespace around it and try to convert
 its contents into the corresponding Greek or math symbol. If successful,
 replace the region. If not, or if no region is active, prompt the user."
-  (interactive)
-  (let* ((greek-map
-          '(;; --- Greek letters (lowercase) ---
-            ("alpha" . "α") ("beta" . "β") ("gamma" . "γ") ("delta" . "δ")
-            ("epsilon" . "ε") ("zeta" . "ζ") ("eta" . "η") ("theta" . "θ")
-            ("iota" . "ι") ("kappa" . "κ") ("lambda" . "λ") ("mu" . "μ")
-            ("nu" . "ν") ("xi" . "ξ") ("omicron" . "ο") ("pi" . "π")
-            ("rho" . "ρ") ("sigma" . "σ") ("tau" . "τ") ("upsilon" . "υ")
-            ("phi" . "φ") ("chi" . "χ") ("psi" . "ψ") ("omega" . "ω")
+    (interactive)
+    (let* ((greek-map
+            '(;; --- Greek letters (lowercase) ---
+              ("alpha" . "α") ("beta" . "β") ("gamma" . "γ") ("delta" . "δ")
+              ("epsilon" . "ε") ("zeta" . "ζ") ("eta" . "η") ("theta" . "θ")
+              ("iota" . "ι") ("kappa" . "κ") ("lambda" . "λ") ("mu" . "μ")
+              ("nu" . "ν") ("xi" . "ξ") ("omicron" . "ο") ("pi" . "π")
+              ("rho" . "ρ") ("sigma" . "σ") ("tau" . "τ") ("upsilon" . "υ")
+              ("phi" . "φ") ("chi" . "χ") ("psi" . "ψ") ("omega" . "ω")
 
-            ;; --- Greek letters (uppercase) ---
-            ("Alpha" . "Α") ("Beta" . "Β") ("Gamma" . "Γ") ("Delta" . "Δ")
-            ("Epsilon" . "Ε") ("Zeta" . "Ζ") ("Eta" . "Η") ("Theta" . "Θ")
-            ("Iota" . "Ι") ("Kappa" . "Κ") ("Lambda" . "Λ") ("Mu" . "Μ")
-            ("Nu" . "Ν") ("Xi" . "Ξ") ("Omicron" . "Ο") ("Pi" . "Π")
-            ("Rho" . "Ρ") ("Sigma" . "Σ") ("Tau" . "Τ") ("Upsilon" . "Υ")
-            ("Phi" . "Φ") ("Chi" . "Χ") ("Psi" . "Ψ") ("Omega" . "Ω")
+              ;; --- Greek letters (uppercase) ---
+              ("Alpha" . "Α") ("Beta" . "Β") ("Gamma" . "Γ") ("Delta" . "Δ")
+              ("Epsilon" . "Ε") ("Zeta" . "Ζ") ("Eta" . "Η") ("Theta" . "Θ")
+              ("Iota" . "Ι") ("Kappa" . "Κ") ("Lambda" . "Λ") ("Mu" . "Μ")
+              ("Nu" . "Ν") ("Xi" . "Ξ") ("Omicron" . "Ο") ("Pi" . "Π")
+              ("Rho" . "Ρ") ("Sigma" . "Σ") ("Tau" . "Τ") ("Upsilon" . "Υ")
+              ("Phi" . "Φ") ("Chi" . "Χ") ("Psi" . "Ψ") ("Omega" . "Ω")
 
-            ;; --- Logic ---
-            ("forall" . "∀") ("exists" . "∃") ("nexists" . "∄")
-            ("neg" . "¬") ("lnot" . "¬")
-            ("land" . "∧") ("lor" . "∨")
-            ("implies" . "⇒") ("iff" . "⇔")
+              ;; --- Logic ---
+              ("forall" . "∀") ("exists" . "∃") ("nexists" . "∄")
+              ("neg" . "¬") ("lnot" . "¬")
+              ("land" . "∧") ("lor" . "∨")
+              ("implies" . "⇒") ("iff" . "⇔")
 
-            ;; --- Sets ---
-            ("in" . "∈") ("notin" . "∉")
-            ("subset" . "⊂") ("subseteq" . "⊆") ("nsubseteq" . "⊈")
-            ("supset" . "⊃") ("supseteq" . "⊇") ("nsupseteq" . "⊉")
-            ("emptyset" . "∅")
-            ("cap" . "∩") ("cup" . "∪")
-            ("propto" . "∝")
+              ;; --- Sets ---
+              ("in" . "∈") ("notin" . "∉")
+              ("subset" . "⊂") ("subseteq" . "⊆") ("nsubseteq" . "⊈")
+              ("supset" . "⊃") ("supseteq" . "⊇") ("nsupseteq" . "⊉")
+              ("emptyset" . "∅")
+              ("cap" . "∩") ("cup" . "∪")
+              ("propto" . "∝")
 
-            ;; --- Relations ---
-            ("=" . "=") ("!=" . "≠") ("equiv" . "≡") ("neq" . "≠")
-            ("approx" . "≈") ("sim" . "∼") ("cong" . "≅")
-            ("<=" . "≤") (">=" . "≥") ("<<" . "≪") (">>" . "≫")
+              ;; --- Relations ---
+              ("=" . "=") ("!=" . "≠") ("equiv" . "≡") ("neq" . "≠")
+              ("approx" . "≈") ("sim" . "∼") ("cong" . "≅")
+              ("<=" . "≤") (">=" . "≥") ("<<" . "≪") (">>" . "≫")
 
-            ;; --- Arithmetic ---
-            ("times" . "×") ("cdot" . "·") ("ast" . "∗")
-            ("pm" . "±") ("mp" . "∓")
-            ("div" . "÷")
-            ("sqrt" . "√") ("cbrt" . "∛") ("qdrt" . "∜")
+              ;; --- Arithmetic ---
+              ("times" . "×") ("cdot" . "·") ("ast" . "∗")
+              ("pm" . "±") ("mp" . "∓")
+              ("div" . "÷")
+              ("sqrt" . "√") ("cbrt" . "∛") ("qdrt" . "∜")
 
-            ;; --- Calculus & Algebra ---
-            ("int" . "∫") ("iint" . "∬") ("iiint" . "∭")
-            ("oint" . "∮") ("oiint" . "∯")
-            ("sum" . "∑") ("prod" . "∏") ("lim" . "lim") ;; leave lim as text
-            ("infty" . "∞") ("infinity" . "∞")
-            ("nabla" . "∇") ("partial" . "∂")
+              ;; --- Calculus & Algebra ---
+              ("int" . "∫") ("iint" . "∬") ("iiint" . "∭")
+              ("oint" . "∮") ("oiint" . "∯")
+              ("sum" . "∑") ("prod" . "∏") ("lim" . "lim") ;; leave lim as text
+              ("infty" . "∞") ("infinity" . "∞")
+              ("nabla" . "∇") ("partial" . "∂")
 
-            ;; --- Arrows ---
-            ("->" . "→") ("=>" . "⇒") ("-->" . "⟶")
-            ("<-" . "←") ("<=" . "⇐") ("<--" . "⟵")
-            ("<->" . "↔") ("<=>" . "⇔")
-            ("uparrow" . "↑") ("downarrow" . "↓")
-            ("Uparrow" . "⇑") ("Downarrow" . "⇓")
-            ("leftrightarrow" . "↔") ("Rightarrow" . "⇒")
-            ("Leftarrow" . "⇐") ("Leftrightarrow" . "⇔")
+              ;; --- Arrows ---
+              ("->" . "→") ("=>" . "⇒") ("-->" . "⟶")
+              ("<-" . "←") ("<=" . "⇐") ("<--" . "⟵")
+              ("<->" . "↔") ("<=>" . "⇔")
+              ("uparrow" . "↑") ("downarrow" . "↓")
+              ("Uparrow" . "⇑") ("Downarrow" . "⇓")
+              ("leftrightarrow" . "↔") ("Rightarrow" . "⇒")
+              ("Leftarrow" . "⇐") ("Leftrightarrow" . "⇔")
 
-            ;; --- Geometry ---
-            ("angle" . "∠") ("measuredangle" . "∡") ("perp" . "⊥") ("parallel" . "∥")
+              ;; --- Geometry ---
+              ("angle" . "∠") ("measuredangle" . "∡") ("perp" . "⊥") ("parallel" . "∥")
 
-            ;; --- Miscellaneous ---
-            ("degree" . "°") ("prime" . "′")
-            ("ell" . "ℓ") ("hbar" . "ℏ") ("Re" . "ℜ") ("Im" . "ℑ")
-            ("aleph" . "ℵ")
-            ("top" . "⊤") ("bot" . "⊥")
-            ))
-         (text (if (use-region-p)
-                   (string-trim (buffer-substring-no-properties
-                                 (region-beginning) (region-end)))
-                 nil))
-         (replacement (assoc-default text greek-map)))
-    (if (and text replacement)
-        ;; Replace region
-        (progn
-          (delete-region (region-beginning) (region-end))
-          (insert replacement))
-      ;; Prompt for input
-      (let* ((name (completing-read "Greek letter: "
-                                    (mapcar #'car greek-map) nil t))
-             (symbol (assoc-default name greek-map)))
-        (when symbol
-          (if (use-region-p)
-              (delete-region (region-beginning) (region-end)))
-          (insert symbol))))))
+              ;; --- Miscellaneous ---
+              ("degree" . "°") ("prime" . "′")
+              ("ell" . "ℓ") ("hbar" . "ℏ") ("Re" . "ℜ") ("Im" . "ℑ")
+              ("aleph" . "ℵ")
+              ("top" . "⊤") ("bot" . "⊥")
+              ))
+           (text (if (use-region-p)
+                     (string-trim (buffer-substring-no-properties
+                                   (region-beginning) (region-end)))
+                   nil))
+           (replacement (assoc-default text greek-map)))
+      (if (and text replacement)
+          ;; Replace region
+          (progn
+            (delete-region (region-beginning) (region-end))
+            (insert replacement))
+        ;; Prompt for input
+        (let* ((name (completing-read "Greek letter: "
+                                      (mapcar #'car greek-map) nil t))
+               (symbol (assoc-default name greek-map)))
+          (when symbol
+            (if (use-region-p)
+                (delete-region (region-beginning) (region-end)))
+            (insert symbol))))))
 
-(defun yilin/insert-accented (accent char)
-  "Insert CHAR with ACCENT. Uses combining marks when needed.
+  (defun yilin/insert-accented (accent char)
+    "Insert CHAR with ACCENT. Uses combining marks when needed.
 ACCENT choices: ^ ` ' ~ \" ."
-  (interactive
-   (list
-    (read-char-choice "Accent (^ ` ' ~ \"): " '(?^ ?` ?' ?~ ?\" ?.))
-    (read-char "Character: ")))
-  (let* ((combining-map
-          '((?^ . ?\u0302)   ;; COMBINING CIRCUMFLEX
-            (?` . ?\u0300)   ;; COMBINING GRAVE
-            (?' . ?\u0301)   ;; COMBINING ACUTE
-            (?~ . ?\u0303)   ;; COMBINING TILDE
-            (?\" . ?\u0308)  ;; COMBINING DIAERESIS
-            (?. . ?\u0307))) ;; COMBINING DOT ABOVE
-         (combining (cdr (assoc accent combining-map))))
-    (insert (string char combining))))
+    (interactive
+     (list
+      (read-char-choice "Accent (^ ` ' ~ \"): " '(?^ ?` ?' ?~ ?\" ?.))
+      (read-char "Character: ")))
+    (let* ((combining-map
+            '((?^ . ?\u0302)   ;; COMBINING CIRCUMFLEX
+              (?` . ?\u0300)   ;; COMBINING GRAVE
+              (?' . ?\u0301)   ;; COMBINING ACUTE
+              (?~ . ?\u0303)   ;; COMBINING TILDE
+              (?\" . ?\u0308)  ;; COMBINING DIAERESIS
+              (?. . ?\u0307))) ;; COMBINING DOT ABOVE
+           (combining (cdr (assoc accent combining-map))))
+      (insert (string char combining))))
 
-;; **************************************************************
-;; Quote lines
-;; `http://xahlee.info/emacs/emacs/emacs_quote_lines.html'
-;; **************************************************************
-(defun yilin/quote-lines ()
-  "Change current text block's lines to quoted lines with comma or other separator char.
+  ;; **************************************************************
+  ;; Quote lines
+  ;; `http://xahlee.info/emacs/emacs/emacs_quote_lines.html'
+  ;; **************************************************************
+  (defun yilin/quote-lines ()
+    "Change current text block's lines to quoted lines with comma or other separator char.
   When there is a text selection, act on the selection, else, act on a text block separated by blank lines.
 
   For example,
@@ -1089,63 +1084,63 @@ ACCENT choices: ^ ` ' ~ \" ."
 
   URL `http://ergoemacs.org/emacs/emacs_quote_lines.html'
   Version 2017-01-08"
-  (interactive)
-  (let* (
-         $p1
-         $p2
-         ($quoteToUse
-          (read-string
-           "Quote to use:" "\"" nil
-           '(
-             ""
-             "\""
-             "'"
-             "("
-             "{"
-             "["
-             )))
-         ($separator
-          (read-string
-           "line separator:" "," nil
-           '(
-             ""
-             ","
-             ";"
-             )))
-         ($beginQuote $quoteToUse)
-         ($endQuote
-          ;; if begin quote is a bracket, set end quote to the matching one. else, same as begin quote
-          (let (($syntableValue (aref (syntax-table) (string-to-char $beginQuote))))
-            (if (eq (car $syntableValue ) 4) ; ; syntax table, code 4 is open paren
-                (char-to-string (cdr $syntableValue))
-              $quoteToUse
-              ))))
-    (if (use-region-p)
+    (interactive)
+    (let* (
+           $p1
+           $p2
+           ($quoteToUse
+            (read-string
+             "Quote to use:" "\"" nil
+             '(
+               ""
+               "\""
+               "'"
+               "("
+               "{"
+               "["
+               )))
+           ($separator
+            (read-string
+             "line separator:" "," nil
+             '(
+               ""
+               ","
+               ";"
+               )))
+           ($beginQuote $quoteToUse)
+           ($endQuote
+            ;; if begin quote is a bracket, set end quote to the matching one. else, same as begin quote
+            (let (($syntableValue (aref (syntax-table) (string-to-char $beginQuote))))
+              (if (eq (car $syntableValue) 4) ; ; syntax table, code 4 is open paren
+                  (char-to-string (cdr $syntableValue))
+                $quoteToUse
+                ))))
+      (if (use-region-p)
+          (progn
+            (setq $p1 (region-beginning))
+            (setq $p2 (region-end)))
         (progn
-          (setq $p1 (region-beginning))
-          (setq $p2 (region-end)))
-      (progn
-        (if (re-search-backward "\n[ \t]*\n" nil "NOERROR")
-            (progn (re-search-forward "\n[ \t]*\n")
-                   (setq $p1 (point)))
-          (setq $p1 (point)))
-        (re-search-forward "\n[ \t]*\n" nil "NOERROR")
-        (skip-chars-backward " \t\n" )
-        (setq $p2 (point))))
-    (save-excursion
-      (save-restriction
-        (narrow-to-region $p1 $p2)
-        (goto-char (point-min))
-        (skip-chars-forward "\t ")
-        (insert $beginQuote)
-        (goto-char (point-max))
-        (insert $endQuote)
-        (goto-char (point-min))
-        (while (re-search-forward "\n\\([\t ]*\\)" nil "NOERROR" )
-          (replace-match
-           (concat $endQuote $separator (concat "\n" (match-string 1)) $beginQuote) "FIXEDCASE" "LITERAL"))
-        ;;
-        ))))
+          (if (re-search-backward "\n[ \t]*\n" nil "NOERROR")
+              (progn (re-search-forward "\n[ \t]*\n")
+                     (setq $p1 (point)))
+            (setq $p1 (point)))
+          (re-search-forward "\n[ \t]*\n" nil "NOERROR")
+          (skip-chars-backward " \t\n")
+          (setq $p2 (point))))
+      (save-excursion
+        (save-restriction
+          (narrow-to-region $p1 $p2)
+          (goto-char (point-min))
+          (skip-chars-forward "\t ")
+          (insert $beginQuote)
+          (goto-char (point-max))
+          (insert $endQuote)
+          (goto-char (point-min))
+          (while (re-search-forward "\n\\([\t ]*\\)" nil "NOERROR")
+            (replace-match
+             (concat $endQuote $separator (concat "\n" (match-string 1)) $beginQuote) "FIXEDCASE" "LITERAL"))
+          ;;
+          )))))
 
 (provide 'init-edit)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

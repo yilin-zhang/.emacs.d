@@ -36,7 +36,6 @@
      (treemacs-git-mode 'simple))))
 
 (use-package treemacs-nerd-icons
-  :demand t
   :after (treemacs nerd-icons)
   :custom-face
   (treemacs-nerd-icons-root-face ((t (:inherit nerd-icons-green :height 1.3))))
@@ -55,6 +54,8 @@
 ;;                            Dashbord
 ;; --------------------------------------------------------------
 (use-package dashboard
+  :defer t
+  :commands (dashboard-open)
   :init
   ;; add instruction
   (setq initial-scratch-message
@@ -165,12 +166,12 @@
 ;; --------------------------------------------------------------
 ;;                           Project
 ;; --------------------------------------------------------------
-(defun yilin/ibuffer-project-hook ()
-  (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
-  (unless (eq ibuffer-sorting-mode 'project-file-relative)
-    (ibuffer-do-sort-by-project-file-relative)))
-
 (use-package ibuffer-project
+  :preface
+  (defun yilin/ibuffer-project-hook ()
+    (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
+    (unless (eq ibuffer-sorting-mode 'project-file-relative)
+      (ibuffer-do-sort-by-project-file-relative)))
   :hook (ibuffer . yilin/ibuffer-project-hook))
 
 (use-package eyebrowse
@@ -236,187 +237,173 @@
 ;; **************************************************************
 ;; Open in finder and terminal (Mac)
 ;; **************************************************************
-
-(defun yilin/expand-and-quote-default-directory ()
-  (shell-quote-argument (expand-file-name default-directory)))
-
-(defun yilin/open-with-terminal ()
-  "Open the current dir in a new iTerm window."
-  (interactive)
-  (shell-command (concat "open -a iTerm.app " (yilin/expand-and-quote-default-directory))))
-
-(defun yilin/open-with-finder-or-default-app ()
-  "Open the current dir with Finder or open the current file with a default app"
-  (interactive)
-  (let ((dired-file (condition-case nil
-                        (dired-get-filename)
-                      (error nil))))
-    (if dired-file
-        (shell-command (concat "open " (shell-quote-argument dired-file)))
-      (shell-command (concat "open " (yilin/expand-and-quote-default-directory))))))
-
 (use-package emacs
+  :ensure nil
   :after meow
+  :preface
+  (defun yilin/expand-and-quote-default-directory ()
+    (shell-quote-argument (expand-file-name default-directory)))
+
+  (defun yilin/open-with-terminal ()
+    "Open the current dir in a new iTerm window."
+    (interactive)
+    (shell-command (concat "open -a iTerm.app " (yilin/expand-and-quote-default-directory))))
+
+  (defun yilin/open-with-finder-or-default-app ()
+    "Open the current dir with Finder or open the current file with a default app"
+    (interactive)
+    (let ((dired-file (condition-case nil
+                          (dired-get-filename)
+                        (error nil))))
+      (if dired-file
+          (shell-command (concat "open " (shell-quote-argument dired-file)))
+        (shell-command (concat "open " (yilin/expand-and-quote-default-directory))))))
+
+  (defun yilin/-copy-file-path ()
+    "Return the file path of the current buffer or file under cursor.
+Returns nil if the buffer is not visiting a file and no file is under cursor."
+    (cond
+     ;; If buffer is visiting a file, return its path
+     ((buffer-file-name) (buffer-file-name))
+     ;; If in dired mode, return the full path of file under cursor
+     ((eq major-mode 'dired-mode)
+      (ignore-errors (dired-get-filename)))
+     ;; Otherwise return nil
+     (t nil)))
+
+  (defun yilin/copy-file-path ()
+    "Copy the current buffer file path to the clipboard."
+    (interactive)
+    (let ((filename (yilin/-copy-file-path)))
+      (when filename
+        (kill-new filename)
+        (message "Copied buffer file path '%s' to the clipboard." filename))))
+
+  (defun yilin/copy-file-name ()
+    "Copy the current buffer file path to the clipboard."
+    (interactive)
+    (let ((path (yilin/-copy-file-path)))
+      (if path
+          (let ((filename (file-name-base path)))
+            (kill-new filename)
+            (message "Copied buffer file name '%s' to the clipboard." filename))
+        (message "No file name available to copy."))))
+
+  (defun yilin/lookup-thesaurus (&optional arg)
+    "Look up the word on an online thesaurus.
+If a region is active, use the text in that region (whitespaces stripped).
+If no region is active, use the word at point.
+If no word is at point, prompt for a word, using prefix arg as default if provided."
+    (interactive "P")
+    (let ((word
+           (cond
+            ;; If region is active, use the region text and strip whitespace
+            ((use-region-p)
+             (string-trim (buffer-substring-no-properties (region-beginning) (region-end))))
+            ;; If there's a word at point, use it
+            ((thing-at-point 'word)
+             (thing-at-point 'word t))
+            ;; Otherwise, prompt for a word
+            (t
+             (read-string "Word for thesaurus: " (when arg (format "%s" arg)))))))
+      (browse-url (format "https://www.merriam-webster.com/thesaurus/%s" word))))
+
+  (defun yilin/arxiv-get-paper-id ()
+    "Get arXiv paper ID from user input or selected region.
+Returns the paper ID as a trimmed string."
+    (let* ((region-text (when (use-region-p)
+                          (string-trim (buffer-substring-no-properties
+                                        (region-beginning) (region-end)))))
+           (looks-like-arxiv-id (when region-text
+                                  (string-match-p "^\\([0-9]+\\.[0-9]+\\|[a-z-]+\\.[A-Z]+/[0-9]+\\)$" region-text)))
+           (prompt (if looks-like-arxiv-id
+                       (format "Enter arXiv paper ID (%s): " region-text)
+                     "Enter arXiv paper ID: "))
+           (user-input (read-string prompt)))
+      (cond
+       ;; If user just pressed enter and we have a valid region ID, use it
+       ((and looks-like-arxiv-id (string-empty-p user-input))
+        (when (use-region-p) (delete-region (region-beginning) (region-end)))
+        region-text)
+       ;; If user entered something, use that
+       ((not (string-empty-p user-input))
+        (when (use-region-p) (delete-region (region-beginning) (region-end)))
+        (string-trim user-input))
+       ;; If we have selected text that looks like an ID and user pressed enter
+       (looks-like-arxiv-id
+        (when (use-region-p) (delete-region (region-beginning) (region-end)))
+        region-text)
+       ;; Fallback: use whatever the user typed
+       (t (string-trim user-input)))))
+
+  (defun yilin/arxiv-insert-org-link (paper-id)
+    "Insert an org-mode link for an arXiv paper given its ID.
+If called interactively, prompts for paper ID or uses selected text.
+PAPER-ID should be in format like '2301.07041' or 'math.GT/0309136'."
+    (interactive (list (yilin/arxiv-get-paper-id)))
+    (require 'url) ; simple lazy load
+    (let* ((paper-id paper-id)
+           (url (format "https://arxiv.org/abs/%s" paper-id))
+           (title (condition-case nil
+                      (let ((buffer (url-retrieve-synchronously url t nil 10)))
+                        (when buffer
+                          (unwind-protect
+                              (with-current-buffer buffer
+                                (goto-char (point-min))
+                                (when (re-search-forward "<title>\\[.*?\\]\\s-*\\(.*?\\)</title>" nil t)
+                                  (string-trim (match-string 1))))
+                            (kill-buffer buffer))))
+                    (error nil))))
+      (insert (format "[[%s][%s]]" url (or title (format "arXiv:%s" paper-id))))
+      (message "Inserted link for %s" (or title paper-id))))
+
+  (defun yilin/arxiv-open-paper (paper-id)
+    "Open an arXiv paper in the default browser.
+If called interactively, prompts for paper ID or uses selected text.
+PAPER-ID should be in format like '2301.07041' or 'math.GT/0309136'."
+    (interactive (list (yilin/arxiv-get-paper-id)))
+    (browse-url (format "https://arxiv.org/abs/%s" paper-id)))
+
+  (defun yilin/org-insert-link-with-html-title (url)
+    "Asynchronously fetch URL and insert an Org link with the page title at point."
+    (interactive "sEnter URL: ")
+    ;; Capture the buffer and point where we should insert later
+    (let ((target-buf (current-buffer))
+          (target-pos (point)))
+      (url-retrieve
+       url
+       #'yilin/org--insert-link-callback
+       (list url target-buf target-pos))))
+
+  (defun yilin/org--insert-link-callback (status url target-buf target-pos)
+    "Callback for `yilin/org-insert-link-with-title-async'.
+STATUS is the retrieval status. URL is the original URL.
+TARGET-BUF and TARGET-POS are where to insert the link."
+    (require 'url)
+    (require 'dom)
+    (if (plist-get status :error)
+        (message "Error fetching URL: %s" (plist-get status :error))
+      (goto-char (point-min))
+      ;; Skip HTTP headers
+      (re-search-forward "\n\n" nil 'move)
+      (let* ((dom (libxml-parse-html-region (point) (point-max)))
+             (title-node (car (dom-by-tag dom 'title)))
+             (title (when title-node (string-trim (dom-text title-node)))))
+        ;; Clean up this temporary buffer
+        (kill-buffer (current-buffer))
+        ;; Insert into the original buffer at original position
+        (when (buffer-live-p target-buf)
+          (with-current-buffer target-buf
+            (save-excursion
+              (goto-char target-pos)
+              (insert (if title
+                          (format "[[%s][%s]]" url title)
+                        (format "[[%s]]" url))))
+            (message "Inserted link for %s" url))))))
   :config
   (meow-leader-define-key
    '("t" . yilin/open-with-terminal)
    '("e" . yilin/open-with-finder-or-default-app)))
-
-;; **************************************************************
-;; Copy file path and name
-;; **************************************************************
-
-(defun yilin/-copy-file-path ()
-  "Return the file path of the current buffer or file under cursor.
-Returns nil if the buffer is not visiting a file and no file is under cursor."
-  (cond
-   ;; If buffer is visiting a file, return its path
-   ((buffer-file-name) (buffer-file-name))
-   ;; If in dired mode, return the full path of file under cursor
-   ((eq major-mode 'dired-mode)
-    (ignore-errors (dired-get-filename)))
-   ;; Otherwise return nil
-   (t nil)))
-
-(defun yilin/copy-file-path ()
-  "Copy the current buffer file path to the clipboard."
-  (interactive)
-  (let ((filename (yilin/-copy-file-path)))
-    (when filename
-      (kill-new filename)
-      (message "Copied buffer file path '%s' to the clipboard." filename))))
-
-(defun yilin/copy-file-name ()
-  "Copy the current buffer file path to the clipboard."
-  (interactive)
-  (let ((filename (file-name-base (yilin/-copy-file-path))))
-    (when filename
-      (kill-new filename)
-      (message "Copied buffer file name '%s' to the clipboard." filename))))
-
-;; **************************************************************
-;; Dictionary
-;; **************************************************************
-
-(defun yilin/lookup-thesaurus (&optional arg)
-  "Look up the word on an online thesaurus.
-If a region is active, use the text in that region (whitespaces stripped).
-If no region is active, use the word at point.
-If no word is at point, prompt for a word, using prefix arg as default if provided."
-  (interactive "P")
-  (let ((word
-         (cond
-          ;; If region is active, use the region text and strip whitespace
-          ((use-region-p)
-           (string-trim (buffer-substring-no-properties (region-beginning) (region-end))))
-          ;; If there's a word at point, use it
-          ((thing-at-point 'word)
-           (thing-at-point 'word t))
-          ;; Otherwise, prompt for a word
-          (t
-           (read-string "Word for thesaurus: " (when arg (format "%s" arg)))))))
-    (browse-url (format "https://www.merriam-webster.com/thesaurus/%s" word))))
-
-;; **************************************************************
-;; arXiv
-;; **************************************************************
-
-(defun yilin/arxiv-get-paper-id ()
-  "Get arXiv paper ID from user input or selected region.
-Returns the paper ID as a trimmed string."
-  (let* ((region-text (when (use-region-p)
-                        (string-trim (buffer-substring-no-properties
-                                      (region-beginning) (region-end)))))
-         (looks-like-arxiv-id (when region-text
-                                (string-match-p "^\\([0-9]+\\.[0-9]+\\|[a-z-]+\\.[A-Z]+/[0-9]+\\)$" region-text)))
-         (prompt (if looks-like-arxiv-id
-                     (format "Enter arXiv paper ID (%s): " region-text)
-                   "Enter arXiv paper ID: "))
-         (user-input (read-string prompt)))
-    (cond
-     ;; If user just pressed enter and we have a valid region ID, use it
-     ((and looks-like-arxiv-id (string-empty-p user-input))
-      (when (use-region-p) (delete-region (region-beginning) (region-end)))
-      region-text)
-     ;; If user entered something, use that
-     ((not (string-empty-p user-input))
-      (when (use-region-p) (delete-region (region-beginning) (region-end)))
-      (string-trim user-input))
-     ;; If we have selected text that looks like an ID and user pressed enter
-     (looks-like-arxiv-id
-      (when (use-region-p) (delete-region (region-beginning) (region-end)))
-      region-text)
-     ;; Fallback: use whatever the user typed
-     (t (string-trim user-input)))))
-
-(defun yilin/arxiv-insert-org-link (paper-id)
-  "Insert an org-mode link for an arXiv paper given its ID.
-If called interactively, prompts for paper ID or uses selected text.
-PAPER-ID should be in format like '2301.07041' or 'math.GT/0309136'."
-  (interactive (list (yilin/arxiv-get-paper-id)))
-  (require 'url) ; simple lazy load
-  (let* ((paper-id paper-id)
-         (url (format "https://arxiv.org/abs/%s" paper-id))
-         (title (condition-case nil
-                    (let ((buffer (url-retrieve-synchronously url t nil 10)))
-                      (when buffer
-                        (unwind-protect
-                            (with-current-buffer buffer
-                              (goto-char (point-min))
-                              (when (re-search-forward "<title>\\[.*?\\]\\s-*\\(.*?\\)</title>" nil t)
-                                (string-trim (match-string 1))))
-                          (kill-buffer buffer))))
-                  (error nil))))
-    (insert (format "[[%s][%s]]" url (or title (format "arXiv:%s" paper-id))))
-    (message "Inserted link for %s" (or title paper-id))))
-
-(defun yilin/arxiv-open-paper (paper-id)
-  "Open an arXiv paper in the default browser.
-If called interactively, prompts for paper ID or uses selected text.
-PAPER-ID should be in format like '2301.07041' or 'math.GT/0309136'."
-  (interactive (list (yilin/arxiv-get-paper-id)))
-  (browse-url (format "https://arxiv.org/abs/%s" paper-id)))
-
-;; **************************************************************
-;; org link
-;; **************************************************************
-
-(defun yilin/org-insert-link-with-html-title (url)
-  "Asynchronously fetch URL and insert an Org link with the page title at point."
-  (interactive "sEnter URL: ")
-  ;; Capture the buffer and point where we should insert later
-  (let ((target-buf (current-buffer))
-        (target-pos (point)))
-    (url-retrieve
-     url
-     #'yilin/org--insert-link-callback
-     (list url target-buf target-pos))))
-
-(defun yilin/org--insert-link-callback (status url target-buf target-pos)
-  "Callback for `yilin/org-insert-link-with-title-async'.
-STATUS is the retrieval status. URL is the original URL.
-TARGET-BUF and TARGET-POS are where to insert the link."
-  (require 'url)
-  (require 'dom)
-  (if (plist-get status :error)
-      (message "Error fetching URL: %s" (plist-get status :error))
-    (goto-char (point-min))
-    ;; Skip HTTP headers
-    (re-search-forward "\n\n" nil 'move)
-    (let* ((dom (libxml-parse-html-region (point) (point-max)))
-           (title-node (car (dom-by-tag dom 'title)))
-           (title (when title-node (string-trim (dom-text title-node)))))
-      ;; Clean up this temporary buffer
-      (kill-buffer (current-buffer))
-      ;; Insert into the original buffer at original position
-      (when (buffer-live-p target-buf)
-        (with-current-buffer target-buf
-          (save-excursion
-            (goto-char target-pos)
-            (insert (if title
-                        (format "[[%s][%s]]" url title)
-                      (format "[[%s]]" url))))
-          (message "Inserted link for %s" url))))))
 
 (provide 'init-utils)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

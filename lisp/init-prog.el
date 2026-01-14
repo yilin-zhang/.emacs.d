@@ -25,47 +25,57 @@
 ;;         (css-mode . css-ts-mode)))
 
 (use-package treesit-auto
-  :demand t
   :custom
   (treesit-auto-install 'prompt)
   :config
   (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode))
+  :hook (after-init . global-treesit-auto-mode))
 
 ;; --------------------------------------------------------------
 ;;                             LSP
 ;; --------------------------------------------------------------
 
-(global-set-key (kbd "s-b") 'xref-find-definitions)
-(global-set-key (kbd "s-r") 'xref-find-references)
-
-;; `https://github.com/joaotavora/eglot/discussions/1184'
-(defun yilin/vue-eglot-init-options ()
-  (let ((tsdk-path
-         (expand-file-name
-          "lib"
-          (shell-command-to-string "npm list --global --parseable typescript | head -n1 | tr -d \"\n\""))))
-    `(:typescript
-      (:tsdk
-       ,tsdk-path
-       :languageFeatures (:completion
-                          (
-                           :defaultTagNameCase "both"
-                           :defaultAttrNameCase "kebabCase"
-                           :getDocumentNameCasesRequest nil
-                           :getDocumentSelectionRequest nil
-                           )
-                          :diagnostics
-                          (:getDocumentVersionRequest nil))
-       :documentFeatures (:documentFormatting
-                          (
-                           :defaultPrintWidth 100
-                           :getDocumentPrintWidthRequest nil
-                           )
-                          :documentSymbol t
-                          :documentColor t)))))
+(use-package emacs
+  :ensure nil
+  :bind
+  (("s-b" . xref-find-definitions)
+   ("s-r" . xref-find-references)))
 
 (use-package eglot
+  :preface
+  ;; `https://github.com/joaotavora/eglot/discussions/1184'
+  (defun yilin/vue-eglot-init-options ()
+    (let ((tsdk-path
+           (expand-file-name
+            "lib"
+            (shell-command-to-string "npm list --global --parseable typescript | head -n1 | tr -d \"\n\""))))
+      `(:typescript
+        (:tsdk
+         ,tsdk-path
+         :languageFeatures (:completion
+                            (
+                             :defaultTagNameCase "both"
+                             :defaultAttrNameCase "kebabCase"
+                             :getDocumentNameCasesRequest nil
+                             :getDocumentSelectionRequest nil
+                             )
+                            :diagnostics
+                            (:getDocumentVersionRequest nil))
+         :documentFeatures (:documentFormatting
+                            (
+                             :defaultPrintWidth 100
+                             :getDocumentPrintWidthRequest nil
+                             )
+                            :documentSymbol t
+                            :documentColor t)))))
+
+  ;; Re-opens the current buffer before reconnection
+  (defun yilin/eglot-reconnect ()
+    (interactive)
+    (let ((filepath (buffer-file-name)))
+      (kill-buffer (current-buffer))
+      (find-file filepath)
+      (eglot-reconnect (eglot--current-server-or-lose))))
   :config
   (setq eglot-events-buffer-size 0
         eglot-ignored-server-capabilities '(:hoverProvider
@@ -76,14 +86,7 @@
   (add-to-list 'eglot-server-programs
                `(vue-mode . ("vue-language-server" "--stdio"
                              :initializationOptions ,(yilin/vue-eglot-init-options))))
-
-  ;; Re-opens the current buffer before reconnection
-  (defun yilin/eglot-reconnect ()
-    (interactive)
-    (let ((filepath (buffer-file-name)))
-      (kill-buffer (current-buffer))
-      (find-file filepath)
-      (eglot-reconnect (eglot--current-server-or-lose)))))
+  )
 
 ;; `https://github.com/jdtsmith/eglot-booster'
 (use-package eglot-booster
@@ -144,10 +147,16 @@ Requires `project-current' to identify the project."
                          (read-directory-name "Project path: "))))
     (let* ((dir (or path default-directory))
            (proj (project-current nil dir))
-           (root (project-root proj))
-           (venv-dir (expand-file-name ".venv" root)))
-      (pyvenv-activate venv-dir)
-      (message "%s activated" venv-dir))))
+           (root (when proj (project-root proj)))
+           (venv-dir (when root (expand-file-name ".venv" root))))
+      (cond
+       ((not proj)
+        (user-error "No project found for %s" dir))
+       ((not (file-directory-p venv-dir))
+        (user-error "No .venv directory at %s" venv-dir))
+       (t
+        (pyvenv-activate venv-dir)
+        (message "%s activated" venv-dir))))))
 
 (defun yilin/generate-pyrightconfig ()
   "Generate a pyrightconfig.json file in the current directory."
@@ -177,14 +186,17 @@ Requires `project-current' to identify the project."
 ;; --------------------------------------------------------------
 (use-package web-mode
   :mode
-  ("\\.html\\'"
-   "\\.phtml\\'"
-   "\\.tpl\\.php\\'"
-   "\\.[agj]sp\\'"
-   "\\.as[cp]x\\'"
-   "\\.erb\\'"
-   "\\.mustache\\'"
-   "\\.djhtml\\'")
+  (("\\.html\\'" . web-mode)
+   ("\\.phtml\\'" . web-mode)
+   ("\\.tpl\\.php\\'" . web-mode)
+   ("\\.[agj]sp\\'" . web-mode)
+   ("\\.as[cp]x\\'" . web-mode)
+   ("\\.erb\\'" . web-mode)
+   ("\\.mustache\\'" . web-mode)
+   ("\\.djhtml\\'" . web-mode)
+   ("\\.vue\\'" . vue-mode))
+  :preface
+  (define-derived-mode vue-mode web-mode "Vue")
   :hook
   (web-mode . (lambda () (setq-local tab-width web-mode-indent-style)))
   :custom
@@ -208,9 +220,6 @@ Requires `project-current' to identify the project."
   :ensure nil
   :custom (css-indent-offset 2))
 
-(define-derived-mode vue-mode web-mode "Vue")
-(add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
-
 ;; --------------------------------------------------------------
 ;;                       Rust Configurations
 ;; --------------------------------------------------------------
@@ -221,27 +230,26 @@ Requires `project-current' to identify the project."
 ;; --------------------------------------------------------------
 (use-package lua-mode)
 
-;;;###autoload
-(defun yilin/pico8-narrow-buffer ()
-  (interactive)
-  (cl-flet ((find-string-point (str)
-              (save-excursion
-                (goto-char (point-min))
-                (search-forward str nil t))))
-    (let* ((lua-point (find-string-point "__lua__"))
-           (gfx-point (find-string-point "__gfx__"))
-           (map-point (find-string-point "__map__"))
-           (sfx-point (find-string-point "__sfx__"))
-           (end-point (or gfx-point map-point sfx-point (point-max))))
-      (narrow-to-region (1+ lua-point)
-                        (save-excursion
-                          (goto-char end-point)
-                          (beginning-of-line)
-                          (1- (point)))))))
-
 (use-package pico8-mode
   :vc (:url "https://github.com/Kaali/pico8-mode.git")
   :mode "\\.p8\\'"
+  :preface
+  (defun yilin/pico8-narrow-buffer ()
+    (interactive)
+    (cl-flet ((find-string-point (str)
+                (save-excursion
+                  (goto-char (point-min))
+                  (search-forward str nil t))))
+      (let* ((lua-point (find-string-point "__lua__"))
+             (gfx-point (find-string-point "__gfx__"))
+             (map-point (find-string-point "__map__"))
+             (sfx-point (find-string-point "__sfx__"))
+             (end-point (or gfx-point map-point sfx-point (point-max))))
+        (narrow-to-region (1+ lua-point)
+                          (save-excursion
+                            (goto-char end-point)
+                            (beginning-of-line)
+                            (1- (point)))))))
   :hook
   (pico8-mode . (lambda () (setq-local lua-indent-level 1)))
   (pico8-mode . yilin/pico8-narrow-buffer)
@@ -250,12 +258,13 @@ Requires `project-current' to identify the project."
                       :foreground (face-foreground 'shadow)
                       :weight 'bold))
 
-(with-eval-after-load 'nerd-icons
+(use-package nerd-icons
+  :after pico8-mode
+  :config
   (add-to-list 'nerd-icons-extension-icon-alist
                '("p8" nerd-icons-sucicon "nf-seti-lua" :face nerd-icons-lpink))
   (add-to-list 'nerd-icons-mode-icon-alist
-               '(pico8-mode nerd-icons-sucicon "nf-seti-lua" :face nerd-icons-lpink))
-  )
+               '(pico8-mode nerd-icons-sucicon "nf-seti-lua" :face nerd-icons-lpink)))
 
 ;; --------------------------------------------------------------
 ;;                           Container

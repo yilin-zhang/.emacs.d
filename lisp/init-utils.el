@@ -36,11 +36,8 @@
      (treemacs-git-mode 'simple))))
 
 (use-package treemacs-nerd-icons
-  :after (treemacs nerd-icons)
-  :custom-face
-  (treemacs-nerd-icons-root-face ((t (:inherit nerd-icons-green :height 1.3))))
-  (treemacs-nerd-icons-file-face ((t (:inherit nerd-icons-dsilver))))
-  :config (treemacs-load-theme "nerd-icons"))
+  :after nerd-icons
+  :hook (after-init . treemacs-nerd-icons-config))
 
 (use-package treemacs-magit
   :after (treemacs magit)

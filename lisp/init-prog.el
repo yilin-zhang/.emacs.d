@@ -131,6 +131,12 @@
   :load-path yilin/site-lisp-directory
   :hook (emacs-lisp-mode . elispfl-mode))
 
+(use-package emacs
+  :ensure nil
+  :hook (emacs-lisp-mode . (lambda ()
+                             (add-to-list 'imenu-generic-expression
+                                          '("Sections" "^;;; \\(.+\\)$" 1)))))
+
 ;; --------------------------------------------------------------
 ;;                       Python Configurations
 ;; --------------------------------------------------------------

@@ -48,43 +48,6 @@
          . treemacs-magit--schedule-update))
 
 ;; --------------------------------------------------------------
-;;                            Dashbord
-;; --------------------------------------------------------------
-(use-package dashboard
-  :defer t
-  :commands (dashboard-open)
-  :init
-  ;; add instruction
-  (setq initial-scratch-message
-        (concat initial-scratch-message
-                ";; Press <f6> to open the dashboard\n\n"))
-  ;; layout
-  (setq dashboard-center-content t)
-  ;; icons
-  (setq dashboard-display-icons-p t)
-  (setq dashboard-icon-type 'nerd-icons)
-  (setq dashboard-set-file-icons t)
-  (setq dashboard-set-heading-icons t)
-  :bind
-  ("<f6>" . dashboard-open)
-  :custom
-  ;; minimalist layout
-  (dashboard-startupify-list '(dashboard-insert-items))
-  (dashboard-vertically-center-content t)
-  ;; only show names, not paths
-  (dashboard-agenda-prefix-format " %i %?-12t% s") ; same as the agenda format in `org-agenad-prefix-format'
-  (dashboard-agenda-time-string-format "%m-%d %a") ; add an abbreviated weekday name
-  (dashboard-bookmarks-item-format "%s") ; no need to show file paths
-  (dashboard-recentf-show-base t)
-  (dashboard-recentf-item-format "%s") ; only show file names, not whole paths
-  ;; limited items
-  (dashboard-items '((bookmarks . 10)
-                     (projects  . 10)
-                     (agenda    . 5)
-                     (recents   . 5)
-                     (registers . 5))))
-
-;; --------------------------------------------------------------
 ;;                         Better Writing
 ;; --------------------------------------------------------------
 (use-package olivetti

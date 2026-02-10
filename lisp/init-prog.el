@@ -24,13 +24,6 @@
 ;;         (json-mode . json-ts-mode)
 ;;         (css-mode . css-ts-mode)))
 
-(use-package treesit-auto
-  :custom
-  (treesit-auto-install 'prompt)
-  :config
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  :hook (after-init . global-treesit-auto-mode))
-
 ;; --------------------------------------------------------------
 ;;                             LSP
 ;; --------------------------------------------------------------

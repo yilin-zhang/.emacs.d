@@ -171,6 +171,12 @@
   :load-path yilin/site-lisp-directory
   :commands trashcat)
 
+(use-package macmount
+  :ensure nil
+  :load-path yilin/site-lisp-directory
+  :if (eq system-type 'darwin)
+  :commands (macmount-mount macmount-unmount macmount-eject))
+
 ;; --------------------------------------------------------------
 ;;                         Terminal
 ;; --------------------------------------------------------------

@@ -45,6 +45,21 @@ Follow the instruction in [[https://github.com/blahgeek/emacs-lsp-booster][emacs
 | Vue      | =vue-language-server=        |
 | Lua      | =lua-language-server=        |
 
+* Local plugins
+Checked-in local plugins in =site-lisp/=:
+
+Third-party:
+- =elispfl.el=: enhanced font-lock rules that make Emacs Lisp buffers more
+  readable.
+- =kind-nerd-icons.el=: icon integration for completion candidates using nerd
+  icons.
+
+Self-made:
+- =lazy-revert.el=: lazy buffer revert.
+- =trashcat.el=: remove macOS applications and common residual files.
+- =ocbud.el=: commands to open OpenCode sessions from Emacs.
+- =macmount.el=: mount, unmount, and eject external storage devices on macOS.
+
 * Customization
 Create file =~/.emacs.d/custom/custom-post.el=. The configuration in the file will
 be loaded last.

@@ -203,7 +203,10 @@
 (use-package ocbud
   :ensure nil
   :load-path yilin/site-lisp-directory
-  :commands (ocbud-open-session ocbud-open-session-project)
+  :commands
+  (ocbud-open-session
+   ocbud-open-session-project
+   ocbud-update-session-directory)
   :custom
   (ocbud-terminal-function #'ocbud-open-in-iterm))
 

@@ -130,6 +130,27 @@ Each plist has keys :id, :title and :directory."
                    :directory (expand-file-name directory))))
          (split-string output "\n" t))))))
 
+(defun ocbud--sql-quote (value)
+  "Return SQL single-quoted VALUE with escaped apostrophes."
+  (concat "'" (replace-regexp-in-string "'" "''" value t t) "'"))
+
+(defun ocbud--update-session-directory (session-id directory)
+  "Update SESSION-ID directory to DIRECTORY in OpenCode database.
+Return non-nil when one row was updated."
+  (let ((sqlite3 (executable-find "sqlite3")))
+    (unless sqlite3
+      (user-error "sqlite3 command not found in PATH"))
+    (let* ((dir (expand-file-name directory))
+           (sql (format "UPDATE session SET directory = %s WHERE id = %s; SELECT changes();"
+                        (ocbud--sql-quote dir)
+                        (ocbud--sql-quote session-id)))
+           (cmd (format "%s %s %s"
+                        (shell-quote-argument sqlite3)
+                        (shell-quote-argument ocbud-opencode-db-path)
+                        (shell-quote-argument sql)))
+           (output (string-trim (shell-command-to-string cmd))))
+      (string= output "1"))))
+
 (defun ocbud--session-labels (sessions)
   "Build completion labels for SESSIONS.
 Labels use title only. Duplicate titles are numbered as (1), (2), (3)."
@@ -199,6 +220,22 @@ otherwise return `default-directory'."
      (format "%s -s %s"
              ocbud-opencode-command
              (shell-quote-argument session-id)))))
+
+;;;###autoload
+(defun ocbud-update-session-directory ()
+  "Update directory of an existing OpenCode session."
+  (interactive)
+  (let ((sessions (ocbud--load-sessions)))
+    (unless sessions
+      (user-error "No OpenCode sessions found"))
+    (let* ((session (ocbud--select-session sessions "Select OpenCode session to update: "))
+           (old-dir (plist-get session :directory))
+           (new-dir (read-directory-name (format "New directory (current: %s): " old-dir)
+                                         old-dir nil t))
+           (session-id (plist-get session :id)))
+      (if (ocbud--update-session-directory session-id new-dir)
+          (message "Updated session %s directory to %s" session-id (expand-file-name new-dir))
+        (user-error "No session updated for id %s" session-id)))))
 
 ;;;###autoload
 (defun ocbud-open-session ()

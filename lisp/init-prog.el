@@ -120,9 +120,8 @@
 ;; --------------------------------------------------------------
 ;;                        Lisp Configurations
 ;; --------------------------------------------------------------
-(use-package elispfl
-  :load-path yilin/site-lisp-directory
-  :hook (emacs-lisp-mode . elispfl-mode))
+(use-package lisp-semantic-hl
+  :hook ((emacs-lisp-mode lisp-mode) . lisp-semantic-hl-mode))
 
 (use-package emacs
   :ensure nil

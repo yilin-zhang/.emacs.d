@@ -836,7 +836,7 @@ Supports *, =, +, / and properly pairs (, [, {."
   (setf hl-todo-keyword-faces (assoc-delete-all "XXXX*" hl-todo-keyword-faces))
   (dolist (keyword '("BUG" "DEFECT" "ISSUE"))
     (cl-pushnew `(,keyword . ,(face-foreground 'error)) hl-todo-keyword-faces))
-  (dolist (keyword '("WORKAROUND" "HACK" "TRICK"))
+  (dolist (keyword '("WORKAROUND" "HACK" "TRICK" "WIP"))
     (cl-pushnew `(,keyword . ,(face-foreground 'warning)) hl-todo-keyword-faces)))
 
 ;; Highlight uncommitted changes using VC

@@ -112,10 +112,10 @@
   (defvar yilin/denote-agenda-keyword "agenda"
     "Denote files with this keyword will be considered as agenda files")
   (defun yilin/denote-init-org-agenda-files ()
-    "Append list of files containing `yilin/denote-agenda-keyword' to org-agenda-files"
+    "Append `.org' files with `yilin/denote-agenda-keyword' to `org-agenda-files'."
     (interactive)
     (yilin/init-org-agenda-files)
-    (let ((keyword (concat "_" yilin/denote-agenda-keyword)))
+    (let ((keyword (concat "_" (regexp-quote yilin/denote-agenda-keyword) ".*\\.org\\'")))
       (setq org-agenda-files
             (append org-agenda-files
                     (directory-files denote-directory t keyword)))))

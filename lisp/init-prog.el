@@ -218,6 +218,13 @@ Requires `project-current' to identify the project."
   :ensure nil
   :custom (css-indent-offset 2))
 
+(use-package typescript-ts-mode
+  :ensure nil
+  :mode (("\\.ts\\'" . typescript-ts-mode)
+         ("\\.tsx\\'" . tsx-ts-mode))
+  :custom
+  (typescript-ts-mode-indent-offset 2))
+
 ;; --------------------------------------------------------------
 ;;                       Rust Configurations
 ;; --------------------------------------------------------------

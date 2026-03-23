@@ -24,6 +24,17 @@
 ;;         (json-mode . json-ts-mode)
 ;;         (css-mode . css-ts-mode)))
 
+(setq major-mode-remap-alist
+      '(;; markup lang
+        (yaml-mode . yaml-ts-mode)
+        (json-mode . json-ts-mode)
+        (css-mode . css-ts-mode)
+        ;; programming
+        (bash-mode . bash-ts-mode)
+        (python-mode . python-ts-mode)
+        (js-mode . js-ts-mode)
+        (typescript-mode . typescript-ts-mode)))
+
 ;; --------------------------------------------------------------
 ;;                             LSP
 ;; --------------------------------------------------------------

@@ -210,10 +210,23 @@
   (defun yilin/expand-and-quote-default-directory ()
     (shell-quote-argument (expand-file-name default-directory)))
 
+  (defun yilin/macos-terminal-app ()
+    "Return the preferred terminal app available on macOS."
+    (cond
+     ((file-directory-p "/Applications/Ghostty.app") "Ghostty")
+     ((file-directory-p "/Applications/iTerm.app") "iTerm")
+     ((file-directory-p "/System/Applications/Utilities/Terminal.app") "Terminal")
+     ((file-directory-p "/Applications/Utilities/Terminal.app") "Terminal")
+     (t (user-error "No supported terminal app found"))))
+
   (defun yilin/open-with-terminal ()
-    "Open the current dir in a new iTerm window."
+    "Open the current dir in a terminal tab when possible.
+
+Prefer Ghostty, then iTerm, then macOS Terminal."
     (interactive)
-    (shell-command (concat "open -a iTerm.app " (yilin/expand-and-quote-default-directory))))
+    (call-process "open" nil 0 nil
+                  "-a" (yilin/macos-terminal-app)
+                  (expand-file-name default-directory)))
 
   (defun yilin/open-with-finder-or-default-app ()
     "Open the current dir with Finder or open the current file with a default app"

@@ -27,10 +27,10 @@
              gcs-done))
   :init
   (tool-bar-mode -1)
-  (setq inhibit-splash-screen 1) ; disable welcome screen
+  (setq inhibit-splash-screen t) ; disable welcome screen
   ;; The setting of this variable must come before enable
   ;; display-time-mode, or it will not work.
-  (setq display-time-24hr-format 1
+  (setq display-time-24hr-format t
         display-time-string-forms
         '((propertize (concat 24-hours ":" minutes " ")
                       'face 'font-lock-constant-face)))

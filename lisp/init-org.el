@@ -199,8 +199,7 @@ without worrying about the original agenda files.")
         ;; Each item only belongs to one category, one key stroke is sufficient
         org-fast-tag-selection-single-key t)
   ;; Org capture
-  (setq org-default-notes-file "~/agenda.org"
-        org-capture-templates
+  (setq org-capture-templates
         '(("l" "Log" entry (file org-default-notes-file) "* %?\n")))
   ;; Keywords
   (setq org-todo-keywords '((sequence "TODO(t)" "DOING(i)" "WAITING(w)" "HANGUP(h)"

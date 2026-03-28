@@ -1,4 +1,4 @@
-;; init-basic.el --- Configurations for dired mode. -*- lexical-binding: t -*-
+;; init-dired.el --- Configurations for dired mode. -*- lexical-binding: t -*-
 
 (use-package dired
   :ensure nil

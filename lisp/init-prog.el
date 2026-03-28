@@ -73,20 +73,20 @@
                             :documentSymbol t
                             :documentColor t)))))
 
-  ;; Re-opens the current buffer before reconnection
+  ;; Re-opens the current buffer and starts a fresh eglot server
   (defun yilin/eglot-reconnect ()
     (interactive)
     (let ((filepath (buffer-file-name)))
       (kill-buffer (current-buffer))
       (find-file filepath)
-      (eglot-reconnect (eglot--current-server-or-lose))))
+      (eglot)))
   :config
   (setq eglot-events-buffer-size 0
         eglot-ignored-server-capabilities '(:hoverProvider
                                             :documentHighlightProvider)
         eglot-autoshutdown t)
   (add-to-list 'eglot-server-programs
-               '(json-mode . ("vscode-json-languageserver" "--stdio")))
+               '((json-mode json-ts-mode) . ("vscode-json-languageserver" "--stdio")))
   (add-to-list 'eglot-server-programs
                `(vue-mode . ("vue-language-server" "--stdio"
                              :initializationOptions ,(yilin/vue-eglot-init-options))))

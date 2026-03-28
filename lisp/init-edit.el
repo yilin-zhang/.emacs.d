@@ -1021,7 +1021,7 @@ replace the region. If not, or if no region is active, prompt the user."
 
               ;; --- Arrows ---
               ("->" . "→") ("=>" . "⇒") ("-->" . "⟶")
-              ("<-" . "←") ("<=" . "⇐") ("<--" . "⟵")
+              ("<-" . "←") ("<--" . "⟵")
               ("<->" . "↔") ("<=>" . "⇔")
               ("uparrow" . "↑") ("downarrow" . "↓")
               ("Uparrow" . "⇑") ("Downarrow" . "⇓")

@@ -321,8 +321,7 @@ If called interactively, prompts for paper ID or uses selected text.
 PAPER-ID should be in format like '2301.07041' or 'math.GT/0309136'."
     (interactive (list (yilin/arxiv-get-paper-id)))
     (require 'url) ; simple lazy load
-    (let* ((paper-id paper-id)
-           (url (format "https://arxiv.org/abs/%s" paper-id))
+    (let* ((url (format "https://arxiv.org/abs/%s" paper-id))
            (title (condition-case nil
                       (let ((buffer (url-retrieve-synchronously url t nil 10)))
                         (when buffer

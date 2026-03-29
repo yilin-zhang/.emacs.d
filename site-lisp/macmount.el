@@ -21,7 +21,6 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'json)
 (require 'subr-x)
 
 (defgroup macmount nil
@@ -52,10 +51,15 @@ KEY must be a string."
 
 (defun macmount--external-p (info)
   "Return non-nil if INFO represents an external/removable device."
-  (let ((flag (macmount--jget info "RemovableMediaOrExternalDevice")))
-    (if (null flag)
-        (not (macmount--jget info "Internal"))
-      flag)))
+  (let* ((absent (make-symbol "absent"))
+         (flag (alist-get "RemovableMediaOrExternalDevice"
+                          info absent nil #'string=)))
+    (if (not (eq flag absent))
+        flag
+      (let ((internal (alist-get "Internal" info absent nil #'string=)))
+        (if (not (eq internal absent))
+            (not internal)
+          nil)))))
 
 (defun macmount--run (program &rest args)
   "Run PROGRAM with ARGS and return stdout as string.

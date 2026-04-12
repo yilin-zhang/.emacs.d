@@ -47,32 +47,6 @@
 
 (use-package eglot
   :preface
-  ;; `https://github.com/joaotavora/eglot/discussions/1184'
-  (defun yilin/vue-eglot-init-options ()
-    (let ((tsdk-path
-           (expand-file-name
-            "lib"
-            (shell-command-to-string "npm list --global --parseable typescript | head -n1 | tr -d \"\n\""))))
-      `(:typescript
-        (:tsdk
-         ,tsdk-path
-         :languageFeatures (:completion
-                            (
-                             :defaultTagNameCase "both"
-                             :defaultAttrNameCase "kebabCase"
-                             :getDocumentNameCasesRequest nil
-                             :getDocumentSelectionRequest nil
-                             )
-                            :diagnostics
-                            (:getDocumentVersionRequest nil))
-         :documentFeatures (:documentFormatting
-                            (
-                             :defaultPrintWidth 100
-                             :getDocumentPrintWidthRequest nil
-                             )
-                            :documentSymbol t
-                            :documentColor t)))))
-
   ;; Re-opens the current buffer and starts a fresh eglot server
   (defun yilin/eglot-reconnect ()
     (interactive)
@@ -86,11 +60,7 @@
                                             :documentHighlightProvider)
         eglot-autoshutdown t)
   (add-to-list 'eglot-server-programs
-               '((json-mode json-ts-mode) . ("vscode-json-languageserver" "--stdio")))
-  (add-to-list 'eglot-server-programs
-               `(vue-mode . ("vue-language-server" "--stdio"
-                             :initializationOptions ,(yilin/vue-eglot-init-options))))
-  )
+               '((json-mode json-ts-mode) . ("vscode-json-languageserver" "--stdio"))))
 
 ;; `https://github.com/jdtsmith/eglot-booster'
 (use-package eglot-booster
@@ -202,10 +172,7 @@ Requires `project-current' to identify the project."
    ("\\.as[cp]x\\'" . web-mode)
    ("\\.erb\\'" . web-mode)
    ("\\.mustache\\'" . web-mode)
-   ("\\.djhtml\\'" . web-mode)
-   ("\\.vue\\'" . vue-mode))
-  :preface
-  (define-derived-mode vue-mode web-mode "Vue")
+   ("\\.djhtml\\'" . web-mode))
   :hook
   (web-mode . (lambda () (setq-local tab-width web-mode-indent-style)))
   :custom
@@ -286,15 +253,6 @@ Requires `project-current' to identify the project."
 ;;                           Container
 ;; --------------------------------------------------------------
 (use-package dockerfile-mode)
-
-;; --------------------------------------------------------------
-;;                            Copilot
-;; --------------------------------------------------------------
-(use-package copilot
-  :vc (:url "https://github.com/copilot-emacs/copilot.el.git")
-  :bind
-  (:map copilot-completion-map
-        ("C-M-<return>" . copilot-accept-completion)))
 
 (provide 'init-prog)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

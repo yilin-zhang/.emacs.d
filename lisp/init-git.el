@@ -8,7 +8,7 @@
   (setq magit-auto-revert-mode nil))
 
 (use-package blamer
-  :defer 20
+  :commands blamer-mode
   :custom
   (blamer-idle-time 0.3)
   (blamer-min-offset 70)

@@ -101,13 +101,13 @@
 
 ;; Config reference: `https://github.com/svaante/dape?tab=readme-ov-file#configuration'
 (use-package dape
-  :after meow
   :hook
-  (dape-repl-mode . (lambda () (meow-mode -1)))
-  ;; Save breakpoints on quit
+  (dape-repl-mode . yilin/disable-meow)
+  ;; Save breakpoints on quit. (Loading breakpoints used to live on
+  ;; `after-init', which forced dape to load at startup whether or
+  ;; not you ever debug. Removed -- run `M-x dape-breakpoint-load'
+  ;; manually if you want last session's breakpoints back.)
   (kill-emacs . dape-breakpoint-save)
-  ;; Load breakpoints on startup
-  (after-init . dape-breakpoint-load)
   :config
   ;; Turn on global bindings for setting breakpoints with mouse
   (dape-breakpoint-global-mode)

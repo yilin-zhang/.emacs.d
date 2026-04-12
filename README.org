@@ -11,7 +11,6 @@ cd ~/.emacs.d
 ** Install dependencies (macOS)
 *** Global
 #+begin_src sh
-brew tap homebrew/cask-fonts
 brew install coreutils
 brew install --cask font-sarasa-gothic font-open-dyslexic-nerd-font
 #+end_src
@@ -40,7 +39,7 @@ Follow the instruction in [[https://github.com/blahgeek/emacs-lsp-booster][emacs
 | Language | Server                     |
 |----------+----------------------------|
 | Python   | =pyright=                    |
-| JS/TS    | =typescript-langauge-server= |
+| JS/TS    | =typescript-language-server= |
 | JSON     | =vscode-json-languageserver= |
 | Vue      | =vue-language-server=        |
 | Lua      | =lua-language-server=        |
@@ -49,49 +48,130 @@ Follow the instruction in [[https://github.com/blahgeek/emacs-lsp-booster][emacs
 Checked-in local plugins in =site-lisp/=:
 
 Third-party:
-- =elispfl.el=: enhanced font-lock rules that make Emacs Lisp buffers more
-  readable.
 - =kind-nerd-icons.el=: icon integration for completion candidates using nerd
   icons.
 
 Self-made:
 - =lazy-revert.el=: lazy buffer revert.
-- =trashcat.el=: remove macOS applications and common residual files.
-- =ocbud.el=: commands to open OpenCode sessions from Emacs.
 - =macmount.el=: mount, unmount, and eject external storage devices on macOS.
+- =sailor.el=: personal journaling minor mode with a dedicated hl-todo
+  keyword set (activated via the =sailor-enable= file-local variable).
+- =org-agenda-compose.el=: composes =org-agenda-files= from a static
+  user list and a hook of dynamic source functions (used for the
+  denote agenda integration).
+- =warmup.el=: warms up heavy packages piece by piece on idle time
+  after startup, so the first =C-c a= (or other slow command)
+  doesn't pause. Consumers declare what to warm up via the custom
+  use-package keyword =:warmup (foo bar baz)=, e.g. Org's 17
+  sub-packages are registered from =init-org.el='s =(use-package
+  org ...)= form. Loading the package self-installs on
+  =emacs-startup-hook= -- no mode toggle needed.
 
 * Customization
 Create file =~/.emacs.d/custom/custom-post.el=. The configuration in the file will
 be loaded last.
 
 ** Org
-The most important configuration is to set =org-agenda-files=, so that Emacs knows
-where you agenda files are.
+The main repository intentionally ships no hardcoded agenda paths.
+All personal file configuration belongs in =custom-post.el=.
+
+Agenda files are managed by the =org-agenda-compose= package (see
+[[*Local plugins][Local plugins]]), which exposes a small public API
+described below.
+
+*** Agenda files
+Set =org-agenda-compose-extra-files= to the list of files that should
+always appear in =org-agenda-files=:
 #+begin_src elisp
-(use-package org
-  :ensure nil
-  :config
-  (add-to-list 'org-agenda-files "~/info.org")
-  (add-to-list 'org-agenda-files "~/inbox.org")
-  ;; org-ref
-  (setq reftex-default-bibliography '("~/references.bib"))
-  ;; see org-ref for use of these variables
-  (setq org-ref-bibliography-notes "~/bib-notes.org"
-        org-ref-default-bibliography '("~/references.bib")
-        org-ref-pdf-directory "~/bibtex-pdfs/")
-  )
+(setq org-agenda-compose-extra-files
+      '("~/agenda.org"
+        "~/work.org"))
+#+end_src
+
+This list is merged with any dynamic sources (see [[*Dynamic sources][Dynamic sources]])
+and deduplicated into =org-agenda-files= by
+=org-agenda-compose-refresh=, which runs:
+
+- once when =org= finishes loading, and
+- as a =:before= advice on every =org-agenda= invocation.
+
+The refresh is cheap (=directory-files= is millisecond-range), so new
+agenda entries -- including freshly tagged denote notes -- show up on
+the next =C-c a= without restarting Emacs. A manual refresh is
+available as =M-x org-agenda-compose-refresh=.
+
+*** Capture default
+=org-default-notes-file= (the =org-capture= destination when no
+template specifies one) is conceptually separate from agenda files
+and is not wrapped. Set it directly:
+#+begin_src elisp
+(setq org-default-notes-file "~/inbox.org")
+#+end_src
+
+*** Dynamic sources
+=org-agenda-compose-functions= is a hook of zero-argument functions,
+each returning a list of absolute file paths. Every refresh appends
+the union of their results to =org-agenda-compose-extra-files=. The
+denote integration (see [[*Denote][Denote]]) registers itself on this hook;
+you can add your own sources the same way:
+#+begin_src elisp
+(defun my/project-agenda-files ()
+  "Return all .org files under ~/projects/inbox/."
+  (directory-files "~/projects/inbox/" t "\\.org\\'"))
+
+(add-hook 'org-agenda-compose-functions #'my/project-agenda-files)
+#+end_src
+
+Source functions must return freshly-built lists and should stay in
+the millisecond range since they run on every =C-c a=.
+
+*** org-ref
+#+begin_src elisp
+(setq reftex-default-bibliography '("~/references.bib"))
+(setq org-ref-bibliography-notes "~/bib-notes.org"
+      org-ref-default-bibliography '("~/references.bib")
+      org-ref-pdf-directory "~/bibtex-pdfs/")
 #+end_src
 
 ** Denote
-Set the denote bucket by setting =denote-directory=. Example:
+Set the denote bucket by setting =denote-directory=:
 #+begin_src elisp
 (setq denote-directory "~/Documents/notebooks/denote")
 #+end_src
+
+Denote notes whose filename contains the =_agenda= keyword are
+automatically included in =org-agenda-files= via a dynamic source
+registered on =org-agenda-compose-functions= (see [[*Dynamic sources][Dynamic sources]]).
+The keyword is configurable:
+#+begin_src elisp
+(setq yilin/denote-agenda-keyword "todo")  ; match _todo instead
+#+end_src
+
+To opt out of the agenda integration entirely:
+#+begin_src elisp
+(remove-hook 'org-agenda-compose-functions
+             #'yilin/denote-agenda-files)
+#+end_src
+
+** Sailor (journaling)
+=sailor-mode= is a buffer-local minor mode that swaps in a
+journal-specific =hl-todo= keyword set (=DINNER=, =THOUGHT=,
+=BACKLOG=, ...) without polluting the global keywords used in
+programming buffers. Activate it on a per-file basis by adding a
+file-local variable to the journal file's first line:
+#+begin_src org
+# -*- sailor-enable: t; -*-
+#+TITLE: My Journal
+#+end_src
+The flag is registered as =safe-local-variable= so Emacs won't
+prompt for confirmation. To customize keywords or colors, set
+=sailor-keyword-faces= -- see =site-lisp/sailor.el= for the
+default list and shape.
 
 ** Meow
 Define some leader keys. Example:
 #+begin_src elisp
 (meow-leader-define-key
- '("t" . yilin/open-in-terminal)
- '("e" . yilin/open-in-finder))
+ '("t" . yilin/open-with-terminal)
+ '("e" . yilin/open-with-finder-or-default-app))
 #+end_src

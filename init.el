@@ -2,15 +2,10 @@
 ;;; Commentary:
 ;;; Code:
 
-;; --------------------------------------------------------------
-;;                          Pre-Setup
-;; --------------------------------------------------------------
-;; Defer garbage collection further back in the startup process
-(setq gc-cons-threshold most-positive-fixnum)
-;; https://emacs-lsp.github.io/lsp-mode/page/performance/
-(setq read-process-output-max (* 3 1024 1024))
-;; Prevent flashing of unstyled modeline at startup
-(setq-default mode-line-format nil)
+;; NOTE: All startup performance optimizations (GC, file-name-handler-alist,
+;; mode-line, UI elements, bidi, font cache, etc.) live in early-init.el.
+;; That's the only place those settings can actually take effect -- before
+;; package.el auto-initializes and before the initial frame is created.
 
 ;; --------------------------------------------------------------
 ;;                            Paths
@@ -36,8 +31,9 @@
 ;; --------------------------------------------------------------
 
 (require 'package)
-(setq package-enable-at-startup nil
-      package-native-compile t)
+;; package-enable-at-startup is set to nil in early-init.el, where it
+;; actually takes effect.
+(setq package-native-compile t)
 
 ;; Configure package sources
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")

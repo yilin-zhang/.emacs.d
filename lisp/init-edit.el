@@ -159,6 +159,12 @@ Supports *, =, +, / and properly pairs (, [, {."
 (use-package meow
   :demand t
   :preface
+  (defun yilin/disable-meow ()
+    "Turn `meow-mode' off in the current buffer.
+Hook this onto modes (vterm, dape-repl, color-rg, ...) where
+modal editing gets in the way."
+    (meow-mode -1))
+
   (defun meow-setup ()
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
     (setq meow-use-clipboard t)
@@ -304,7 +310,11 @@ Supports *, =, +, / and properly pairs (, [, {."
 ;;                         Spell checker
 ;; --------------------------------------------------------------
 (use-package jinx
-  :hook (emacs-startup . global-jinx-mode)
+  ;; Defer until first text/prog buffer instead of starting at
+  ;; emacs-startup. Avoids spawning the enchant subprocess + loading
+  ;; jinx eagerly when the user just opens Emacs to read the agenda.
+  :hook ((text-mode . jinx-mode)
+         (prog-mode . jinx-mode))
   :bind
   ("C-;" . jinx-correct)
   ("C-M-;" . jinx-languages))
@@ -339,8 +349,10 @@ Supports *, =, +, / and properly pairs (, [, {."
   ;; Optionally make the Tempel templates available to Abbrev,
   ;; either locally or globally. `expand-abbrev' is bound to C-x '.
   (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
-  (global-tempel-abbrev-mode)
-  )
+  ;; NOTE: `global-tempel-abbrev-mode' is autoloaded -- calling it
+  ;; directly in :init eagerly loads the whole tempel package at
+  ;; startup. Deferring via :hook keeps the load lazy.
+  :hook (after-init . global-tempel-abbrev-mode))
 
 (use-package tempel-collection)
 
@@ -505,13 +517,10 @@ Supports *, =, +, / and properly pairs (, [, {."
   :bind (("M-A" . marginalia-cycle)
          :map minibuffer-local-map
          ("M-A" . marginalia-cycle))
-
-  ;; The :init configuration is always executed (Not lazy!)
-  :init
-
-  ;; Must be in the :init section of use-package such that the mode gets
-  ;; enabled right away. Note that this forces loading the package.
-  (marginalia-mode))
+  ;; Deferred via :hook. The marginalia README puts `(marginalia-mode)'
+  ;; in :init which forces eager loading -- we defer it instead so
+  ;; `use-package-always-defer' is honored.
+  :hook (after-init . marginalia-mode))
 
 (use-package consult
   ;; Replace bindings. Lazily loaded due by `use-package'.
@@ -665,7 +674,7 @@ Supports *, =, +, / and properly pairs (, [, {."
 (use-package color-rg
   :vc (:url "https://github.com/manateelazycat/color-rg.git")
   :after meow
-  :hook (color-rg-mode . (lambda () (meow-mode -1)))
+  :hook (color-rg-mode . yilin/disable-meow)
   :commands (color-rg-search-input
              color-rg-search-symbol
              color-rg-search-input-in-project
@@ -805,17 +814,19 @@ Supports *, =, +, / and properly pairs (, [, {."
   ;; Recommended: Enable Corfu globally.
   ;; This is recommended since Dabbrev can be used globally (M-/).
   ;; See also `corfu-excluded-modes'.
-  :init
-  (global-corfu-mode)
-  )
+  ;; Using :hook instead of :init so corfu actually defers -- :init
+  ;; would force eager loading at startup.
+  :hook (after-init . global-corfu-mode))
 
 ;; A custom package to show icons in corfu completion
 ;; Adapted from `'https://emacs-china.org/t/corfu-all-the-icons-icon/20907'
 (use-package kind-nerd-icons
   :ensure nil
   :load-path yilin/site-lisp-directory
+  ;; No :demand t -- :after already guarantees this loads once both
+  ;; corfu and nerd-icons are loaded, at which point :config registers
+  ;; the margin formatter. Forcing eager load is unnecessary.
   :after (corfu nerd-icons)
-  :demand t
   :config
   (add-to-list 'corfu-margin-formatters
                #'kind-nerd-icons-margin-formatter))

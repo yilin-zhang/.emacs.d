@@ -2,6 +2,13 @@
 
 (use-package org
   :ensure nil
+  ;; Pre-load Org's sub-packages on idle so the first `C-c a' /
+  ;; `C-c c' doesn't pause while ~17 sub-packages get `require'd
+  ;; synchronously. List and order are canonical doomemacs.
+  :warmup (calendar find-func format-spec
+           org-macs org-compat org-faces org-entities
+           org-list org-pcomplete org-src org-footnote
+           org-macro ob org org-clock org-agenda org-capture)
   :preface
   ;; Copy from spacemacs
   (defface org-kbd
@@ -27,9 +34,7 @@ The buffer's major mode should be `org-mode'."
                                      ("=" org-verbatim verbatim)
                                      ("~" org-kbd)
                                      ("+"
-                                      (:strike-through t))))
-    (when (require 'space-doc nil t)
-      (space-doc-mode)))
+                                      (:strike-through t)))))
 
   ;; `https://emacs-china.org/t/org-agenda/8679'
   (defun yilin/org-agenda-time-grid-spacing ()
@@ -86,17 +91,10 @@ The buffer's major mode should be `org-mode'."
       (insert (format "%s月%s日 %s" month day week))))
 
   :init
-  (defvar yilin/org-agenda-files
-    '("~/agenda.org")
-    "Basic org agenda files. The first one is the default file.
-The reason to keep a separate variable is to allow denote to update `org-agenda-files'
-without worrying about the original agenda files.")
-
-  (defun yilin/init-org-agenda-files ()
-    "Initialize `org-agenda-files' and `org-default-notes-file' based on `yilin/org-agenda-files'"
-    (interactive)
-    (setq org-agenda-files (copy-sequence yilin/org-agenda-files))
-    (setq org-default-notes-file (nth 0 yilin/org-agenda-files)))
+  ;; Agenda files composition (static + dynamic sources, refresh on
+  ;; every `org-agenda' call) lives in `org-agenda-compose' above.
+  ;; `org-default-notes-file' (the capture default) is a plain org
+  ;; variable -- set it directly in custom-post.el if you want one.
 
   :bind
   ("C-c a" . org-agenda)
@@ -128,14 +126,18 @@ without worrying about the original agenda files.")
   (setq org-priority-faces `((?A . (:foreground ,(face-foreground 'error)))
                              (?B . (:foreground ,(face-foreground 'warning)))
                              (?C . (:foreground ,(face-foreground 'success)))))
-  ;; Load habit module
+  ;; Load habit module, then force `org-modules' to be loaded right
+  ;; now (during this :config block) instead of lazily on first
+  ;; `org-mode' activation. Combined with the incremental loader
+  ;; pre-`require'ing `org' itself during idle, this moves the entire
+  ;; `org-load-modules-maybe' cascade off the user's first `C-c a' --
+  ;; profiling showed it was ~44% of that command's CPU time.
   (add-to-list 'org-modules 'org-habit t)
+  (org-load-modules-maybe)
   ;; Latex preview scale
   (setq org-export-backends '(ascii html icalendar latex md)
         org-format-latex-options (plist-put org-format-latex-options :scale 2.3)
         org-latex-compiler "xelatex") ; Set XeLaTeX as the default LaTeX compiler
-  ;; Set my org agenda file
-  (yilin/init-org-agenda-files)
   (setq org-agenda-log-mode-items '(closed clock state)) ; show when things get done in the log mode
   ;; Custom agenda views
   (setq org-agenda-block-separator nil)
@@ -211,7 +213,6 @@ without worrying about the original agenda files.")
 
 ;; Bullet beautification
 (use-package org-superstar
-  :after org
   :hook (org-mode . org-superstar-mode)
   :config
   (setq org-superstar-headline-bullets-list
@@ -223,17 +224,22 @@ without worrying about the original agenda files.")
 
 ;; Auto hide and appear markers
 (use-package org-appear
-  :after org
   :hook (org-mode . org-appear-mode))
 
 ;; Convert the buffer text and the associated decorations to HTML
-(use-package htmlize
-  :after org)
+(use-package htmlize)
 
 ;; Literature management
 ;; path variables can be set in custom/custom-post.el
-(use-package org-ref
-  :after org)
+(use-package org-ref)
+
+;; Compose `org-agenda-files' from static and dynamic sources. Eager
+;; (`:demand t') so its `advice-add' on `org-agenda' is registered
+;; before any agenda command runs. See site-lisp/org-agenda-compose.el.
+(use-package org-agenda-compose
+  :ensure nil
+  :load-path yilin/site-lisp-directory
+  :demand t)
 
 ;; --------------------------------------------------------------
 ;;                            Custom

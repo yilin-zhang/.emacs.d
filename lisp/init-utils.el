@@ -37,7 +37,10 @@
 
 (use-package treemacs-nerd-icons
   :after nerd-icons
-  :hook (after-init . treemacs-nerd-icons-config))
+  ;; Defer icon registration until treemacs is actually opened.
+  ;; Was on `after-init', which configured icons at every startup
+  ;; even when treemacs was never used.
+  :hook (treemacs-mode . treemacs-nerd-icons-config))
 
 (use-package treemacs-magit
   :after (treemacs magit)
@@ -106,20 +109,29 @@
   :commands yilin/denote-random-review)
 
 (use-package denote
-  :after org
+  ;; Pre-load denote on idle so the first `org-agenda-compose-refresh'
+  ;; doesn't pay the `(require 'denote)' cost on the user's first
+  ;; `C-c a'. (The agenda refresh advice still re-scans the directory
+  ;; on every invocation -- that's I/O, not package loading.)
+  :warmup (denote)
   :init
   ;; `https://baty.net/posts/2022/11/keeping-my-org-agenda-updated/'
   (defvar yilin/denote-agenda-keyword "agenda"
-    "Denote files with this keyword will be considered as agenda files")
-  (defun yilin/denote-init-org-agenda-files ()
-    "Append `.org' files with `yilin/denote-agenda-keyword' to `org-agenda-files'."
-    (interactive)
-    (yilin/init-org-agenda-files)
-    (let ((keyword (concat "_" (regexp-quote yilin/denote-agenda-keyword) ".*\\.org\\'")))
-      (setq org-agenda-files
-            (append org-agenda-files
-                    (directory-files denote-directory t keyword)))))
-  (yilin/denote-init-org-agenda-files))
+    "Denote keyword used to identify notes that belong in `org-agenda-files'.")
+
+  (defun yilin/denote-agenda-files ()
+    "Return denote notes whose filename contains `yilin/denote-agenda-keyword'.
+Intended to be registered on `org-agenda-compose-functions'."
+    (require 'denote)
+    (let ((re (concat "_" (regexp-quote yilin/denote-agenda-keyword)
+                      ".*\\.org\\'")))
+      (directory-files denote-directory t re)))
+
+  ;; Register denote as a dynamic source for `org-agenda-files'. The
+  ;; actual scan happens lazily inside `org-agenda-compose-refresh'
+  ;; (defined in the org-agenda-compose package), which runs on org
+  ;; load and before every `org-agenda' invocation.
+  (add-hook 'org-agenda-compose-functions #'yilin/denote-agenda-files))
 
 (use-package annotate)
 
@@ -184,7 +196,7 @@
   :after meow
   :commands vterm
   :hook
-  (vterm-mode . (lambda () (meow-mode -1)))
+  (vterm-mode . yilin/disable-meow)
   (vterm-mode . (lambda () (setq-local global-hl-line-mode nil)))
   )
 

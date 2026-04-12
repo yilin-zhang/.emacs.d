@@ -1,7 +1,5 @@
 ;; init-basic.el --- Basic configurations. -*- lexical-binding: t -*-
 
-(require 'cl-lib)
-
 ;; --------------------------------------------------------------
 ;;                         Performance
 ;; --------------------------------------------------------------
@@ -12,6 +10,17 @@
   (setq gcmh-idle-delay 'auto
         gcmh-auto-idle-delay-factor 10
         gcmh-high-cons-threshold #x1000000)) ; 16MB
+
+;; Warm up heavy multi-file packages on idle time after startup, so
+;; the first interactive use (e.g. `C-c a' for `org-agenda') doesn't
+;; pause while a tower of sub-packages is `require'd synchronously.
+;; Loading the package is enough -- it self-installs on
+;; `emacs-startup-hook'. Consumers declare what to warm up via the
+;; `:warmup' use-package keyword. See site-lisp/warmup.el.
+(use-package warmup
+  :ensure nil
+  :load-path yilin/site-lisp-directory
+  :demand t)
 
 ;; --------------------------------------------------------------
 ;;                        Basic Features
@@ -26,26 +35,21 @@
                       (time-subtract after-init-time before-init-time)))
              gcs-done))
   :init
-  (tool-bar-mode -1)
-  (setq inhibit-splash-screen t) ; disable welcome screen
   ;; The setting of this variable must come before enable
   ;; display-time-mode, or it will not work.
   (setq display-time-24hr-format t
         display-time-string-forms
         '((propertize (concat 24-hours ":" minutes " ")
                       'face 'font-lock-constant-face)))
-  ;; UI
-  (setq window-divider-default-places t
-        window-divider-default-bottom-width 1
-        window-divider-default-right-width 1)
+  ;; UI: window-divider defaults moved to early-init.el.
   ;; Confirmation
-  (fset 'yes-or-no-p 'y-or-n-p) ; change yes or no to y or n
+  (setq use-short-answers t) ; Emacs 28+: replaces (fset 'yes-or-no-p 'y-or-n-p)
   (setq confirm-kill-emacs 'yes-or-no-p)
   ;; Editing
   (setq-default major-mode 'text-mode
                 fill-column 80
                 truncate-lines t)
-  (setq ring-bell-function 'ignore) ; disable ring-bell-function
+  ;; ring-bell-function moved to early-init.el.
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete)
@@ -57,8 +61,7 @@
         scroll-conservatively 100000                 ; keyboard scroll one line at a time
         scroll-preserve-screen-position 'always      ; lock cursor position when scrolling
         )
-  ;; Frame
-  (setq frame-resize-pixelwise t)
+  ;; Frame: frame-resize-pixelwise moved to early-init.el.
   ;; File saving
   (setq make-backup-files nil  ; disable backup file
         auto-save-default nil  ; disable auto-save
@@ -104,9 +107,19 @@
 ;;                            Paths
 ;; --------------------------------------------------------------
 (use-package exec-path-from-shell
-  :hook (after-init . (lambda ()
-                        (when (memq window-system '(mac ns x))
-                          (exec-path-from-shell-initialize)))))
+  ;; Only relevant in GUI sessions; TTY/batch inherit the parent
+  ;; shell's environment already. `:if' is evaluated at use-package
+  ;; expansion time, so the whole block is dropped on non-GUI Emacs.
+  :if (memq window-system '(mac ns x))
+  :init
+  ;; The default `exec-path-from-shell-arguments' is ("-l" "-i"), but
+  ;; `-i' forces loading ~/.zshrc / ~/.bashrc, which typically runs
+  ;; slow plugin init (nvm, rbenv, oh-my-zsh, conda init, ...) and can
+  ;; cost 100-500ms at startup. `-l' alone still reads ~/.zprofile /
+  ;; ~/.zlogin / /etc/profile, which by convention is where env
+  ;; variables belong. Put env vars in .zprofile, not .zshrc.
+  (setq exec-path-from-shell-arguments '("-l"))
+  :hook (after-init . exec-path-from-shell-initialize))
 
 ;; --------------------------------------------------------------
 ;;                            Server

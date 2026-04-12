@@ -4,5 +4,5 @@
 !early-init.el
 !/lisp/*.el
 !/site-lisp
-!/snippets
+!templates
 !README.org

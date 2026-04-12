@@ -325,7 +325,11 @@ modal editing gets in the way."
 
 (use-package tempel
   :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
-         ("M-*" . tempel-insert))
+         ("M-*" . tempel-insert)
+         :map tempel-map
+         ("<tab>" . tempel-next)
+         ("<backtab>" . tempel-previous)
+         ("RET" . tempel-done))
 
   :init
   ;; Setup completion at point

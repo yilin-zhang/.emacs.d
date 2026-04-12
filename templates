@@ -1,0 +1,113 @@
+sclang-mode
+
+(nd "Ndef(\\" (p "name") ")" q)
+
+(nda "Ndef.ar(\\" (p "name") ")" q)
+
+(ndk "Ndef.kr(\\" (p "name") ")" q)
+
+(ndd "Ndef(\\" (p "name") ", {" q "});")
+
+(ndf "Ndef(\\" (p "name") ")[" (p "index") "] = \\filter -> {arg sig; " q "};")
+
+(ndp "Ndef(\\" (p "name") ") <<>." (p "param") " " q ";")
+
+(ndb "Ndef(\\" (p "name" name) ", Pbind(" n>
+"\instrument, \\\\" (p "inst_name") "," n>
+"\\degree, Pseq([" (p "degrees") "], inf)," n>
+"\\dur, Pseq([" (p "durations") "], inf)," q n>
+"\\amp, 0.5" n>
+"));" n
+"Ndef(\\" (s name) ").quant_(4*4);" n
+"Ndef(\\" (s name) ").fadeTime_(30);" n
+"Ndef(\\" (s name) ").play;" n
+"Ndef(\\" (s name) ").stop(fadeTime: 10);")
+
+(pb "Pbind(" n>
+"\\instrument, \\\\" (p "name") "," n>
+"\\degree, Pseq([" q "], inf);" n
+").play")
+
+(pd "Pdef(\\" (p "name") ")" q)
+
+(pma "p = PmonoArtic(" n>
+"\\\\" (p "name") "," n>
+"\\dur, 0.2," n>
+"\\freq, Pwhite(1,8) * 100," n>
+"\\legato, Pwrand(#[0.5, 1.0], #[0.1, 0.9], inf)" n
+").play;")
+
+(sd "SynthDef(\\" (p "name") ", {" n>
+"arg freq=440, amp=0.5, gate=1, pan=0, out=0;" n>
+"var sig;" n>
+"sig = Saw.ar(freq);" n>
+"sig = sig * EnvGen.kr(Env.perc, gate, doneAction: 2);" n>
+"sig = Pan2.ar(sig, pan);" n>
+"sig = sig * amp;" n>
+"sig = Out.ar(out, sig);" n
+"}).add;")
+
+(sdpb "SynthDef(\\" (p "name" name) ", {" n>
+"arg freq=440, amp=0.5, gate=1, pan=0, out=0;" n>
+"var sig;" n>
+"sig = Saw.ar(freq);" n>
+"sig = sig * EnvGen.kr(Env.perc, gate, doneAction: 2);" n>
+"sig = Pan2.ar(sig, pan);" n>
+"sig = sig * amp;" n>
+"sig = Out.ar(out, sig);" n
+"}).add;" n n
+"Pbind(" n>
+"\\instrument, \\\\" (s name) "," n>
+"\\degree, Pseq([0, 1, 2, 3, 4, 5, 6, 7], inf);" n
+").play")
+
+(oscdef "OSCdef(\\" (p "name") ", {" n>
+"arg msg, time, addr, port;" n>
+"var val = msg[1].asFloat;" q n
+"}, '" (p "address") "');")
+
+(midiinit "MIDIClient.init; // optional" n
+"MIDIIn.connectAll;" n
+"MIDIFunc.trace(true);")
+
+(midicc "MIDIdef.cc(\\" (p "name") ", { |val, num, chan|" n>
+q n
+"}, " (p "cc_channel") ");")
+
+(midipoly "a = Array.fill(127, { nil });" n
+"MIDIdef.noteOn(\\" (p "name_on") ", { |vel, key, channel, device|" n>
+"a[key].release;" n>
+"a[key] = Synth(\\\\" (p "synth_name") ", [\\freq, key.midicps, \\amp, vel/127" q "]);" n>
+"[key, vel].postln;" n
+"});" n n
+"MIDIdef.noteOff(\\" (p "name_off") ", { |vel, key, channel, device|" n>
+"a[key].release;" n>
+"a[key] = nil;" n
+"});")
+
+(midimono "~note_list = [];" n
+"~synth = nil;" n n
+"MIDIdef.noteOn(\\note_on, { |vel, key, channel, device|" n>
+"// Check if note list is empty" n>
+"if (~note_list.isEmpty," n>>
+"// if it's empty, create a new synth" n>>
+"{~synth = Synth(\\\\" (p "synth_name") ", [\\freq, key.midicps, \\amp, vel/127" q "])}," n>>
+"// if it's not empty, set the freq and amp" n>>
+"{~synth.set(\\freq, key.midicps, \\amp, vel/127)}" n>
+");" n>
+"// add the new note into note list" n>
+"~note_list.add(key);" n>
+"\"note_list in note_on: \".post; ~note_list.postln;" n
+"});" n n
+"MIDIdef.noteOff(\\note_off, { |vel, key, channel, device|" n>
+"// remove the note from the note list" n>
+"~note_list = ~note_list.select {|item, idx| item != key};" n>
+"// check if the note list is empty" n>
+"if (~note_list.isEmpty," n>>
+"// if it's empty, release the synth" n>>
+"{~synth.release}," n>>
+"// if it's not empty, set the freq to the first note in the list" n>>
+"{~synth.set(\\freq, ~note_list[0].midicps)}" n>
+");" n>
+"\"note_list in note_off: \".post; ~note_list.postln;" n
+"});")

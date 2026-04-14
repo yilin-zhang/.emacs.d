@@ -178,11 +178,6 @@ Intended to be registered on `org-agenda-compose-functions'."
 ;; --------------------------------------------------------------
 ;;                            Sys Tools
 ;; --------------------------------------------------------------
-(use-package trashcat
-  :ensure nil
-  :load-path yilin/site-lisp-directory
-  :commands trashcat)
-
 (use-package macmount
   :ensure nil
   :load-path yilin/site-lisp-directory

@@ -80,7 +80,10 @@
 ;; --------------------------------------------------------------
 ;;                              Icons
 ;; --------------------------------------------------------------
-(use-package nerd-icons :demand t)
+;; No :demand -- doom-modeline (:hook after-init) requires nerd-icons,
+;; pulling it in at that point.  Other consumers (nerd-icons-ibuffer,
+;; treemacs-nerd-icons, kind-nerd-icons) rely on their :after chains.
+(use-package nerd-icons)
 
 ;; --------------------------------------------------------------
 ;;                        Theme and Modeline

@@ -197,8 +197,7 @@ Intended to be registered on `org-agenda-compose-functions'."
   :commands vterm
   :hook
   (vterm-mode . yilin/disable-meow)
-  (vterm-mode . (lambda () (setq-local global-hl-line-mode nil)))
-  )
+  (vterm-mode . (lambda () (hl-line-mode -1))))
 
 (use-package multi-vterm
   :commands multi-vterm

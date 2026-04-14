@@ -35,126 +35,15 @@
 ;;                            Meow
 ;; --------------------------------------------------------------
 
-;; indent-rigid-xxx-to-tab-stop has strange behaviour in python-mode
-;; where the indentation is 8 spaces. Use python-indent-shift-xxx instead.
-(use-package emacs
+(use-package indent-shift
   :ensure nil
-  :preface
-  (defun yilin/indent-right ()
-    (interactive)
-    (cond ((member major-mode '(python-mode python-ts-mode))
-           (python-indent-shift-right (region-beginning) (region-end)
-                                      python-indent-offset))
-          ((member major-mode '(json-mode json-ts-mode js-mode js-ts-mode))
-           (indent-rigidly (region-beginning) (region-end) js-indent-level))
-          ((member major-mode '(css-mode css-ts-mode))
-           (indent-rigidly (region-beginning) (region-end) css-indent-offset))
-          ((member major-mode '(lua-mode pico8-mode))
-           (indent-rigidly (region-beginning) (region-end) lua-indent-level))
-          ((member major-mode '(ruby-mode ruby-ts-mode))
-           (indent-rigidly (region-beginning) (region-end) ruby-indent-level))
-          ((member major-mode '(yaml-mode yaml-ts-mode))
-           (indent-rigidly (region-beginning) (region-end) yaml-indent-offset))
-          (t (indent-rigidly-right-to-tab-stop (region-beginning) (region-end)))))
+  :load-path yilin/site-lisp-directory
+  :demand t)
 
-  (defun yilin/indent-left ()
-    (interactive)
-    (cond ((member major-mode '(python-mode python-ts-mode))
-           (python-indent-shift-left (region-beginning) (region-end)
-                                     python-indent-offset))
-          ((member major-mode '(json-mode json-ts-mode js-mode js-ts-mode))
-           (indent-rigidly (region-beginning) (region-end) (- js-indent-level)))
-          ((member major-mode '(css-mode css-ts-mode))
-           (indent-rigidly (region-beginning) (region-end) (- css-indent-offset)))
-          ((member major-mode '(lua-mode pico8-mode))
-           (indent-rigidly (region-beginning) (region-end) (- lua-indent-level)))
-          ((member major-mode '(ruby-mode ruby-ts-mode))
-           (indent-rigidly (region-beginning) (region-end) (- ruby-indent-level)))
-          ((member major-mode '(yaml-mode yaml-ts-mode))
-           (indent-rigidly (region-beginning) (region-end) (- yaml-indent-offset)))
-          (t (indent-rigidly-left-to-tab-stop (region-beginning) (region-end)))))
-
-  (defun yilin/surround-region (char)
-    "Surround the selected region's non-whitespace content with CHAR.
-Supports *, =, +, / and properly pairs (, [, {."
-    (interactive "cEnter character to surround with: ")
-    (let* ((pairs '((?\( . ?\))
-                    (?\[ . ?\])
-                    (?\{ . ?\})
-                    (?\< . ?\>)))
-           (left-char char)
-           (right-char (or (cdr (assoc char pairs)) char)))
-      (if (use-region-p)
-          (let ((beg (region-beginning))
-                (end (region-end)))
-            (save-excursion
-              ;; Narrow to region to simplify handling
-              (save-restriction
-                (narrow-to-region beg end)
-                (goto-char (point-min))
-                (skip-chars-forward " \t\n")
-                (let ((left-pos (point)))
-                  (goto-char (point-max))
-                  (skip-chars-backward " \t\n")
-                  (let ((right-pos (point)))
-                    ;; Insert in reverse to preserve positions
-                    (goto-char right-pos)
-                    (insert right-char)
-                    (goto-char left-pos)
-                    (insert left-char))))))
-        (message "No region selected"))))
-
-  (defun yilin/surround-region-equal ()
-    (interactive)
-    (yilin/surround-region ?=))
-
-  (defun yilin/surround-region-plus ()
-    (interactive)
-    (yilin/surround-region ?+))
-
-  (defun yilin/surround-region-asterisk ()
-    (interactive)
-    (yilin/surround-region ?*))
-
-  (defun yilin/surround-region-dash ()
-    (interactive)
-    (yilin/surround-region ?-))
-
-  (defun yilin/surround-region-paren ()
-    (interactive)
-    (yilin/surround-region ?\())
-
-  (defun yilin/surround-region-bracket ()
-    (interactive)
-    (yilin/surround-region ?\[))
-
-  (defun yilin/surround-region-curly ()
-    (interactive)
-    (yilin/surround-region ?\{))
-
-  (defun yilin/surround-region-angle ()
-    (interactive)
-    (yilin/surround-region ?\<))
-
-  (defun yilin/surround-region-quote ()
-    (interactive)
-    (yilin/surround-region ?\'))
-
-  (defun yilin/surround-region-dquote ()
-    (interactive)
-    (yilin/surround-region ?\"))
-
-  (defun yilin/surround-region-slash ()
-    (interactive)
-    (yilin/surround-region ?/))
-
-  (defun yilin/surround-region-underscore ()
-    (interactive)
-    (yilin/surround-region ?_))
-
-  (defun yilin/surround-region-tilde ()
-    (interactive)
-    (yilin/surround-region ?~)))
+(use-package surround-region
+  :ensure nil
+  :load-path yilin/site-lisp-directory
+  :demand t)
 
 (use-package meow
   :demand t
@@ -189,24 +78,8 @@ modal editing gets in the way."
      '("0" . meow-digit-argument)
      '("h" . meow-keypad-describe-key)
      '("?" . meow-cheatsheet)
-     ;; Surround
-     '("=" . yilin/surround-region-equal)
-     '("+" . yilin/surround-region-plus)
-     '("*" . yilin/surround-region-asterisk)
-     '("-" . yilin/surround-region-dash)
-     '("(" . yilin/surround-region-paren)
-     '(")" . yilin/surround-region-paren)
-     '("[" . yilin/surround-region-bracket)
-     '("]" . yilin/surround-region-bracket)
-     '("{" . yilin/surround-region-curly)
-     '("}" . yilin/surround-region-curly)
-     '("<" . yilin/surround-region-angle)
-     '(">" . yilin/surround-region-angle)
-     '("'" . yilin/surround-region-quote)
-     '("\"" . yilin/surround-region-dquote)
-     '("/" . yilin/surround-region-slash)
-     '("_" . yilin/surround-region-underscore)
-     '("~" . yilin/surround-region-tilde)
+     ;; Surround (SPC SPC <char>)
+     '("SPC" . surround-region-map)
      ;; Custom leader bindings
      '("f" . find-file)
      '("b" . consult-buffer)
@@ -233,8 +106,8 @@ modal editing gets in the way."
      '("." . meow-bounds-of-thing)
      '("[" . meow-beginning-of-thing)
      '("]" . meow-end-of-thing)
-     '("<" . yilin/indent-left)
-     '(">" . yilin/indent-right)
+     '("<" . indent-shift-left)
+     '(">" . indent-shift-right)
      '("a" . meow-append)
      '("A" . meow-open-below)
      '("b" . meow-back-word)

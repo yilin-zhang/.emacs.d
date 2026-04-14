@@ -63,6 +63,9 @@
     ("PLAYED"    . ,(face-foreground 'ansi-color-bright-green))
     ("WATCHED"   . ,(face-foreground 'ansi-color-bright-green))
     ("FINISHED"  . ,(face-foreground 'ansi-color-bright-green))
+    ;; states
+    ("WIP"       . ,(face-foreground 'ansi-color-yellow))
+    ("NEXT"       . ,(face-foreground 'ansi-color-cyan))
     ;; backlog
     ("BACKLOG"   . ,(face-foreground 'ansi-color-yellow)))
   "Keyword face alist used by `sailor-mode'.

@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: ndef-kr
-# key: ndk
-# --
-
-Ndef.kr(\\${1:name})$0

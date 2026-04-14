@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: ndef
-# key: nd
-# --
-
-Ndef(\\${1:name})$0

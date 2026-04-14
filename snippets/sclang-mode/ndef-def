@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: ndef-def
-# key: ndd
-# --
-
-Ndef(\\${1:name}, {$0});

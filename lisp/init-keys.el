@@ -68,7 +68,8 @@ modal editing gets in the way."
     (meow-motion-define-key
      '("j" . meow-next)
      '("k" . meow-prev)
-     '("<escape>" . ignore))
+     '("<escape>" . ignore)
+     '("/" . execute-extended-command))
     (meow-leader-define-key
      ;; SPC j/k will run the original command in MOTION state.
      '("j" . "H-j")
@@ -161,6 +162,7 @@ modal editing gets in the way."
      '("Y" . meow-sync-grab)
      '("z" . meow-pop-selection)
      '("'" . repeat)
+     '("/" . execute-extended-command)
      '("<escape>" . ignore))
     ;; Make sure C-[ works in GUI
     (when window-system

@@ -1,4 +1,4 @@
-;;; package --- My init.el
+;;; package --- My init.el  -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
 
@@ -59,11 +59,16 @@
 ;;                       Configurations
 ;; --------------------------------------------------------------
 (require 'init-basic)
+;; Load init-keys early: meow is :demand t.
+;; Everything downstream of this point can rely on meow being loaded.
+(require 'init-keys)
 (require 'init-dired)
 (require 'init-org)
 (require 'init-git)
 (require 'init-markup)
 (require 'init-prog)
+(require 'init-search)
+(require 'init-completion)
 (require 'init-edit)
 (require 'init-utils)
 

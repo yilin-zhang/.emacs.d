@@ -2,6 +2,11 @@
 !.gitignore
 !init.el
 !early-init.el
+# Un-ignore the lisp/ directory, then ignore everything inside it,
+# then re-include just *.el. Need to un-ignore the directory first
+# because git will not descend into an ignored directory.
+!/lisp/
+/lisp/*
 !/lisp/*.el
 !/site-lisp
 !templates

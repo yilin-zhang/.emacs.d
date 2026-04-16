@@ -79,6 +79,12 @@
 ;; --------------------------------------------------------------
 
 (use-package denote
+  ;; Pre-load denote on idle so the first `org-agenda-compose-refresh'
+  ;; doesn't pay the `(require 'denote)' cost on the user's first
+  ;; `C-c a'. (The agenda refresh advice still re-scans the directory
+  ;; on every invocation -- that's I/O, not package loading.)
+  :warmup (denote)
+  :commands yilin/denote-random-review
   :custom
   (denote-org-store-link-to-heading 'id)
   :preface
@@ -106,14 +112,6 @@
             (message "Jumped to %s at line %d"
                      (file-name-nondirectory file) line))
         (message "No notes with :review: tag found."))))
-  :commands yilin/denote-random-review)
-
-(use-package denote
-  ;; Pre-load denote on idle so the first `org-agenda-compose-refresh'
-  ;; doesn't pay the `(require 'denote)' cost on the user's first
-  ;; `C-c a'. (The agenda refresh advice still re-scans the directory
-  ;; on every invocation -- that's I/O, not package loading.)
-  :warmup (denote)
   :init
   ;; `https://baty.net/posts/2022/11/keeping-my-org-agenda-updated/'
   (defvar yilin/denote-agenda-keyword "agenda"
@@ -185,7 +183,7 @@ Intended to be registered on `org-agenda-compose-functions'."
   :commands (macmount-mount macmount-unmount macmount-eject))
 
 ;; --------------------------------------------------------------
-;;                         Terminal
+;;                           Terminal
 ;; --------------------------------------------------------------
 (use-package vterm
   :after meow
@@ -278,7 +276,8 @@ Returns nil if the buffer is not visiting a file and no file is under cursor."
     "Look up the word on an online thesaurus.
 If a region is active, use the text in that region (whitespaces stripped).
 If no region is active, use the word at point.
-If no word is at point, prompt for a word, using prefix arg as default if provided."
+If no word is at point, prompt for a word, using prefix ARG as default
+if provided."
     (interactive "P")
     (let ((word
            (cond
@@ -324,7 +323,7 @@ Returns the paper ID as a trimmed string."
   (defun yilin/arxiv-insert-org-link (paper-id)
     "Insert an org-mode link for an arXiv paper given its ID.
 If called interactively, prompts for paper ID or uses selected text.
-PAPER-ID should be in format like '2301.07041' or 'math.GT/0309136'."
+PAPER-ID should be in format like `2301.07041' or `math.GT/0309136'."
     (interactive (list (yilin/arxiv-get-paper-id)))
     (require 'url) ; simple lazy load
     (let* ((url (format "https://arxiv.org/abs/%s" paper-id))
@@ -344,7 +343,7 @@ PAPER-ID should be in format like '2301.07041' or 'math.GT/0309136'."
   (defun yilin/arxiv-open-paper (paper-id)
     "Open an arXiv paper in the default browser.
 If called interactively, prompts for paper ID or uses selected text.
-PAPER-ID should be in format like '2301.07041' or 'math.GT/0309136'."
+PAPER-ID should be in format like `2301.07041' or `math.GT/0309136'."
     (interactive (list (yilin/arxiv-get-paper-id)))
     (browse-url (format "https://arxiv.org/abs/%s" paper-id)))
 

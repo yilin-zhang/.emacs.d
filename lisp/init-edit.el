@@ -1,185 +1,6 @@
 ;; init-edit.el --- Configurations for a better editing experience. -*- lexical-binding: t -*-
 
 ;; --------------------------------------------------------------
-;;                            Key Bindings
-;; --------------------------------------------------------------
-;; Use M-l as backspace
-;; (global-set-key (kbd "M-l") (kbd "<backspace>"))
-
-;; Key Modifiers
-(use-package emacs
-  :ensure nil
-  :init
-  (when (eq system-type 'darwin)
-    ;; Compatible with Emacs Mac port
-    (setq mac-option-modifier 'meta
-          mac-command-modifier 'super
-          mac-function-modifier 'hyper)
-    (bind-keys ([(super a)] . mark-whole-buffer)
-               ([(super c)] . kill-ring-save)
-               ([(super l)] . goto-line)
-               ([(super q)] . save-buffers-kill-emacs)
-               ([(super s)] . save-buffer)
-               ([(super v)] . yank)
-               ([(super w)] . kill-current-buffer)
-               ([(super z)] . undo))))
-
-(use-package fcitx
-  :if (eq system-type 'gnu/linux)
-  :init
-  (fcitx-aggressive-setup)
-  :config
-  (setq fcitx-use-dbus t))
-
-;; --------------------------------------------------------------
-;;                            Meow
-;; --------------------------------------------------------------
-
-(use-package indent-shift
-  :ensure nil
-  :load-path yilin/site-lisp-directory
-  :demand t)
-
-(use-package surround-region
-  :ensure nil
-  :load-path yilin/site-lisp-directory
-  :demand t)
-
-(use-package meow
-  :demand t
-  :preface
-  (defun yilin/disable-meow ()
-    "Turn `meow-mode' off in the current buffer.
-Hook this onto modes (vterm, dape-repl, color-rg, ...) where
-modal editing gets in the way."
-    (meow-mode -1))
-
-  (defun meow-setup ()
-    (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-    (setq meow-use-clipboard t)
-    (meow-motion-overwrite-define-key
-     '("j" . meow-next)
-     '("k" . meow-prev)
-     '("<escape>" . ignore))
-    (meow-leader-define-key
-     ;; SPC j/k will run the original command in MOTION state.
-     '("j" . "H-j")
-     '("k" . "H-k")
-     ;; Use SPC (0-9) for digit arguments.
-     '("1" . meow-digit-argument)
-     '("2" . meow-digit-argument)
-     '("3" . meow-digit-argument)
-     '("4" . meow-digit-argument)
-     '("5" . meow-digit-argument)
-     '("6" . meow-digit-argument)
-     '("7" . meow-digit-argument)
-     '("8" . meow-digit-argument)
-     '("9" . meow-digit-argument)
-     '("0" . meow-digit-argument)
-     '("h" . meow-keypad-describe-key)
-     '("?" . meow-cheatsheet)
-     ;; Surround (SPC SPC <char>)
-     '("SPC" . surround-region-map)
-     ;; Custom leader bindings
-     '("f" . find-file)
-     '("b" . consult-buffer)
-     '("k" . kill-buffer)
-     '("p" . consult-yank-pop)
-     '("o" . other-window)
-     '("d" . dired-jump)
-     '("s" . outline-cycle)
-     '("r" . color-rg-search-input))
-    (meow-normal-define-key
-     '("0" . meow-expand-0)
-     '("9" . meow-expand-9)
-     '("8" . meow-expand-8)
-     '("7" . meow-expand-7)
-     '("6" . meow-expand-6)
-     '("5" . meow-expand-5)
-     '("4" . meow-expand-4)
-     '("3" . meow-expand-3)
-     '("2" . meow-expand-2)
-     '("1" . meow-expand-1)
-     '("-" . negative-argument)
-     '(";" . meow-reverse)
-     '("," . meow-inner-of-thing)
-     '("." . meow-bounds-of-thing)
-     '("[" . meow-beginning-of-thing)
-     '("]" . meow-end-of-thing)
-     '("<" . indent-shift-left)
-     '(">" . indent-shift-right)
-     '("a" . meow-append)
-     '("A" . meow-open-below)
-     '("b" . meow-back-word)
-     '("B" . meow-back-symbol)
-     '("c" . meow-change-save)
-     '("d" . meow-kill)
-     '("e" . meow-next-word)
-     '("E" . meow-next-symbol)
-     '("f" . meow-find)
-     '("g" . meow-cancel-selection)
-     '("G" . meow-grab)
-     '("h" . meow-left)
-     '("H" . meow-left-expand)
-     '("i" . meow-insert)
-     '("I" . meow-block)
-     '("j" . meow-next)
-     '("J" . meow-next-expand)
-     '("k" . meow-prev)
-     '("K" . meow-prev-expand)
-     '("l" . meow-right)
-     '("L" . meow-right-expand)
-     '("m" . meow-join)
-     '("n" . meow-search)
-     '("o" . meow-open-below)
-     '("O" . meow-open-above)
-     '("p" . meow-yank)
-     '("q" . meow-quit)
-     '("Q" . meow-to-block)
-     '("r" . meow-replace)
-     '("R" . meow-swap-grab)
-     '("s" . meow-visit)
-     '("S" . meow-goto-line)
-     '("t" . meow-till)
-     '("u" . meow-undo)
-     '("U" . meow-undo-in-selection)
-     '("v" . meow-line)
-     '("V" . rectangle-mark-mode)
-     '("w" . meow-mark-word)
-     '("W" . meow-mark-symbol)
-     '("x" . meow-delete)
-     '("X" . meow-backward-delete)
-     '("y" . meow-save)
-     '("Y" . meow-sync-grab)
-     '("z" . meow-pop-selection)
-     '("'" . repeat)
-     '("<escape>" . ignore))
-    ;; Make sure C-[ works in GUI
-    (when window-system
-      (define-key input-decode-map (kbd "C-[") [control-bracketleft])
-      (define-key meow-insert-state-keymap [control-bracketleft] 'meow-insert-exit)
-      (define-key meow-normal-state-keymap [control-bracketleft] 'ignore)))
-
-  (defun yilin/toggle-meow-mode ()
-    "Toggle meow-mode"
-    (interactive)
-    (if (bound-and-true-p meow-mode)
-        (meow-mode -1)
-      (meow-mode 1)))
-  :hook
-  ;; Should not put meow-setup under :config,
-  ;; otherwise some leader bindings will not bind
-  (after-init . meow-setup)
-  :bind
-  ("C-z" . yilin/toggle-meow-mode)
-  :config
-  (meow-global-mode 1))
-
-(use-package meow
-  :after corfu
-  :hook (meow-insert-exit . corfu-quit))
-
-;; --------------------------------------------------------------
 ;;                         Spell checker
 ;; --------------------------------------------------------------
 (use-package jinx
@@ -331,384 +152,6 @@ modal editing gets in the way."
 ;;   :config (setq-default hungry-delete-chars-to-skip " \t\f\v"))
 
 ;; --------------------------------------------------------------
-;;                            Search
-;; --------------------------------------------------------------
-
-(use-package which-key
-  :ensure nil
-  :diminish (which-key-mode)
-  :hook after-init)
-
-(use-package savehist
-  :ensure nil
-  :init (savehist-mode 1))
-
-(use-package vertico
-  :hook after-init
-  :custom
-  (vertico-count 10)                    ; Number of candidates to display
-  (vertico-resize nil)
-  (vertico-cycle t) ; Go from last to first candidate and first to last (cycle)?
-  :bind
-  (:map vertico-map
-        ("<tab>" . vertico-insert)  ; Insert selected candidate into text area
-        ("<escape>" . minibuffer-keyboard-quit) ; Close minibuffer
-        ;; Cycle through candidate groups
-        ("C-M-n" . vertico-next-group)
-        ("C-M-p" . vertico-previous-group)))
-
-(use-package emacs
-  :ensure nil
-  :init
-  ;; Add prompt indicator to `completing-read-multiple'.
-  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-  (defun crm-indicator (args)
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string
-                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                   crm-separator)
-                  (car args))
-          (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-  ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-  ;; Vertico commands are hidden in normal buffers.
-  ;; (setq read-extended-command-predicate
-  ;;       #'command-completion-default-include-p)
-
-  ;; Enable recursive minibuffers
-  (setq enable-recursive-minibuffers t))
-
-(use-package orderless
-  :custom
-  (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles partial-completion)))))
-
-(use-package marginalia
-  ;; Either bind `marginalia-cycle' globally or only in the minibuffer
-  :bind (("M-A" . marginalia-cycle)
-         :map minibuffer-local-map
-         ("M-A" . marginalia-cycle))
-  ;; Deferred via :hook. The marginalia README puts `(marginalia-mode)'
-  ;; in :init which forces eager loading -- we defer it instead so
-  ;; `use-package-always-defer' is honored.
-  :hook (after-init . marginalia-mode))
-
-(use-package consult
-  ;; Replace bindings. Lazily loaded due by `use-package'.
-  :bind (("C-s" . consult-line)
-         ("C-c i" . consult-minor-mode-menu)
-         ;; C-c bindings (mode-specific-map)
-         ("C-c h" . consult-history)
-         ("C-c m" . consult-mode-command)
-         ("C-c k" . consult-kmacro)
-         ;; C-x bindings (ctl-x-map)
-         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
-         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
-         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
-         ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
-         ;; Custom M-# bindings for fast register access
-         ("M-#" . consult-register-load)
-         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-         ("C-M-#" . consult-register)
-         ;; Other custom bindings
-         ("M-Y" . consult-yank-pop)                ;; orig. yank-pop (M-y is for yasnippet, use Y instead)
-         ("<help> a" . consult-apropos)            ;; orig. apropos-command
-         ;; M-g bindings (goto-map)
-         ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
-         ("M-g g" . consult-goto-line)             ;; orig. goto-line
-         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
-         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
-         ("M-g m" . consult-mark)
-         ("M-g k" . consult-global-mark)
-         ("M-g i" . consult-imenu)
-         ("M-g I" . consult-imenu-multi)
-         ;; M-s bindings (search-map)
-         ("M-s d" . consult-find)
-         ("M-s D" . consult-locate)
-         ("M-s g" . consult-grep)
-         ("M-s G" . consult-git-grep)
-         ("M-s r" . consult-ripgrep)
-         ("M-s l" . consult-line)
-         ("M-s L" . consult-line-multi)
-         ("M-s m" . consult-multi-occur)
-         ("M-s k" . consult-keep-lines)
-         ("M-s u" . consult-focus-lines)
-         ;; Isearch integration
-         ("M-s e" . consult-isearch-history)
-         :map isearch-mode-map
-         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
-         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
-         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
-         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
-         ;; Minibuffer history
-         :map minibuffer-local-map
-         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
-
-  ;; Enable automatic preview at point in the *Completions* buffer. This is
-  ;; relevant when you use the default completion UI.
-  :hook (completion-list-mode . consult-preview-at-point-mode)
-
-  ;; The :init configuration is always executed (Not lazy)
-  :init
-
-  ;; Optionally configure the register formatting. This improves the register
-  ;; preview for `consult-register', `consult-register-load',
-  ;; `consult-register-store' and the Emacs built-ins.
-  (setq register-preview-delay 0.5
-        register-preview-function #'consult-register-format)
-
-  ;; Optionally tweak the register preview window.
-  ;; This adds thin lines, sorting and hides the mode line of the window.
-  (advice-add #'register-preview :override #'consult-register-window)
-
-  ;; Use Consult to select xref locations with preview
-  (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
-
-  ;; Configure other variables and modes in the :config section,
-  ;; after lazily loading the package.
-  :config
-
-  ;; Optionally configure preview. The default value
-  ;; is 'any, such that any key triggers the preview.
-  ;; (setq consult-preview-key 'any)
-  ;; (setq consult-preview-key (kbd "M-."))
-  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
-  ;; For some commands and buffer sources it is useful to configure the
-  ;; :preview-key on a per-command basis using the `consult-customize' macro.
-  (consult-customize
-   consult-theme :preview-key '(:debounce 0.2 any)
-   consult-ripgrep consult-git-grep consult-grep
-   consult-bookmark consult-recent-file consult-xref
-   consult-source-bookmark consult-source-file-register
-   consult-source-recent-file consult-source-project-recent-file
-   ;; :preview-key "M-."
-   :preview-key '(:debounce 0.4 any))
-
-  ;; Optionally configure the narrowing key.
-  ;; Both < and C-+ work reasonably well.
-  (setq consult-narrow-key "<") ;; (kbd "C-+")
-
-  ;; Optionally make narrowing help available in the minibuffer.
-  ;; You may want to use `embark-prefix-help-command' or which-key instead.
-  ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
-
-  ;; By default `consult-project-function' uses `project-root' from project.el.
-  ;; Optionally configure a different project root function.
-  ;; There are multiple reasonable alternatives to chose from.
-  ;;;; 1. project.el (the default)
-  ;; (setq consult-project-function #'consult--default-project--function)
-  ;;;; 2. projectile.el (projectile-project-root)
-  ;; (autoload 'projectile-project-root "projectile")
-  ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
-  ;;;; 3. vc.el (vc-root-dir)
-  ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
-  ;;;; 4. locate-dominating-file
-  ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
-  )
-
-(use-package embark
-  :bind
-  (("C-." . embark-act)         ;; pick some comfortable binding
-   ("M-." . embark-dwim)        ;; good alternative: M-.
-   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
-
-  :init
-
-  ;; Optionally replace the key help with a completing-read interface
-  (setq prefix-help-command #'embark-prefix-help-command)
-
-  :config
-
-  ;; Hide the mode line of the Embark live/completions buffers
-  (add-to-list 'display-buffer-alist
-               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                 nil
-                 (window-parameters (mode-line-format . none)))))
-
-;; Consult users will also want the embark-consult package.
-(use-package embark-consult
-  :after (embark consult)
-  ;; if you want to have consult previews as you move around an
-  ;; auto-updating embark collect buffer
-  :hook
-  (embark-collect-mode . consult-preview-at-point-mode))
-
-(use-package nerd-icons-completion
-  :after vertico
-  :hook vertico-mode)
-
-(use-package color-rg
-  :vc (:url "https://github.com/manateelazycat/color-rg.git")
-  :after meow
-  :hook (color-rg-mode . yilin/disable-meow)
-  :commands (color-rg-search-input
-             color-rg-search-symbol
-             color-rg-search-input-in-project
-             color-rg-search-symbol-in-project
-             color-rg-search-symbol-in-current-file
-             color-rg-search-input-in-current-file
-             color-rg-search-project-rails
-             color-rg-search-symbol-with-type
-             color-rg-search-project-with-type
-             color-rg-search-project-rails-with-type))
-
-(use-package breadcrumb
-  :hook ((prog-mode org-mode) . breadcrumb-local-mode))
-
-;; A collection of user interfaces for various built-in Emacs modes.
-;; Keybinding reference:
-;; `https://github.com/kickingvegas/casual/tree/main/docs'
-(use-package casual
-  :bind (("C-o" . casual-editkit-main-tmenu))
-  :init
-  (use-package casual-agenda
-    :ensure nil
-    :after org-agenda
-    :bind (:map org-agenda-mode-map
-                ("C-o" . casual-agenda-tmenu)))
-
-  (use-package casual-bookmarks
-    :ensure nil
-    :after bookmark
-    :bind (:map bookmark-bmenu-mode-map
-                ("C-o" . casual-bookmarks-tmenu)))
-
-  (use-package casual-calc
-    :ensure nil
-    :after calc
-    :bind ((:map calc-mode-map
-                 ("C-o" . casual-calc-tmenu))
-           (:map calc-alg-map
-                 ("C-o" . casual-calc-tmenu))))
-
-  (use-package casual-calendar
-    :ensure nil
-    :after calendar
-    :bind (:map calendar-mode-map
-                ("C-o" . casual-calendar-tmenu)))
-
-  (use-package casual-dired
-    :ensure nil
-    :after dired
-    :bind (:map dired-mode-map
-                ("C-o" . casual-dired-tmenu)
-                ("s"   . casual-dired-sort-by-tmenu)
-                ("/"   . casual-dired-search-replace-tmenu)))
-
-  (use-package casual-ibuffer
-    :ensure nil
-    :after ibuffer
-    :bind (:map ibuffer-mode-map
-                ("C-o" . casual-ibuffer-tmenu)
-                ("F"   . casual-ibuffer-filter-tmenu)
-                ("s"   . casual-ibuffer-sortby-tmenu)))
-
-  (use-package casual-image
-    :ensure nil
-    :after image-mode
-    :bind (:map image-mode-map
-                ("C-o" . casual-image-resize-tmenu)))
-
-  (use-package casual-info
-    :ensure nil
-    :after Info
-    :bind (:map Info-mode-map
-                ("C-o" . casual-info-tmenu)))
-
-  (use-package casual-isearch
-    :ensure nil
-    :after isearch
-    :bind (:map isearch-mode-map
-                ("C-o" . casual-isearch-tmenu)))
-
-  (use-package casual-make
-    :ensure nil
-    :after makefile-mode
-    :bind (:map makefile-mode-map
-                ("C-o" . casual-make-tmenu)))
-
-  (use-package casual-re-builder
-    :ensure nil
-    :after re-builder
-    :bind ((:map reb-mode-map
-                 ("C-o" . casual-re-builder-tmenu))
-           (:map reb-lisp-mode-map
-                 ("C-o" . casual-re-builder-tmenu))))
-  )
-
-;; --------------------------------------------------------------
-;;                           Completion
-;; --------------------------------------------------------------
-
-;; Path auto completion
-(use-package comint
-  :ensure nil
-  :init
-  (add-to-list 'completion-at-point-functions #'comint--complete-file-name-data)
-  (setq comint-completion-addsuffix nil
-        comint-completion-autolist nil))
-
-(use-package corfu
-  ;; Optional customizations
-  :custom
-  (corfu-cycle t)                   ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)                    ;; Enable auto completion
-  (corfu-auto-delay 0.1)
-  (corfu-auto-prefix 2)
-  ;; (corfu-separator ?\s)          ;; Orderless field separator
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
-  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
-  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
-
-  ;; Use TAB for cycling, default is `corfu-complete'.
-  :bind
-  (:map corfu-map
-        ("TAB" . corfu-next)
-        ([tab] . corfu-next)
-        ("S-TAB" . corfu-previous)
-        ([backtab] . corfu-previous))
-
-  ;; Enable Corfu only for certain modes.
-  ;; :hook ((prog-mode . corfu-mode)
-  ;;        (shell-mode . corfu-mode)
-  ;;        (eshell-mode . corfu-mode))
-
-  ;; Recommended: Enable Corfu globally.
-  ;; This is recommended since Dabbrev can be used globally (M-/).
-  ;; See also `corfu-excluded-modes'.
-  ;; Using :hook instead of :init so corfu actually defers -- :init
-  ;; would force eager loading at startup.
-  :hook (after-init . global-corfu-mode))
-
-;; A custom package to show icons in corfu completion
-;; Adapted from `'https://emacs-china.org/t/corfu-all-the-icons-icon/20907'
-(use-package kind-nerd-icons
-  :ensure nil
-  :load-path yilin/site-lisp-directory
-  ;; No :demand t -- :after already guarantees this loads once both
-  ;; corfu and nerd-icons are loaded, at which point :config registers
-  ;; the margin formatter. Forcing eager load is unnecessary.
-  :after (corfu nerd-icons)
-  :config
-  (add-to-list 'corfu-margin-formatters
-               #'kind-nerd-icons-margin-formatter))
-
-;; --------------------------------------------------------------
 ;;                            Highlight
 ;; --------------------------------------------------------------
 ;; Highlight TODO and similar keywords in comments and strings
@@ -726,34 +169,6 @@ modal editing gets in the way."
     (cl-pushnew `(,keyword . ,(face-foreground 'error)) hl-todo-keyword-faces))
   (dolist (keyword '("WORKAROUND" "HACK" "TRICK" "WIP"))
     (cl-pushnew `(,keyword . ,(face-foreground 'warning)) hl-todo-keyword-faces)))
-
-;; Highlight uncommitted changes using VC
-(use-package diff-hl
-  :preface
-  (defun yilin/diff-hl-dired-mode-unless-remote ()
-    (unless (file-remote-p default-directory)
-      (diff-hl-dired-mode)))
-  :bind (:map diff-hl-command-map
-              ("SPC" . diff-hl-mark-hunk))
-  :hook ((after-init . global-diff-hl-mode)
-         (diff-hl-mode . diff-hl-flydiff-mode)
-         (dired-mode . yilin/diff-hl-dired-mode-unless-remote))
-  :config
-  (setq diff-hl-update-async t)
-  (set-face-attribute 'diff-hl-change nil
-                      :background 'unspecified
-                      :foreground (face-foreground 'warning))
-  (set-face-attribute 'diff-hl-insert nil
-                      :background 'unspecified
-                      :foreground (face-foreground 'success))
-  (set-face-attribute 'diff-hl-delete nil
-                      :background 'unspecified
-                      :foreground (face-foreground 'error))
-  (with-no-warnings
-    ;; Integration with magit
-    (with-eval-after-load 'magit
-      (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
-      (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))))
 
 ;; Make the cursor have a tail, which is easier for
 ;; users to locate the cursor.
@@ -802,6 +217,7 @@ modal editing gets in the way."
           (emacs-lisp-docstring-fill-column t))
       (fill-paragraph nil region)))
 
+  (declare-function LaTeX-narrow-to-environment "latex" (&optional count))
   (defun yilin/narrow-or-widen-dwim (p)
     "Widen if buffer is narrowed, narrow-dwim otherwise.
 Dwim means: region, org-src-block, org-subtree, or
@@ -810,8 +226,8 @@ org-src-block actually calls `org-edit-src-code'.
 
 With prefix P, don't widen, just narrow even if buffer
 is already narrowed."
+    (declare (interactive-only t))
     (interactive "P")
-    (declare (interactive-only))
     (cond ((and (buffer-narrowed-p) (not p)) (widen))
           ((region-active-p)
            (narrow-to-region (region-beginning)
@@ -852,84 +268,85 @@ is already narrowed."
       (goto-char (point-min))
       (flush-lines "^[ \t]*$")))
 
+  (defconst yilin/greek-math-symbol-map
+    '(;; --- Greek letters (lowercase) ---
+      ("alpha" . "α") ("beta" . "β") ("gamma" . "γ") ("delta" . "δ")
+      ("epsilon" . "ε") ("zeta" . "ζ") ("eta" . "η") ("theta" . "θ")
+      ("iota" . "ι") ("kappa" . "κ") ("lambda" . "λ") ("mu" . "μ")
+      ("nu" . "ν") ("xi" . "ξ") ("omicron" . "ο") ("pi" . "π")
+      ("rho" . "ρ") ("sigma" . "σ") ("tau" . "τ") ("upsilon" . "υ")
+      ("phi" . "φ") ("chi" . "χ") ("psi" . "ψ") ("omega" . "ω")
+
+      ;; --- Greek letters (uppercase) ---
+      ("Alpha" . "Α") ("Beta" . "Β") ("Gamma" . "Γ") ("Delta" . "Δ")
+      ("Epsilon" . "Ε") ("Zeta" . "Ζ") ("Eta" . "Η") ("Theta" . "Θ")
+      ("Iota" . "Ι") ("Kappa" . "Κ") ("Lambda" . "Λ") ("Mu" . "Μ")
+      ("Nu" . "Ν") ("Xi" . "Ξ") ("Omicron" . "Ο") ("Pi" . "Π")
+      ("Rho" . "Ρ") ("Sigma" . "Σ") ("Tau" . "Τ") ("Upsilon" . "Υ")
+      ("Phi" . "Φ") ("Chi" . "Χ") ("Psi" . "Ψ") ("Omega" . "Ω")
+
+      ;; --- Logic ---
+      ("forall" . "∀") ("exists" . "∃") ("nexists" . "∄")
+      ("neg" . "¬") ("lnot" . "¬")
+      ("land" . "∧") ("lor" . "∨")
+      ("implies" . "⇒") ("iff" . "⇔")
+
+      ;; --- Sets ---
+      ("in" . "∈") ("notin" . "∉")
+      ("subset" . "⊂") ("subseteq" . "⊆") ("nsubseteq" . "⊈")
+      ("supset" . "⊃") ("supseteq" . "⊇") ("nsupseteq" . "⊉")
+      ("emptyset" . "∅")
+      ("cap" . "∩") ("cup" . "∪")
+      ("propto" . "∝")
+
+      ;; --- Relations ---
+      ("=" . "=") ("!=" . "≠") ("equiv" . "≡") ("neq" . "≠")
+      ("approx" . "≈") ("sim" . "∼") ("cong" . "≅")
+      ("<=" . "≤") (">=" . "≥") ("<<" . "≪") (">>" . "≫")
+
+      ;; --- Arithmetic ---
+      ("times" . "×") ("cdot" . "·") ("ast" . "∗")
+      ("pm" . "±") ("mp" . "∓")
+      ("div" . "÷")
+      ("sqrt" . "√") ("cbrt" . "∛") ("qdrt" . "∜")
+
+      ;; --- Calculus & Algebra ---
+      ("int" . "∫") ("iint" . "∬") ("iiint" . "∭")
+      ("oint" . "∮") ("oiint" . "∯")
+      ("sum" . "∑") ("prod" . "∏") ("lim" . "lim") ;; leave lim as text
+      ("infty" . "∞") ("infinity" . "∞")
+      ("nabla" . "∇") ("partial" . "∂")
+
+      ;; --- Arrows ---
+      ("->" . "→") ("=>" . "⇒") ("-->" . "⟶")
+      ("<-" . "←") ("<--" . "⟵")
+      ("<->" . "↔") ("<=>" . "⇔")
+      ("uparrow" . "↑") ("downarrow" . "↓")
+      ("Uparrow" . "⇑") ("Downarrow" . "⇓")
+      ("leftrightarrow" . "↔") ("Rightarrow" . "⇒")
+      ("Leftarrow" . "⇐") ("Leftrightarrow" . "⇔")
+
+      ;; --- Geometry ---
+      ("angle" . "∠") ("measuredangle" . "∡") ("perp" . "⊥") ("parallel" . "∥")
+
+      ;; --- Miscellaneous ---
+      ("degree" . "°") ("prime" . "′")
+      ("ell" . "ℓ") ("hbar" . "ℏ") ("Re" . "ℜ") ("Im" . "ℑ")
+      ("aleph" . "ℵ")
+      ("top" . "⊤") ("bot" . "⊥"))
+    "Alist mapping LaTeX-like names to Greek/math unicode symbols.
+Used by `yilin/insert-greek-or-math-symbol'.")
+
   (defun yilin/insert-greek-or-math-symbol ()
     "Replace region with corresponding Greek or math symbol, or prompt for one.
 If a region is active, trim whitespace around it and try to convert
 its contents into the corresponding Greek or math symbol. If successful,
 replace the region. If not, or if no region is active, prompt the user."
     (interactive)
-    (let* ((greek-map
-            '(;; --- Greek letters (lowercase) ---
-              ("alpha" . "α") ("beta" . "β") ("gamma" . "γ") ("delta" . "δ")
-              ("epsilon" . "ε") ("zeta" . "ζ") ("eta" . "η") ("theta" . "θ")
-              ("iota" . "ι") ("kappa" . "κ") ("lambda" . "λ") ("mu" . "μ")
-              ("nu" . "ν") ("xi" . "ξ") ("omicron" . "ο") ("pi" . "π")
-              ("rho" . "ρ") ("sigma" . "σ") ("tau" . "τ") ("upsilon" . "υ")
-              ("phi" . "φ") ("chi" . "χ") ("psi" . "ψ") ("omega" . "ω")
-
-              ;; --- Greek letters (uppercase) ---
-              ("Alpha" . "Α") ("Beta" . "Β") ("Gamma" . "Γ") ("Delta" . "Δ")
-              ("Epsilon" . "Ε") ("Zeta" . "Ζ") ("Eta" . "Η") ("Theta" . "Θ")
-              ("Iota" . "Ι") ("Kappa" . "Κ") ("Lambda" . "Λ") ("Mu" . "Μ")
-              ("Nu" . "Ν") ("Xi" . "Ξ") ("Omicron" . "Ο") ("Pi" . "Π")
-              ("Rho" . "Ρ") ("Sigma" . "Σ") ("Tau" . "Τ") ("Upsilon" . "Υ")
-              ("Phi" . "Φ") ("Chi" . "Χ") ("Psi" . "Ψ") ("Omega" . "Ω")
-
-              ;; --- Logic ---
-              ("forall" . "∀") ("exists" . "∃") ("nexists" . "∄")
-              ("neg" . "¬") ("lnot" . "¬")
-              ("land" . "∧") ("lor" . "∨")
-              ("implies" . "⇒") ("iff" . "⇔")
-
-              ;; --- Sets ---
-              ("in" . "∈") ("notin" . "∉")
-              ("subset" . "⊂") ("subseteq" . "⊆") ("nsubseteq" . "⊈")
-              ("supset" . "⊃") ("supseteq" . "⊇") ("nsupseteq" . "⊉")
-              ("emptyset" . "∅")
-              ("cap" . "∩") ("cup" . "∪")
-              ("propto" . "∝")
-
-              ;; --- Relations ---
-              ("=" . "=") ("!=" . "≠") ("equiv" . "≡") ("neq" . "≠")
-              ("approx" . "≈") ("sim" . "∼") ("cong" . "≅")
-              ("<=" . "≤") (">=" . "≥") ("<<" . "≪") (">>" . "≫")
-
-              ;; --- Arithmetic ---
-              ("times" . "×") ("cdot" . "·") ("ast" . "∗")
-              ("pm" . "±") ("mp" . "∓")
-              ("div" . "÷")
-              ("sqrt" . "√") ("cbrt" . "∛") ("qdrt" . "∜")
-
-              ;; --- Calculus & Algebra ---
-              ("int" . "∫") ("iint" . "∬") ("iiint" . "∭")
-              ("oint" . "∮") ("oiint" . "∯")
-              ("sum" . "∑") ("prod" . "∏") ("lim" . "lim") ;; leave lim as text
-              ("infty" . "∞") ("infinity" . "∞")
-              ("nabla" . "∇") ("partial" . "∂")
-
-              ;; --- Arrows ---
-              ("->" . "→") ("=>" . "⇒") ("-->" . "⟶")
-              ("<-" . "←") ("<--" . "⟵")
-              ("<->" . "↔") ("<=>" . "⇔")
-              ("uparrow" . "↑") ("downarrow" . "↓")
-              ("Uparrow" . "⇑") ("Downarrow" . "⇓")
-              ("leftrightarrow" . "↔") ("Rightarrow" . "⇒")
-              ("Leftarrow" . "⇐") ("Leftrightarrow" . "⇔")
-
-              ;; --- Geometry ---
-              ("angle" . "∠") ("measuredangle" . "∡") ("perp" . "⊥") ("parallel" . "∥")
-
-              ;; --- Miscellaneous ---
-              ("degree" . "°") ("prime" . "′")
-              ("ell" . "ℓ") ("hbar" . "ℏ") ("Re" . "ℜ") ("Im" . "ℑ")
-              ("aleph" . "ℵ")
-              ("top" . "⊤") ("bot" . "⊥")
-              ))
-           (text (if (use-region-p)
-                     (string-trim (buffer-substring-no-properties
-                                   (region-beginning) (region-end)))
-                   nil))
-           (replacement (assoc-default text greek-map)))
+    (let* ((text (when (use-region-p)
+                   (string-trim (buffer-substring-no-properties
+                                 (region-beginning) (region-end)))))
+           (replacement (assoc-default text yilin/greek-math-symbol-map)))
       (if (and text replacement)
           ;; Replace region
           (progn
@@ -937,11 +354,12 @@ replace the region. If not, or if no region is active, prompt the user."
             (insert replacement))
         ;; Prompt for input
         (let* ((name (completing-read "Greek letter: "
-                                      (mapcar #'car greek-map) nil t))
-               (symbol (assoc-default name greek-map)))
+                                      (mapcar #'car yilin/greek-math-symbol-map)
+                                      nil t))
+               (symbol (assoc-default name yilin/greek-math-symbol-map)))
           (when symbol
-            (if (use-region-p)
-                (delete-region (region-beginning) (region-end)))
+            (when (use-region-p)
+              (delete-region (region-beginning) (region-end)))
             (insert symbol))))))
 
   (defun yilin/insert-accented (accent char)
@@ -966,31 +384,33 @@ ACCENT choices: ^ ` ' ~ \" ."
   ;; `http://xahlee.info/emacs/emacs/emacs_quote_lines.html'
   ;; **************************************************************
   (defun yilin/quote-lines ()
-    "Change current text block's lines to quoted lines with comma or other separator char.
-  When there is a text selection, act on the selection, else, act on a text block separated by blank lines.
+    "Wrap each line in the current block with quotes and a separator.
+If a region is active, act on the region; otherwise act on the text
+block delimited by blank lines.
 
-  For example,
+For example,
 
   cat
   dog
   cow
 
-  becomes
+becomes
 
   \"cat\",
   \"dog\",
   \"cow\",
 
-  or
+or
 
   (cat)
   (dog)
   (cow)
 
-  If the delimiter is any left bracket, the end delimiter is automatically the matching bracket.
+If the delimiter is a left bracket, the closing delimiter is the
+matching right bracket.
 
-  URL `http://ergoemacs.org/emacs/emacs_quote_lines.html'
-  Version 2017-01-08"
+URL `http://ergoemacs.org/emacs/emacs_quote_lines.html'
+Version 2017-01-08"
     (interactive)
     (let* (
            $p1

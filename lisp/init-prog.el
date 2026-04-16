@@ -46,16 +46,8 @@
    ("s-r" . xref-find-references)))
 
 (use-package eglot
-  :preface
-  ;; Re-opens the current buffer and starts a fresh eglot server
-  (defun yilin/eglot-reconnect ()
-    (interactive)
-    (let ((filepath (buffer-file-name)))
-      (kill-buffer (current-buffer))
-      (find-file filepath)
-      (eglot)))
   :config
-  (setq eglot-events-buffer-size 0
+  (setq eglot-events-buffer-config '(:size 0 :format full)
         eglot-ignored-server-capabilities '(:hoverProvider
                                             :documentHighlightProvider)
         eglot-autoshutdown t)
@@ -239,15 +231,13 @@ Requires `project-current' to identify the project."
   :config
   (set-face-attribute 'pico8--non-lua-overlay nil
                       :foreground (face-foreground 'shadow)
-                      :weight 'bold))
-
-(use-package nerd-icons
-  :after pico8-mode
-  :config
-  (add-to-list 'nerd-icons-extension-icon-alist
-               '("p8" nerd-icons-sucicon "nf-seti-lua" :face nerd-icons-lpink))
-  (add-to-list 'nerd-icons-mode-icon-alist
-               '(pico8-mode nerd-icons-sucicon "nf-seti-lua" :face nerd-icons-lpink)))
+                      :weight 'bold)
+  ;; Register pico8 icon with nerd-icons if/when it's loaded.
+  (with-eval-after-load 'nerd-icons
+    (add-to-list 'nerd-icons-extension-icon-alist
+                 '("p8" nerd-icons-sucicon "nf-seti-lua" :face nerd-icons-lpink))
+    (add-to-list 'nerd-icons-mode-icon-alist
+                 '(pico8-mode nerd-icons-sucicon "nf-seti-lua" :face nerd-icons-lpink))))
 
 ;; --------------------------------------------------------------
 ;;                           Container

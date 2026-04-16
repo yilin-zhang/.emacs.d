@@ -51,10 +51,10 @@ The buffer's major mode should be `org-mode'."
         (goto-char (point-min))
         (while (setq pos (next-single-property-change (point) 'duration))
           (goto-char pos)
-          (when (and (not (equal pos (point-at-eol)))
+          (when (and (not (equal pos (line-end-position)))
                      (setq duration (org-get-at-bol 'duration)))
             (let ((line-height (if (< duration 30) 1.0 (+ 0.5 (/ duration 60))))
-                  (ov (make-overlay (point-at-bol) (1+ (point-at-eol)))))
+                  (ov (make-overlay (line-beginning-position) (1+ (line-end-position)))))
               (overlay-put ov 'face `(:background ,(car colors)
                                                   :foreground
                                                   ,(if background-dark-p "black" "white")))
@@ -62,6 +62,7 @@ The buffer's major mode should be `org-mode'."
               (overlay-put ov 'line-height line-height)
               (overlay-put ov 'line-spacing (1- line-height))))))))
 
+  (defvar org-state)  ; dynamically bound by `org-after-todo-state-change-hook'
   (defun yilin/org-remove-priority-when-done-or-cancel ()
     "Remove priority from non-repeating tasks when state becomes DONE or CANCEL."
     (when (and (member org-state '("DONE" "CANCEL"))

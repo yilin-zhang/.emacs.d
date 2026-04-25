@@ -18,7 +18,8 @@
   :config
   ;; support --dired
   (when (eq system-type 'darwin)
-    (setq insert-directory-program "gls")))
+    (when-let ((gls (executable-find "gls")))
+      (setq insert-directory-program gls))))
 
 (use-package async
   :init

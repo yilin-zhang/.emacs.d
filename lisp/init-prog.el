@@ -12,7 +12,7 @@
 
 (use-package code-cells
   :hook
-  (python-mode . code-cells-mode-maybe))
+  ((python-mode python-ts-mode) . code-cells-mode-maybe))
 
 ;; --------------------------------------------------------------
 ;;                         Tree Sitter
@@ -178,7 +178,8 @@ Requires `project-current' to identify the project."
   (web-mode-script-padding 0))
 
 (use-package rainbow-mode
-  :hook (css-mode js-mode))
+  :hook ((css-mode css-ts-mode js-mode js-ts-mode typescript-ts-mode tsx-ts-mode)
+         . rainbow-mode))
 
 (use-package js-mode
   :ensure nil

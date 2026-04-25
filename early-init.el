@@ -39,9 +39,14 @@
 ;; During startup we don't need to compare mtimes between .el and .elc
 ;; files. The default `load-prefer-newer' = t makes every `load' stat
 ;; both files. With hundreds of files loaded at startup, those stat
-;; calls add up. `doom sync' (or, for us, normal byte/native recompile)
-;; is responsible for keeping .elc fresh, not the loader.
+;; calls add up. Restore it after startup so later interactive loads
+;; prefer edited source over stale byte-code.
 (setq load-prefer-newer nil)
+
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq load-prefer-newer t))
+          100)
 
 
 ;; --------------------------------------------------------------

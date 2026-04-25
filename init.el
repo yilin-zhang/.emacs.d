@@ -59,8 +59,7 @@
 ;;                       Configurations
 ;; --------------------------------------------------------------
 (require 'init-basic)
-;; Load init-keys early: meow is :demand t.
-;; Everything downstream of this point can rely on meow being loaded.
+;; Load init-keys early so downstream modules can reference Meow helpers.
 (require 'init-keys)
 (require 'init-dired)
 (require 'init-org)
@@ -71,6 +70,9 @@
 (require 'init-completion)
 (require 'init-edit)
 (require 'init-utils)
+
+(when (file-exists-p custom-file)
+  (load custom-file nil 'nomessage))
 
 (when (file-directory-p yilin/custom-lisp-directory)
   (require 'custom-post))

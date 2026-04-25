@@ -24,10 +24,6 @@ The buffer's major mode should be `org-mode'."
     (unless (derived-mode-p 'org-mode)
       (user-error "org-mode should be enabled in the current buffer."))
 
-    ;; Make ~SPC ,~ work, reference:
-    ;; http://stackoverflow.com/questions/24169333/how-can-i-emphasize-or-verbatim-quote-a-comma-in-org-mode
-    (setcar (nthcdr 2 org-emphasis-regexp-components) " \t\n")
-    (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
     (setq-local org-emphasis-alist '(("*" bold)
                                      ("/" italic)
                                      ("_" underline)
@@ -111,6 +107,10 @@ The buffer's major mode should be `org-mode'."
   (org-agenda-finalize . yilin/org-agenda-time-grid-spacing)
   (org-after-todo-state-change . yilin/org-remove-priority-when-done-or-cancel)
   :config
+  ;; Make ~SPC ,~ work, reference:
+  ;; http://stackoverflow.com/questions/24169333/how-can-i-emphasize-or-verbatim-quote-a-comma-in-org-mode
+  (setcar (nthcdr 2 org-emphasis-regexp-components) " \t\n")
+  (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
   (setq system-time-locale "C")       ; make sure the time stamps are in English
   (setq org-log-done 'time            ; add time stamp after an item is DONE
         org-log-into-drawer t         ; put log notes into drawer by default

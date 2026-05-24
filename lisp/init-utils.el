@@ -185,20 +185,16 @@ Intended to be registered on `org-agenda-compose-functions'."
 ;; --------------------------------------------------------------
 ;;                           Terminal
 ;; --------------------------------------------------------------
-(use-package vterm
+(use-package ghostel
+  :vc (:url "https://github.com/dakra/ghostel"
+       :lisp-dir "lisp"
+       :rev :newest)
   :after meow
-  :commands vterm
+  :commands (ghostel ghostel-project ghostel-other)
+  :bind ("s-j" . ghostel-other)
   :hook
-  (vterm-mode . yilin/disable-meow)
-  (vterm-mode . (lambda () (hl-line-mode -1))))
-
-(use-package multi-vterm
-  :commands multi-vterm
-  :after vterm)
-
-(use-package vterm-toggle
-  :commands vterm-toggle
-  :bind ("s-j" . vterm-toggle))
+  (ghostel-mode . yilin/disable-meow)
+  (ghostel-mode . (lambda () (hl-line-mode -1))))
 
 ;; --------------------------------------------------------------
 ;;                            Custom

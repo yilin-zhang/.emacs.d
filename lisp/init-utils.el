@@ -191,10 +191,45 @@ Intended to be registered on `org-agenda-compose-functions'."
        :rev :newest)
   :after meow
   :commands (ghostel ghostel-project ghostel-other)
-  :bind ("s-j" . ghostel-other)
+  :bind ("s-j" . yilin/ghostel-popup-toggle)
   :hook
   (ghostel-mode . yilin/disable-meow)
-  (ghostel-mode . (lambda () (hl-line-mode -1))))
+  (ghostel-mode . (lambda () (hl-line-mode -1)))
+  :preface
+  (defun yilin/ghostel-popup-toggle ()
+    "Toggle a ghostel terminal in a bottom popup window (VSCode-style).
+If the popup is selected, dismiss it.  If it is visible elsewhere,
+focus it.  Otherwise, show an existing ghostel buffer (or create
+one) in a bottom side window."
+    (interactive)
+    (let ((win (seq-find
+                (lambda (w)
+                  (and (eq (window-parameter w 'window-side) 'bottom)
+                       (with-current-buffer (window-buffer w)
+                         (derived-mode-p 'ghostel-mode))))
+                (window-list))))
+      (cond
+       ((and win (eq win (selected-window)))
+        (delete-window win))
+       (win
+        (select-window win))
+       (t
+        (let* ((display-buffer-alist
+                (cons '((lambda (buf _action)
+                          (with-current-buffer buf
+                            (derived-mode-p 'ghostel-mode)))
+                        (display-buffer-in-side-window)
+                        (side . bottom)
+                        (slot . 0)
+                        (window-height . 0.3)
+                        (preserve-size . (nil . t)))
+                      display-buffer-alist))
+               (buf (or (seq-find (lambda (b)
+                                    (with-current-buffer b
+                                      (derived-mode-p 'ghostel-mode)))
+                                  (buffer-list))
+                        (ghostel))))
+          (select-window (display-buffer buf))))))))
 
 ;; --------------------------------------------------------------
 ;;                            Custom

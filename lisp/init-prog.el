@@ -202,6 +202,13 @@ Requires `project-current' to identify the project."
 (use-package rust-mode)
 
 ;; --------------------------------------------------------------
+;;                       Zig Configurations
+;; --------------------------------------------------------------
+;; eglot already maps `zig-mode' -> ("zls"), so installing the `zls'
+;; binary (brew install zls) is all that's needed.
+(use-package zig-mode)
+
+;; --------------------------------------------------------------
 ;;                       Lua Configurations
 ;; --------------------------------------------------------------
 (use-package lua-mode)

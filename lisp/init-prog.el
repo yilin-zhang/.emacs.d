@@ -10,9 +10,8 @@
   :hook
   (prog-mode . outline-minor-mode))
 
-(use-package code-cells
-  :hook
-  ((python-mode python-ts-mode) . code-cells-mode-maybe))
+(use-package eldoc-box
+  :hook (prog-mode . eldoc-box-mouse-mode))
 
 ;; --------------------------------------------------------------
 ;;                         Tree Sitter

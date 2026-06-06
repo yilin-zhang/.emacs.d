@@ -10,9 +10,6 @@
   :hook
   (prog-mode . outline-minor-mode))
 
-(use-package eldoc-box
-  :hook (prog-mode . eldoc-box-mouse-mode))
-
 ;; --------------------------------------------------------------
 ;;                         Tree Sitter
 ;; --------------------------------------------------------------

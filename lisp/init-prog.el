@@ -44,16 +44,49 @@
    ("s-r" . xref-find-references)))
 
 (use-package eglot
+  :bind (:map eglot-mode-map
+              ;; The echo area is only a one-line glance; this opens the
+              ;; full, rendered docs for the symbol at point in a buffer.
+              ("C-c C-d" . yilin/eglot-documentation-at-point))
   :config
   (setq eglot-events-buffer-config '(:size 0 :format full)
-        ;; Keep `:hoverProvider' off (we don't use a hover popup), but
-        ;; leave `:documentHighlightProvider' on so eglot highlights the
-        ;; other occurrences of the symbol under point -- the VSCode/Zed
-        ;; "select-a-variable, see-it-everywhere" behavior.
-        eglot-ignored-server-capabilities '(:hoverProvider)
-        eglot-autoshutdown t)
+        ;; Nothing ignored: we want hover docs (a quick glance in the echo
+        ;; area) AND documentHighlight (same-symbol highlighting) both on.
+        eglot-ignored-server-capabilities nil
+        eglot-autoshutdown t
+        ;; Keep the echo-area glance to a tidy single line. The echo area
+        ;; can't render markdown (no wrapping/fontification), so multi-line
+        ;; there is just a "blob" -- real docs go to the buffer below.
+        eldoc-echo-area-use-multiline-p 'truncate-sym-name-if-fit)
   (add-to-list 'eglot-server-programs
-               '((json-mode json-ts-mode) . ("vscode-json-languageserver" "--stdio"))))
+               '((json-mode json-ts-mode) . ("vscode-json-languageserver" "--stdio")))
+
+  ;; Documentation in a dedicated buffer, the way doom does it: the echo
+  ;; area can't render LSP hover markdown, so mirror doom's
+  ;; `+eglot-lookup-documentation' -- fetch hover synchronously and show
+  ;; the rendered (fontified, wrapped, scrollable, copyable) contents in
+  ;; a *eglot-help* window.
+  (defvar yilin/eglot--help-buffer nil)
+  (defun yilin/eglot-documentation-at-point ()
+    "Show LSP documentation for the symbol at point in a help buffer."
+    (interactive)
+    (eglot--dbind ((Hover) contents range)
+        (jsonrpc-request (eglot--current-server-or-lose) :textDocument/hover
+                         (eglot--TextDocumentPositionParams))
+      (let ((blurb (and (not (seq-empty-p contents))
+                        (eglot--hover-info contents range)))
+            (hint (thing-at-point 'symbol)))
+        (if blurb
+            (with-current-buffer
+                (or (and (buffer-live-p yilin/eglot--help-buffer)
+                         yilin/eglot--help-buffer)
+                    (setq yilin/eglot--help-buffer
+                          (generate-new-buffer "*eglot-help*")))
+              (with-help-window (current-buffer)
+                (rename-buffer (format "*eglot-help for %s*" hint))
+                (with-current-buffer standard-output (insert blurb))
+                (setq-local nobreak-char-display nil)))
+          (message "No documentation for %s" (or hint "symbol at point")))))))
 
 ;; `https://github.com/jdtsmith/eglot-booster'
 (use-package eglot-booster

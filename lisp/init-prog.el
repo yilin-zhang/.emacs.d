@@ -13,12 +13,13 @@
 ;; --------------------------------------------------------------
 ;;                         Tree Sitter
 ;; --------------------------------------------------------------
-;; `https://archive.casouri.cc/note/2023/tree-sitter-in-emacs-29/index.html'
-;; (setq major-mode-remap-alist
-;;       '((python-mode . python-ts-mode)
-;;         (js-mode . js-ts-mode)
-;;         (json-mode . json-ts-mode)
-;;         (css-mode . css-ts-mode)))
+;; Bump tree-sitter fontification from the default of 3 to 4 (the max).
+;; At level 3 operators, delimiters, function calls, property accesses,
+;; `self'/`cls', escape sequences etc. stay the default foreground color,
+;; which makes buffers look "flat" / under-highlighted compared to
+;; VSCode/Zed. Level 4 colors them by category. Must be set before any
+;; `*-ts-mode' fontifies a buffer.
+(setq treesit-font-lock-level 4)
 
 (setq major-mode-remap-alist
       '(;; markup lang
@@ -29,7 +30,8 @@
         (bash-mode . bash-ts-mode)
         (python-mode . python-ts-mode)
         (js-mode . js-ts-mode)
-        (typescript-mode . typescript-ts-mode)))
+        (typescript-mode . typescript-ts-mode)
+        (rust-mode . rust-ts-mode)))
 
 ;; --------------------------------------------------------------
 ;;                             LSP
@@ -44,8 +46,11 @@
 (use-package eglot
   :config
   (setq eglot-events-buffer-config '(:size 0 :format full)
-        eglot-ignored-server-capabilities '(:hoverProvider
-                                            :documentHighlightProvider)
+        ;; Keep `:hoverProvider' off (we don't use a hover popup), but
+        ;; leave `:documentHighlightProvider' on so eglot highlights the
+        ;; other occurrences of the symbol under point -- the VSCode/Zed
+        ;; "select-a-variable, see-it-everywhere" behavior.
+        eglot-ignored-server-capabilities '(:hoverProvider)
         eglot-autoshutdown t)
   (add-to-list 'eglot-server-programs
                '((json-mode json-ts-mode) . ("vscode-json-languageserver" "--stdio"))))

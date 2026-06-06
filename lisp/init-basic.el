@@ -68,11 +68,18 @@
         )
   ;; Warning handling
   (setq warning-suppress-types '((emacs)))
+  ;; Misc QoL tweaks (from emacsredux "stealing from the best configs").
+  (setq set-mark-command-repeat-pop t  ; keep popping the mark ring with C-SPC
+        help-window-select t           ; focus help/helpful windows when they open
+        ffap-machine-p-known 'reject   ; never ping hostnames on find-file-at-point
+        reb-re-syntax 'string)         ; readable string syntax in `re-builder'
   :hook
   (after-init . global-so-long-mode)
   (after-init . delete-selection-mode)
   (after-init . global-hl-line-mode) ; highlight the current line
   (after-init . pixel-scroll-precision-mode)
+  ;; Make saved files that start with a shebang executable automatically.
+  (after-save . executable-make-buffer-file-executable-if-script-p)
   (window-setup . window-divider-mode)
   (emacs-startup . yilin/display-startup-time)
   )
@@ -215,6 +222,16 @@
   :hook after-init
   :custom
   (recentf-max-saved-items 50))
+
+;; Remember and restore point's position in each visited file.
+(use-package saveplace
+  :ensure nil
+  :hook (after-init . save-place-mode)
+  :config
+  ;; Recenter the window after save-place jumps to the restored position.
+  (advice-add 'save-place-find-file-hook :after
+              (lambda (&rest _)
+                (when buffer-file-name (ignore-errors (recenter))))))
 
 ;; --------------------------------------------------------------
 ;;                             Buffer

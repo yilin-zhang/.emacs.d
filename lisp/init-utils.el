@@ -9,6 +9,10 @@
              treemacs-git-mode)
   :custom-face
   (cfrs-border-color ((t (:inherit posframe-border))))
+  ;; doom-gruvbox leaves `treemacs-git-untracked-face' completely
+  ;; unstyled, so untracked files look identical to normal ones. Give
+  ;; them a visible (green) face, consistent with "new" elsewhere.
+  (treemacs-git-untracked-face ((t (:inherit font-lock-string-face))))
   :bind (([f8]        . treemacs)
          ("M-0"       . treemacs-select-window)
          ("C-x t 1"   . treemacs-delete-other-windows)
@@ -21,11 +25,20 @@
   :config
   (setq treemacs-collapse-dirs           (if treemacs-python-executable 3 0)
         treemacs-missing-project-action  'remove
-        treemacs-sorting                 'alphabetic-asc
+        ;; Case-insensitive so `Zebra' doesn't sort before `apple'.
+        treemacs-sorting                 'alphabetic-case-insensitive-asc
         treemacs-follow-after-init       t
         treemacs-width                   30
+        ;; Skip the sidebar when cycling windows (`C-x o' etc.) so the
+        ;; cursor never lands in the file tree by accident.
+        treemacs-is-never-other-window   t
         treemacs-no-png-images           nil)
-  (treemacs-follow-mode t)
+  ;; Continuous follow-mode (auto-locating the current file on every
+  ;; buffer switch) is too jarring -- the tree keeps jumping around.
+  ;; `treemacs-follow-after-init' still does a one-time locate on open,
+  ;; and `treemacs-project-follow-mode' keeps the tree scoped to the
+  ;; current project, which is the part worth keeping.
+  (treemacs-follow-mode -1)
   (treemacs-filewatch-mode t)
   (treemacs-project-follow-mode t)
   (pcase (cons (not (null (executable-find "git")))

@@ -144,6 +144,41 @@
                         (if (> (buffer-size) (* 3000 80))
                             (aggressive-indent-mode -1))))))
 
+;; Vertical indentation guides, like VSCode/Zed. Tree-sitter aware, so
+;; the bars follow real scopes in `*-ts-mode' buffers (Python especially).
+(use-package indent-bars
+  :hook
+  ;; Enable it only for Python for now.
+  (python-ts-mode . indent-bars-mode)
+  :custom
+  (indent-bars-treesit-support t)
+  ;; Bitmaps are inexplicably slow on macOS; character-based bars are
+  ;; fast and look the same here.
+  (indent-bars-prefer-character t)
+  (indent-bars-starting-column 0)
+  ;; Subtle, not the default rainbow -- a dim comment-colored line.
+  (indent-bars-width-frac 0.15)
+  (indent-bars-color-by-depth nil)
+  (indent-bars-color '(font-lock-comment-face :face-bg nil :blend 0.425))
+  (indent-bars-highlight-current-depth nil)
+  ;; Extend bars across blank lines *within* an indented block only, so
+  ;; there are no distracting gaps but no stray bars past the block end.
+  (indent-bars-display-on-blank-lines 'least)
+  :config
+  ;; HACK: `indent-bars-display-on-blank-lines' puts a display property
+  ;;   containing a newline on blank lines, which confuses `move-to-column'
+  ;;   and breaks `next-line' past such lines (jdtsmith/indent-bars#22).
+  (defun yilin/indent-bars--protect-move-to-column (fn col &rest args)
+    (if-let* ((indent-bars-mode)
+              (indent-bars-display-on-blank-lines)
+              (nlp (line-end-position))
+              (dprop (get-text-property nlp 'display))
+              ((seq-contains-p dprop ?\n))
+              ((> col (- nlp (point)))))
+        (goto-char nlp)
+      (apply fn col args)))
+  (advice-add #'move-to-column :around #'yilin/indent-bars--protect-move-to-column))
+
 ;; Note that this package has conflict with smartparens.
 ;; The solution is written inside smartparens' configurations.
 ;; (use-package hungry-delete
@@ -164,11 +199,30 @@
               ("C-c t o" . hl-todo-occur))
   :hook (after-init . global-hl-todo-mode)
   :config
-  (setf hl-todo-keyword-faces (assoc-delete-all "XXXX*" hl-todo-keyword-faces))
-  (dolist (keyword '("BUG" "DEFECT" "ISSUE"))
-    (cl-pushnew `(,keyword . ,(face-foreground 'error)) hl-todo-keyword-faces))
-  (dolist (keyword '("WORKAROUND" "HACK" "TRICK" "WIP"))
-    (cl-pushnew `(,keyword . ,(face-foreground 'warning)) hl-todo-keyword-faces)))
+  ;; Highlight ":" after the keyword too, like doom.
+  (setq hl-todo-highlight-punctuation ":")
+  ;; Semantic, distinctly-colored faces (instead of flattening everything
+  ;; into just error/warning red+yellow). Borrowed from doom's keyword set
+  ;; and extended with my own keywords.
+  (setq hl-todo-keyword-faces
+        '(;; needs doing later
+          ("TODO" warning bold)
+          ;; broken / unimplemented / actively wrong
+          ("FIXME" error bold)
+          ("BUG" error bold)
+          ("DEFECT" error bold)
+          ("ISSUE" error bold)
+          ;; revisit / reconsider, not necessarily broken
+          ("REVIEW" font-lock-keyword-face bold)
+          ("WIP" font-lock-keyword-face bold)
+          ;; intentional smell / questionable-but-works
+          ("HACK" font-lock-constant-face bold)
+          ("WORKAROUND" font-lock-constant-face bold)
+          ("TRICK" font-lock-constant-face bold)
+          ;; going away
+          ("DEPRECATED" font-lock-doc-face bold)
+          ;; informational aside
+          ("NOTE" success bold))))
 
 ;; Make the cursor have a tail, which is easier for
 ;; users to locate the cursor.

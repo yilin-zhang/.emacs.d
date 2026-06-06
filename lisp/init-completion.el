@@ -1,13 +1,5 @@
 ;; init-completion.el --- In-buffer completion (corfu + capf). -*- lexical-binding: t -*-
 
-;; Path auto completion
-(use-package comint
-  :ensure nil
-  :init
-  (add-to-list 'completion-at-point-functions #'comint--complete-file-name-data)
-  (setq comint-completion-addsuffix nil
-        comint-completion-autolist nil))
-
 (use-package corfu
   ;; Optional customizations
   :custom
@@ -102,7 +94,6 @@
   ;; (tempel, file, dabbrev) in LSP buffers. Wrap it (and friends) as
   ;; non-exclusive so they compose instead of shadowing each other.
   (advice-add #'eglot-completion-at-point :around #'cape-wrap-nonexclusive)
-  (advice-add #'comint-completion-at-point :around #'cape-wrap-nonexclusive)
   (advice-add #'pcomplete-completions-at-point :around #'cape-wrap-nonexclusive))
 
 (provide 'init-completion)

@@ -16,10 +16,20 @@
   ;; display file sizes in “human-readable” format
   (dired-listing-switches "-alh")
   :config
-  ;; support --dired
+  ;; macOS ships BSD ls, which doesn't understand `--dired'; that's what
+  ;; triggers the "ls does not support --dired" warning. Prefer GNU ls
+  ;; (gls, from `brew install coreutils') for full dired support. Detect
+  ;; it robustly: `executable-find' can fail here if this runs before
+  ;; exec-path-from-shell has populated `exec-path', so also probe the
+  ;; standard Homebrew locations directly. If there's no gls at all, tell
+  ;; dired to stop trying `--dired' so the warning goes away.
   (when (eq system-type 'darwin)
-    (when-let ((gls (executable-find "gls")))
-      (setq insert-directory-program gls))))
+    (let ((gls (or (executable-find "gls")
+                   (seq-find #'file-executable-p
+                             '("/opt/homebrew/bin/gls" "/usr/local/bin/gls")))))
+      (if gls
+          (setq insert-directory-program gls)
+        (setq dired-use-ls-dired nil)))))
 
 (use-package async
   :init

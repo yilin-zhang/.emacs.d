@@ -52,9 +52,6 @@
 
 (require 'use-package)
 
-;; the key word ":diminish" only works when we have diminish
-(use-package diminish)
-
 ;; --------------------------------------------------------------
 ;;                       Configurations
 ;; --------------------------------------------------------------
@@ -70,6 +67,7 @@
 (require 'init-completion)
 (require 'init-edit)
 (require 'init-utils)
+(require 'init-commands)
 
 (when (file-exists-p custom-file)
   (load custom-file nil 'nomessage))

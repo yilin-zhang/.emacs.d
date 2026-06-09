@@ -69,23 +69,9 @@ The buffer's major mode should be `org-mode'."
     "Insert a Chinese date heading based on the current date."
     (interactive)
     (org-insert-heading-respect-content)
-    (insert (format-time-string "%Y年"))
-    (let ((month (format-time-string "%m"))
-          (day (format-time-string "%d"))
-          (week (format-time-string "%a")))
-      (if (string-equal "0" (substring month 0 1))
-          (setq month (substring month 1)))
-      (if (string-equal "0" (substring day 0 1))
-          (setq day (substring day 1)))
-      (cond
-       ((string-equal week "Mon") (setq week "一"))
-       ((string-equal week "Tue") (setq week "二"))
-       ((string-equal week "Wed") (setq week "三"))
-       ((string-equal week "Thu") (setq week "四"))
-       ((string-equal week "Fri") (setq week "五"))
-       ((string-equal week "Sat") (setq week "六"))
-       ((string-equal week "Sun") (setq week "日")))
-      (insert (format "%s月%s日 %s" month day week))))
+    (insert (format-time-string "%Y年%-m月%-d日 ")
+            (aref ["日" "一" "二" "三" "四" "五" "六"]
+                  (string-to-number (format-time-string "%w")))))
 
   :init
   ;; Agenda files composition (static + dynamic sources, refresh on
@@ -100,7 +86,6 @@ The buffer's major mode should be `org-mode'."
   :hook
   (org-mode . org-indent-mode)
   (org-mode . auto-fill-mode)
-  (org-mode . (lambda () (diminish 'org-indent-mode)))
   (org-mode . (lambda () (setq truncate-lines nil)))
   (org-mode . yilin/prettify-org-buffer)
   (org-mode . (lambda () (corfu-mode -1)))
@@ -229,10 +214,6 @@ The buffer's major mode should be `org-mode'."
 
 ;; Convert the buffer text and the associated decorations to HTML
 (use-package htmlize)
-
-;; Literature management
-;; path variables can be set in custom/custom-post.el
-(use-package org-ref)
 
 ;; Compose `org-agenda-files' from static and dynamic sources. Eager
 ;; (`:demand t') so its `advice-add' on `org-agenda' is registered

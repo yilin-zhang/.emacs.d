@@ -66,6 +66,9 @@
   (setq make-backup-files nil  ; disable backup file
         auto-save-default nil  ; disable auto-save
         )
+  ;; Resolve symlinks when visiting files, so buffers always point at
+  ;; the canonical path (also keeps doom-modeline's buffer name honest).
+  (setq find-file-visit-truename t)
   ;; Warning handling
   (setq warning-suppress-types '((emacs)))
   ;; Misc QoL tweaks (from emacsredux "stealing from the best configs").
@@ -110,8 +113,7 @@
   :hook after-init
   :custom
   (doom-modeline-support-imenu t)
-  (doom-modeline-modal-icon nil)
-  (find-file-visit-truename t))
+  (doom-modeline-modal-icon nil))
 
 ;; --------------------------------------------------------------
 ;;                            Paths
@@ -254,7 +256,6 @@
   :preface
   (defvar yilin/default-font-size 15 "The default font size")
   (defvar yilin/fixed-pitch-font "Sarasa Term SC" "The fixed pitch font")
-  ;; (defvar yilin/fixed-pitch-font "Fira Code" "The fixed pitch font")
   (defvar yilin/variable-pitch-font "Noto Serif" "The fixed pitch font")
 
   (defun yilin/set-fonts (&optional font-size)
@@ -275,44 +276,9 @@
     "Set current buffer's font to variable-pitch"
     (buffer-face-set 'variable-pitch))
 
-  ;; `https://github.com/d12frosted/homebrew-emacs-plus/issues/276'
-  (defun yilin/setup-fira-code()
-    "Set up ligatures for Fira Code"
-    (let ((alist '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
-                   (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
-                   (36 . ".\\(?:>\\)")
-                   (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
-                   (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
-                   (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
-                   (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
-                   (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
-                   (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
-                   (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
-                   (48 . ".\\(?:x[a-zA-Z]\\)")
-                   (58 . ".\\(?:::\\|[:=]\\)")
-                   (59 . ".\\(?:;;\\|;\\)")
-                   (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
-                   (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
-                   (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
-                   (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
-                   (91 . ".\\(?:]\\)")
-                   (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
-                   (94 . ".\\(?:=\\)")
-                   (119 . ".\\(?:ww\\)")
-                   (123 . ".\\(?:-\\)")
-                   (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
-                   (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)"))))
-      (dolist (char-regexp alist)
-        (set-char-table-range composition-function-table (car char-regexp)
-                              `([,(cdr char-regexp) 0 font-shape-gstring])))))
-
   :init
   (when (display-graphic-p)
-    (yilin/set-fonts))
-
-  :config
-  (when (equal yilin/fixed-pitch-font "Fira Code")
-    (yilin/setup-fira-code)))
+    (yilin/set-fonts)))
 
 (provide 'init-basic)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

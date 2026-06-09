@@ -71,9 +71,9 @@ modal editing gets in the way."
      '("<escape>" . ignore)
      '("/" . execute-extended-command))
     (meow-leader-define-key
-     ;; SPC j/k will run the original command in MOTION state.
+     ;; SPC j will run the original command in MOTION state.
+     ;; (No "k" passthrough -- SPC k is taken by `kill-buffer' below.)
      '("j" . "H-j")
-     '("k" . "H-k")
      ;; Use SPC (0-9) for digit arguments.
      '("1" . meow-digit-argument)
      '("2" . meow-digit-argument)

@@ -20,12 +20,31 @@
     '("-a" "Autostash" "--autostash")))
 
 ;; Enforce good commit-message conventions: 50-char summary, blank
-;; second line, 72-char body wrap. `global-git-commit-mode' also catches
-;; COMMIT_EDITMSG opened from a terminal `git commit' via emacsclient,
-;; not just commits started from magit. `git-commit' ships inside magit.
+;; second line, 72-char body wrap. This also catches COMMIT_EDITMSG
+;; opened from a terminal `git commit' via emacsclient, not just
+;; commits started from magit.
+;;
+;; PERF: in magit 4.x, git-commit.el `require's the magit core
+;; (magit-git, magit-mode, magit-process, transient, with-editor) at
+;; load time, so enabling `global-git-commit-mode' on `after-init'
+;; would load most of magit at every startup. Instead, match filenames
+;; ourselves on `find-file' and only load git-commit when a commit
+;; message file is actually visited.
 (use-package git-commit
   :ensure nil
-  :hook (after-init . global-git-commit-mode)
+  :preface
+  ;; Mirrors `git-commit-filename-regexp', inlined so the check runs
+  ;; without loading git-commit.
+  (defconst yilin/git-commit-filename-regexp "/\\(\
+\\(\\(COMMIT\\|NOTES\\|PULLREQ\\|MERGEREQ\\|TAG\\)_EDIT\\|MERGE_\\|\\)MSG\
+\\|\\(BRANCH\\|EDIT\\)_DESCRIPTION\\)\\'")
+  (defun yilin/maybe-git-commit-setup ()
+    (when (and buffer-file-name
+               (string-match-p yilin/git-commit-filename-regexp
+                               buffer-file-name))
+      (require 'git-commit)
+      (git-commit-setup-check-buffer)))
+  :hook (find-file . yilin/maybe-git-commit-setup)
   :config
   (setq git-commit-summary-max-length 50
         git-commit-style-convention-checks
@@ -60,14 +79,11 @@
 
 ;; Highlight uncommitted changes using VC
 (use-package diff-hl
-  :preface
-  (defun yilin/diff-hl-dired-mode-unless-remote ()
-    (unless (file-remote-p default-directory)
-      (diff-hl-dired-mode)))
   :bind (:map diff-hl-command-map
               ("SPC" . diff-hl-mark-hunk))
   :hook ((after-init . global-diff-hl-mode)
-         (dired-mode . yilin/diff-hl-dired-mode-unless-remote))
+         ;; Ships with diff-hl (autoloaded from diff-hl-dired).
+         (dired-mode . diff-hl-dired-mode-unless-remote))
   :config
   (setq diff-hl-update-async t
         ;; Better diff algorithm for what the gutter shows.
@@ -79,15 +95,12 @@
   ;; doom #8554); there we fall back to updating on save.
   (unless (eq system-type 'darwin)
     (add-hook 'diff-hl-mode-hook #'diff-hl-flydiff-mode))
-  (set-face-attribute 'diff-hl-change nil
-                      :background 'unspecified
-                      :foreground (face-foreground 'warning))
-  (set-face-attribute 'diff-hl-insert nil
-                      :background 'unspecified
-                      :foreground (face-foreground 'success))
-  (set-face-attribute 'diff-hl-delete nil
-                      :background 'unspecified
-                      :foreground (face-foreground 'error))
+  (pcase-dolist (`(,face . ,source) '((diff-hl-change . warning)
+                                      (diff-hl-insert . success)
+                                      (diff-hl-delete . error)))
+    (set-face-attribute face nil
+                        :background 'unspecified
+                        :foreground (face-foreground source)))
   (with-no-warnings
     ;; Integration with magit
     (with-eval-after-load 'magit

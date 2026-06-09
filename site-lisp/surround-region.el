@@ -39,77 +39,34 @@ Supports *, =, +, / and properly pairs (, [, {."
                   (insert left-char))))))
       (message "No region selected"))))
 
-(defun yilin/surround-region-equal ()
-  (interactive)
-  (yilin/surround-region ?=))
-
-(defun yilin/surround-region-plus ()
-  (interactive)
-  (yilin/surround-region ?+))
-
-(defun yilin/surround-region-asterisk ()
-  (interactive)
-  (yilin/surround-region ?*))
-
-(defun yilin/surround-region-dash ()
-  (interactive)
-  (yilin/surround-region ?-))
-
-(defun yilin/surround-region-paren ()
-  (interactive)
-  (yilin/surround-region ?\())
-
-(defun yilin/surround-region-bracket ()
-  (interactive)
-  (yilin/surround-region ?\[))
-
-(defun yilin/surround-region-curly ()
-  (interactive)
-  (yilin/surround-region ?\{))
-
-(defun yilin/surround-region-angle ()
-  (interactive)
-  (yilin/surround-region ?\<))
-
-(defun yilin/surround-region-quote ()
-  (interactive)
-  (yilin/surround-region ?\'))
-
-(defun yilin/surround-region-dquote ()
-  (interactive)
-  (yilin/surround-region ?\"))
-
-(defun yilin/surround-region-slash ()
-  (interactive)
-  (yilin/surround-region ?/))
-
-(defun yilin/surround-region-underscore ()
-  (interactive)
-  (yilin/surround-region ?_))
-
-(defun yilin/surround-region-tilde ()
-  (interactive)
-  (yilin/surround-region ?~))
+(defconst surround-region--specs
+  '(("equal"      ?= "=")
+    ("plus"       ?+ "+")
+    ("asterisk"   ?* "*")
+    ("dash"       ?- "-")
+    ("paren"      ?\( "(" ")")
+    ("bracket"    ?\[ "[" "]")
+    ("curly"      ?\{ "{" "}")
+    ("angle"      ?< "<" ">")
+    ("quote"      ?' "'")
+    ("dquote"     ?\" "\"")
+    ("slash"      ?/ "/")
+    ("underscore" ?_ "_")
+    ("tilde"      ?~ "~"))
+  "Wrapper specs: (NAME CHAR KEYS...).
+Each spec defines the command `yilin/surround-region-NAME' that
+surrounds the region with CHAR, bound to KEYS in
+`surround-region-map'.")
 
 (defvar surround-region-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "=" #'yilin/surround-region-equal)
-    (define-key map "+" #'yilin/surround-region-plus)
-    (define-key map "*" #'yilin/surround-region-asterisk)
-    (define-key map "-" #'yilin/surround-region-dash)
-    (define-key map "(" #'yilin/surround-region-paren)
-    (define-key map ")" #'yilin/surround-region-paren)
-    (define-key map "[" #'yilin/surround-region-bracket)
-    (define-key map "]" #'yilin/surround-region-bracket)
-    (define-key map "{" #'yilin/surround-region-curly)
-    (define-key map "}" #'yilin/surround-region-curly)
-    (define-key map "<" #'yilin/surround-region-angle)
-    (define-key map ">" #'yilin/surround-region-angle)
-    (define-key map "'" #'yilin/surround-region-quote)
-    (define-key map "\"" #'yilin/surround-region-dquote)
-    (define-key map "/" #'yilin/surround-region-slash)
-    (define-key map "_" #'yilin/surround-region-underscore)
-    (define-key map "~" #'yilin/surround-region-tilde)
+    (pcase-dolist (`(,name ,char . ,keys) surround-region--specs)
+      (let ((cmd (intern (concat "yilin/surround-region-" name))))
+        (defalias cmd
+          (lambda () (interactive) (yilin/surround-region char))
+          (format "Surround the region with `%c'." char))
+        (dolist (key keys)
+          (define-key map key cmd))))
     map)
   "Prefix keymap for `yilin/surround-region' wrappers.")
 (fset 'surround-region-map surround-region-map)

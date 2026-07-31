@@ -99,12 +99,10 @@
 (use-package dape
   :hook
   (dape-repl-mode . yilin/disable-meow)
-  ;; Save breakpoints on quit. (Loading breakpoints used to live on
-  ;; `after-init', which forced dape to load at startup whether or
-  ;; not you ever debug. Removed -- run `M-x dape-breakpoint-load'
-  ;; manually if you want last session's breakpoints back.)
-  (kill-emacs . dape-breakpoint-save)
   :config
+  ;; Save breakpoints on quit, but only after dape has actually been used.
+  ;; A top-level `kill-emacs' hook would autoload dape during every shutdown.
+  (add-hook 'kill-emacs-hook #'dape-breakpoint-save)
   ;; Turn on global bindings for setting breakpoints with mouse
   (dape-breakpoint-global-mode)
   ;; Info buffers to the left

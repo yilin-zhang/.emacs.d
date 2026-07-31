@@ -43,13 +43,11 @@
     )
   (dolist (hook '(conf-mode-hook prog-mode-hook text-mode-hook))
     (add-hook hook 'tempel-setup-capf))
-  ;; Optionally make the Tempel templates available to Abbrev,
-  ;; either locally or globally. `expand-abbrev' is bound to C-x '.
-  (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
-  ;; NOTE: `global-tempel-abbrev-mode' is autoloaded -- calling it
-  ;; directly in :init eagerly loads the whole tempel package at
-  ;; startup. Deferring via :hook keeps the load lazy.
-  :hook (after-init . global-tempel-abbrev-mode))
+  ;; Make Tempel templates available to Abbrev in the same buffers where
+  ;; its completion-at-point function is installed.  A global mode on
+  ;; `after-init' would load Tempel at every startup, before any eligible
+  ;; buffer actually needs it.
+  :hook ((conf-mode prog-mode text-mode) . tempel-abbrev-mode))
 
 (use-package tempel-collection)
 
@@ -134,13 +132,15 @@
 
 ;; Minor mode to aggressively keep your code always indented
 (use-package aggressive-indent
-  :hook ((lisp-mode . aggressive-indent-mode)
-         (emacs-lisp-mode . aggressive-indent-mode)
-         ;; FIXME: Disable in big files due to the performance issues
-         ;; https://github.com/Malabarba/aggressive-indent-mode/issues/73
-         (find-file . (lambda ()
-                        (if (> (buffer-size) (* 3000 80))
-                            (aggressive-indent-mode -1))))))
+  :preface
+  (defun yilin/maybe-enable-aggressive-indent ()
+    "Enable `aggressive-indent-mode' unless the buffer is large."
+    ;; Avoid its known performance problems in files over roughly 240 KB.
+    ;; https://github.com/Malabarba/aggressive-indent-mode/issues/73
+    (unless (> (buffer-size) (* 3000 80))
+      (aggressive-indent-mode 1)))
+  :hook ((lisp-mode . yilin/maybe-enable-aggressive-indent)
+         (emacs-lisp-mode . yilin/maybe-enable-aggressive-indent)))
 
 ;; Vertical indentation guides, like VSCode/Zed. Tree-sitter aware, so
 ;; the bars follow real scopes in `*-ts-mode' buffers (Python especially).

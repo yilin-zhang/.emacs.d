@@ -1,9 +1,12 @@
 ;; init-prog.el --- Configurations for programming languages. -*- lexical-binding: t -*-
 
-(use-package flymake
-  :ensure nil
+(use-package flycheck
+  :hook ((after-init . global-flycheck-mode)
+         (after-init . global-flycheck-annotate-mode))
   :custom
-  (flymake-no-changes-timeout 1))
+  (flycheck-idle-change-delay 1)
+  :config
+  (global-flycheck-eglot-mode 1))
 
 (use-package prog-mode
   :ensure nil

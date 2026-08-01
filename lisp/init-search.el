@@ -1,4 +1,9 @@
-;; init-search.el --- Minibuffer, search, and navigation UI. -*- lexical-binding: t -*-
+;;; init-search.el --- Minibuffer, search, and navigation UI. -*- lexical-binding: t -*-
+
+;;; Commentary:
+;; Configure minibuffer completion, search commands, and navigation aids.
+
+;;; Code:
 
 (use-package which-key
   :ensure nil

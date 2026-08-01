@@ -1,4 +1,9 @@
-;; init-git.el --- Configurations for git. -*- lexical-binding: t -*-
+;;; init-git.el --- Configurations for git. -*- lexical-binding: t -*-
+
+;;; Commentary:
+;; Configure Git integrations including Magit, blamer, and diff-hl.
+
+;;; Code:
 
 ;; Magit
 (use-package magit

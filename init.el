@@ -1,5 +1,10 @@
-;;; package --- My init.el  -*- lexical-binding: t -*-
+;;; init.el --- Personal Emacs configuration entry point -*- lexical-binding: t; -*-
+
 ;;; Commentary:
+
+;; Initialize package management and load the configuration modules in their
+;; required order.  Startup-only optimizations live in early-init.el.
+
 ;;; Code:
 
 ;; NOTE: All startup performance optimizations (GC, file-name-handler-alist,

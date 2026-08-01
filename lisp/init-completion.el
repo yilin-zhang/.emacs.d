@@ -1,4 +1,9 @@
-;; init-completion.el --- In-buffer completion (corfu + capf). -*- lexical-binding: t -*-
+;;; init-completion.el --- In-buffer completion (corfu + capf). -*- lexical-binding: t -*-
+
+;;; Commentary:
+;; Configure Corfu and completion-at-point functions for in-buffer completion.
+
+;;; Code:
 
 (use-package corfu
   ;; Optional customizations

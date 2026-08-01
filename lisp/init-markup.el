@@ -1,4 +1,9 @@
-;; init-markup.el --- Configurations for markup languages. -*- lexical-binding: t -*-
+;;; init-markup.el --- Configurations for markup languages. -*- lexical-binding: t -*-
+
+;;; Commentary:
+;; Configure editing support for LaTeX, Markdown, YAML, CSV, and Mermaid.
+
+;;; Code:
 
 ;; --------------------------------------------------------------
 ;;                     LaTeX Mode Configurations

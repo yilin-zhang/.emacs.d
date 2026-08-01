@@ -1,4 +1,10 @@
-;; init-prog.el --- Configurations for programming languages. -*- lexical-binding: t -*-
+;;; init-prog.el --- Configurations for programming languages. -*- lexical-binding: t -*-
+
+;;; Commentary:
+;; Configure programming modes, syntax checking, language servers, debugging,
+;; and language-specific tooling.
+
+;;; Code:
 
 (use-package flycheck
   :hook ((after-init . global-flycheck-mode)

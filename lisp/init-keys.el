@@ -1,4 +1,9 @@
-;; init-keys.el --- Modal editing and global key modifiers. -*- lexical-binding: t -*-
+;;; init-keys.el --- Modal editing and global key modifiers. -*- lexical-binding: t -*-
+
+;;; Commentary:
+;; Configure global key modifiers, key bindings, and Meow modal editing.
+
+;;; Code:
 
 ;; --------------------------------------------------------------
 ;;                            Key Bindings

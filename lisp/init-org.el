@@ -1,4 +1,9 @@
-;; init-org.el --- Configurations for org mode. -*- lexical-binding: t -*-
+;;; init-org.el --- Configurations for org mode. -*- lexical-binding: t -*-
+
+;;; Commentary:
+;; Configure Org mode, agenda, capture, and bibliography workflows.
+
+;;; Code:
 
 (use-package org
   :ensure nil

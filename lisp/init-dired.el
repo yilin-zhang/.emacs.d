@@ -1,4 +1,9 @@
-;; init-dired.el --- Configurations for dired mode. -*- lexical-binding: t -*-
+;;; init-dired.el --- Configurations for dired mode. -*- lexical-binding: t -*-
+
+;;; Commentary:
+;; Configure Dired file management and related navigation behavior.
+
+;;; Code:
 
 (use-package dired
   :ensure nil

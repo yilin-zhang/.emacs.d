@@ -1,4 +1,10 @@
-;; init-edit.el --- Configurations for a better editing experience. -*- lexical-binding: t -*-
+;;; init-edit.el --- Configurations for a better editing experience. -*- lexical-binding: t -*-
+
+;;; Commentary:
+;; Configure spelling, templates, structural editing, whitespace, and other
+;; editing conveniences.
+
+;;; Code:
 
 ;; --------------------------------------------------------------
 ;;                         Spell checker

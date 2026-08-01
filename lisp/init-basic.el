@@ -1,4 +1,9 @@
-;; init-basic.el --- Basic configurations. -*- lexical-binding: t -*-
+;;; init-basic.el --- Basic configurations. -*- lexical-binding: t -*-
+
+;;; Commentary:
+;; Configure core performance, appearance, and user-interface behavior.
+
+;;; Code:
 
 ;; --------------------------------------------------------------
 ;;                         Performance

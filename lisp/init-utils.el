@@ -1,4 +1,10 @@
-;; init-utils.el --- Utility configurations. -*- lexical-binding: t -*-
+;;; init-utils.el --- Utility configurations. -*- lexical-binding: t -*-
+
+;;; Commentary:
+;; Configure file trees, documentation, notes, buffers, terminals, and other
+;; general-purpose utilities.
+
+;;; Code:
 
 ;; --------------------------------------------------------------
 ;;                         File Tree

@@ -7,8 +7,8 @@
 ;;; Code:
 
 (use-package flycheck
-  :hook ((after-init . global-flycheck-mode)
-         (after-init . global-flycheck-annotate-mode))
+  :hook ((prog-mode . flycheck-mode)
+         (prog-mode . flycheck-annotate-mode))
   :custom
   (flycheck-idle-change-delay 1)
   :config

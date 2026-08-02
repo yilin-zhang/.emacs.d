@@ -73,6 +73,20 @@
 
 (use-package csv-mode)
 
+;; --------------------------------------------------------------
+;;                      Typst Mode Configuration
+;; --------------------------------------------------------------
+(use-package typst-ts-mode
+  :mode "\\.typ\\'"
+  :init
+  ;; Some Typst projects bundle fonts locally and set
+  ;; `typst-ts-compile-options' through .dir-locals.el so compilation can find
+  ;; them.  Trust only this exact relative font-path argument; arbitrary values
+  ;; remain unsafe because the option is passed to a shell command.
+  (put 'typst-ts-compile-options 'safe-local-variable
+       (lambda (value)
+         (equal value "--font-path fonts"))))
+
 (provide 'init-markup)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-markup.el ends here

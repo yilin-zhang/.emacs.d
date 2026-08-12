@@ -36,17 +36,9 @@
         ("S-TAB" . corfu-previous)
         ([backtab] . corfu-previous))
 
-  ;; Enable Corfu only for certain modes.
-  ;; :hook ((prog-mode . corfu-mode)
-  ;;        (shell-mode . corfu-mode)
-  ;;        (eshell-mode . corfu-mode))
-
-  ;; Recommended: Enable Corfu globally.
-  ;; This is recommended since Dabbrev can be used globally (M-/).
-  ;; See also `corfu-excluded-modes'.
-  ;; Using :hook instead of :init so corfu actually defers -- :init
-  ;; would force eager loading at startup.
-  :hook ((after-init . global-corfu-mode)
+  ;; Keep automatic completion in programming buffers.  Text buffers can
+  ;; still request Dabbrev manually with `M-/'.
+  :hook ((prog-mode . corfu-mode)
          ;; Close the corfu popup when meow leaves insert state.
          (meow-insert-exit . corfu-quit)))
 

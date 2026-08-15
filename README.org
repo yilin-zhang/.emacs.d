@@ -1,6 +1,59 @@
 #+TITLE: .emacs.d
 
-A personal Emacs configuration.
+A personal Emacs configuration for macOS: =use-package= + ELPA/MELPA for
+packages, [[https://github.com/meow-edit/meow][Meow]] for modal editing, =eglot= for LSP.
+
+This README doubles as a map of the configuration -- see [[*Structure][Structure]] for
+where things live, [[*Key bindings][Key bindings]] and [[*Commands][Commands]] for what is actually bound.
+
+* Structure
+** Load order
+=early-init.el= runs first (GC and UI tweaks before the frame appears).
+=init.el= then bootstraps =use-package=, registers the package archives
+(GNU, NonGNU, MELPA), and requires the modules in =lisp/= in this order:
+
+#+begin_src
+init-basic -> init-keys -> init-dired -> init-org -> init-git ->
+init-markup -> init-prog -> init-search -> init-completion ->
+init-edit -> init-utils -> init-commands -> custom/custom-post.el
+#+end_src
+
+=init-keys= is loaded early, right after =init-basic=, because many later
+modules reference meow -- color-rg in =init-search=, vterm in =init-utils=,
+=yilin/disable-meow= in =init-prog=. Loading it up front means everything
+downstream can rely on meow being available.
+
+=custom/custom-post.el= is loaded last and is deliberately not tracked by
+git; see [[*Customization][Customization]].
+
+** Modules
+| File               | Responsibility                                                                  |
+|--------------------+---------------------------------------------------------------------------------|
+| =init-basic.el=      | Performance (GCMH), fonts (Sarasa Term SC), theme (doom-gruvbox), doom-modeline |
+| =init-keys.el=       | macOS key modifiers, super-key bindings, Meow (+ indent-shift, surround-region) |
+| =init-dired.el=      | Dired file management and navigation                                            |
+| =init-org.el=        | Org mode, agenda, capture, bibliography                                         |
+| =init-git.el=        | Magit, blamer, diff-hl                                                          |
+| =init-markup.el=     | LaTeX, Markdown, YAML, CSV, Mermaid, Typst                                      |
+| =init-prog.el=       | Tree-sitter, eglot, flycheck, dape, language modes                              |
+| =init-search.el=     | Vertico / marginalia / consult / embark / orderless, which-key, color-rg        |
+| =init-completion.el= | Corfu, kind-nerd-icons, comint capf                                             |
+| =init-edit.el=       | Jinx, tempel, parens, whitespace, aggressive-indent, hl-todo, pulsar, vundo     |
+| =init-utils.el=      | Treemacs, helpful, denote, olivetti, eyebrowse, macmount, auto-save, vterm      |
+| =init-commands.el=   | Personal interactive commands and their keybindings (see [[*Commands][Commands]])              |
+
+** Directories
+| Path       | Contents                                       |
+|------------+------------------------------------------------|
+| =lisp/=      | The =init-*.el= modules above                    |
+| =site-lisp/= | Local packages (see [[*Local plugins][Local plugins]])             |
+| =custom/=    | =custom-post.el=, personal overrides (untracked) |
+| =templates/= | =tempel= snippet definitions                     |
+| =elpa/=      | Installed packages (untracked)                 |
+
+=site-lisp/= also holds several larger in-development packages that are
+kept in their own repositories and are not tracked here. They are wired
+up from =custom-post.el=, not from =lisp/=.
 
 * Installation
 ** Clone the repository
@@ -44,6 +97,143 @@ Follow the instruction in [[https://github.com/blahgeek/emacs-lsp-booster][emacs
 | Vue      | =vue-language-server=        |
 | Lua      | =lua-language-server=        |
 
+* Key bindings
+Meow's own normal-state bindings are the stock QWERTY set
+(=meow-cheatsheet-layout-qwerty=); =SPC ?= brings up =meow-cheatsheet= for
+the full picture. What follows is only what this configuration adds or
+changes on top of that.
+
+** Leader (SPC)
+| Key      | Command                               | Notes                               |
+|----------+---------------------------------------+-------------------------------------|
+| =SPC f=    | =find-file=                             |                                     |
+| =SPC b=    | =consult-buffer=                        |                                     |
+| =SPC k=    | =kill-buffer=                           |                                     |
+| =SPC p=    | =consult-yank-pop=                      |                                     |
+| =SPC o=    | =other-window=                          |                                     |
+| =SPC d=    | =dired-jump=                            |                                     |
+| =SPC s=    | =outline-cycle=                         |                                     |
+| =SPC r=    | =color-rg-search-input=                 |                                     |
+| =SPC t=    | =yilin/open-with-terminal=              | defined in =init-commands.el=         |
+| =SPC e=    | =yilin/open-with-finder-or-default-app= | defined in =init-commands.el=         |
+| =SPC h=    | =meow-keypad-describe-key=              |                                     |
+| =SPC ?=    | =meow-cheatsheet=                       |                                     |
+| =SPC j=    | =H-j=                                   | runs the original =j= in MOTION state |
+| =SPC 0..9= | =meow-digit-argument=                   |                                     |
+| =SPC SPC=  | =surround-region-map=                   | prefix, see [[*Surround (SPC SPC)][Surround]]                |
+
+Add your own leader keys from =custom-post.el= -- see [[*Meow][Meow]].
+
+** Surround (SPC SPC)
+=SPC SPC= followed by a character wraps the selected region's
+non-whitespace content in that character, pairing brackets
+automatically.
+
+#+begin_example
+  keys      region "text" becomes
+  ----      ---------------------
+  =         =text=
+  +         +text+
+  *         *text*
+  -         -text-
+  /         /text/
+  _         _text_
+  ~         ~text~
+  '         'text'
+  "         "text"
+  ( or )    (text)
+  [ or ]    [text]
+  { or }    {text}
+  < or >    <text>
+#+end_example
+
+For a character not listed, =M-x yilin/surround-region= prompts for one. To add a permanent entry, extend =surround-region--specs= in
+=site-lisp/surround-region.el=; the wrapper command and its key are
+generated from the table.
+
+** Normal state (additions)
+| Key | Command                  |
+|-----+--------------------------|
+| =<=   | =indent-shift-left=        |
+| =>=   | =indent-shift-right=       |
+| =/=   | =execute-extended-command= |
+| ='=   | =repeat=                   |
+| =V=   | =rectangle-mark-mode=      |
+
+=<= / =>= shift the region (or current line) by one indent step,
+vim-style; the step width tracks the major mode.
+
+** Global
+| Key           | Command                                            |
+|---------------+----------------------------------------------------|
+| =C-z=           | =yilin/toggle-meow-mode=                             |
+| =C-[=           | =meow-insert-exit= (GUI, insert state)               |
+| =<f12>=         | =yilin/toggle-frame-fullscreen=                      |
+| =C-x \vert{}=         | =yilin/toggle-window-split=                          |
+| =C-x n=         | =yilin/narrow-or-widen-dwim=                         |
+| =M-Q=           | =yilin/unfill-paragraph=                             |
+| =s-j=           | =yilin/ghostel-popup-toggle=                         |
+| =C-c C-d=       | =yilin/eglot-documentation-at-point= (eglot buffers) |
+| =M-<backspace>= | =yilin/delete-minibuffer-directory= (minibuffer)     |
+
+** macOS modifiers
+=Option= is Meta, =Command= is Super, =Fn= is Hyper. The familiar
+Command-key shortcuts are kept:
+
+| Key | Command                 |
+|-----+-------------------------|
+| =s-a= | =mark-whole-buffer=       |
+| =s-c= | =kill-ring-save=          |
+| =s-l= | =goto-line=               |
+| =s-q= | =save-buffers-kill-emacs= |
+| =s-s= | =save-buffer=             |
+| =s-v= | =yank=                    |
+| =s-w= | =kill-current-buffer=     |
+| =s-z= | =undo=                    |
+
+* Commands
+Personal commands live in =init-commands.el=. All are =M-x=-able; the ones
+with a key are listed in [[*Key bindings][Key bindings]] as well.
+
+** Text editing
+| Command                    | Key   | Does                                                        |
+|----------------------------+-------+-------------------------------------------------------------|
+| =yilin/unfill-paragraph=     | =M-Q=   | Collapse a multi-line paragraph into one line               |
+| =yilin/narrow-or-widen-dwim= | =C-x n= | Widen if narrowed, otherwise narrow to region/subtree/defun |
+| =yilin/remove-empty-lines=   |       | Delete all whitespace-only lines in the buffer              |
+| =yilin/quote-lines=          |       | Wrap each line of the current block in quotes + separator   |
+| =yilin/insert-timestamp=     |       | Insert the current timestamp                                |
+
+** Symbols
+| Command                           | Does                                                              |
+|-----------------------------------+-------------------------------------------------------------------|
+| =yilin/insert-greek-or-math-symbol= | Replace the region with the matching Greek/math symbol, or prompt |
+| =yilin/insert-accented=             | Insert a character with an accent                                 |
+
+** Files and paths
+| Command                               | Key           | Does                                                         |
+|---------------------------------------+---------------+--------------------------------------------------------------|
+| =yilin/open-with-terminal=              | =SPC t=         | Open the current directory in a terminal tab                 |
+| =yilin/open-with-finder-or-default-app= | =SPC e=         | Open the directory in Finder, or the file in its default app |
+| =yilin/copy-file-path=                  |               | Copy the buffer's file path to the clipboard                 |
+| =yilin/copy-file-name=                  |               | Copy the buffer's file name to the clipboard                 |
+| =yilin/delete-minibuffer-directory=     | =M-<backspace>= | Delete one directory component in the minibuffer             |
+
+** Lookup and links
+| Command                               | Does                                                                   |
+|---------------------------------------+------------------------------------------------------------------------|
+| =yilin/lookup-thesaurus=                | Look up the word at point (or region) in an online thesaurus           |
+| =yilin/arxiv-open-paper=                | Open an arXiv paper in the browser by ID                               |
+| =yilin/arxiv-insert-org-link=           | Insert an Org link to an arXiv paper by ID                             |
+| =yilin/org-insert-link-with-html-title= | Fetch a URL asynchronously and insert an Org link using the page title |
+
+** Windows and frames
+| Command                       | Key   | Does                                     |
+|-------------------------------+-------+------------------------------------------|
+| =yilin/toggle-frame-fullscreen= | =<f12>= | Toggle fullscreen                        |
+| =yilin/toggle-window-split=     | =C-x \vert{}= | Switch between horizontal/vertical split |
+| =yilin/toggle-meow-mode=        | =C-z=   | Turn modal editing off and back on       |
+
 * Local plugins
 Checked-in local plugins in =site-lisp/=:
 
@@ -52,6 +242,13 @@ Third-party:
   icons.
 
 Self-made:
+- =indent-shift.el=: vim-style =>>= / =<<= for a region or the current
+  line, bound to => = / =<= in meow normal state.  The shift width
+  tracks the major mode.
+- =surround-region.el=: wrap the selected region in a character.
+  Provides =yilin/surround-region= plus generated per-character
+  wrappers, collected in the =surround-region-map= prefix keymap bound
+  to =SPC SPC= (see [[*Surround (SPC SPC)][Surround]]).
 - =lazy-revert.el=: lazy buffer revert.
 - =macmount.el=: mount, unmount, and eject external storage devices on macOS.
 - =sailor.el=: personal journaling minor mode with a dedicated hl-todo
@@ -68,8 +265,16 @@ Self-made:
   =emacs-startup-hook= -- no mode toggle needed.
 
 * Customization
-Create file =~/.emacs.d/custom/custom-post.el=. The configuration in the file will
-be loaded last.
+Create =~/.emacs.d/custom/custom-post.el=.  It is loaded last, after every
+module in =lisp/=, and is excluded from git -- everything personal goes
+there: machine-specific paths, private packages, extra leader keys, and
+any override of a setting made in =lisp/=.
+
+Because it loads last, a plain =setq= there wins over the modules.  For
+settings inside a package's =:config=, wrap yours in
+=with-eval-after-load=.
+
+The sections below cover the hooks that =lisp/= deliberately leaves open.
 
 ** Org
 The main repository intentionally ships no hardcoded agenda paths.
@@ -125,18 +330,18 @@ you can add your own sources the same way:
 Source functions must return freshly-built lists and should stay in
 the millisecond range since they run on every =C-c a=.
 
-*** org-ref
+*** Bibliography
+Bibliography support is =citar= + =org-cite= (=org-ref= was dropped).
+=citar= itself is configured in =custom-post.el=; point it at your
+=.bib= files there:
 #+begin_src elisp
-(setq reftex-default-bibliography '("~/references.bib"))
-(setq org-ref-bibliography-notes "~/bib-notes.org"
-      org-ref-default-bibliography '("~/references.bib")
-      org-ref-pdf-directory "~/bibtex-pdfs/")
+(setq citar-bibliography '("~/references.bib"))
 #+end_src
 
 ** Denote
 Set the denote bucket by setting =denote-directory=:
 #+begin_src elisp
-(setq denote-directory "~/Documents/notebooks/denote")
+(setq denote-directory "~/notes/denote")
 #+end_src
 
 Denote notes whose filename contains the =_agenda= keyword are

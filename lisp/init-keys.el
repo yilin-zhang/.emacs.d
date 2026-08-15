@@ -43,12 +43,14 @@
 (use-package indent-shift
   :ensure nil
   :load-path yilin/site-lisp-directory
-  :after meow)
+  :after meow
+  :demand t)
 
 (use-package surround-region
   :ensure nil
   :load-path yilin/site-lisp-directory
-  :after meow)
+  :after meow
+  :demand t)
 
 (use-package meow
   ;; No :demand -- meow loads lazily. `meow-setup' below runs on

@@ -129,6 +129,10 @@ The buffer's major mode should be `org-mode'."
   (setq org-export-backends '(ascii html icalendar latex md)
         org-format-latex-options (plist-put org-format-latex-options :scale 2.3)
         org-latex-compiler "xelatex") ; Set XeLaTeX as the default LaTeX compiler
+  ;; Render LaTeX fragments as images as soon as a file is opened, so
+  ;; formulas never show up as raw source. `org-fragtog' below keeps
+  ;; them rendered while editing.
+  (setq org-startup-with-latex-preview t)
   (setq org-agenda-log-mode-items '(closed clock state)) ; show when things get done in the log mode
   ;; Custom agenda views
   (setq org-agenda-block-separator nil)
@@ -216,6 +220,11 @@ The buffer's major mode should be `org-mode'."
 ;; Auto hide and appear markers
 (use-package org-appear
   :hook (org-mode . org-appear-mode))
+
+;; Auto toggle LaTeX fragment previews: the fragment under the cursor
+;; turns back into editable source, everything else stays rendered.
+(use-package org-fragtog
+  :hook (org-mode . org-fragtog-mode))
 
 ;; Convert the buffer text and the associated decorations to HTML
 (use-package htmlize)

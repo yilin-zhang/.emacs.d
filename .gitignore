@@ -10,4 +10,4 @@
 !/lisp/*.el
 !/site-lisp
 !templates
-!README.org
+!README.md

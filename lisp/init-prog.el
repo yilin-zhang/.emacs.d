@@ -11,8 +11,58 @@
          (prog-mode . flycheck-annotate-mode))
   :custom
   (flycheck-idle-change-delay 1)
+  ;; Surface the error message faster once point lands on it (0.9 default).
+  (flycheck-display-errors-delay 0.25)
+  ;; Also check buffers we only pass through briefly, so that e.g. editing
+  ;; a config file refreshes the state of several buffers at once.
+  (flycheck-buffer-switch-check-intermediate-buffers t)
+  (flycheck-emacs-lisp-load-path 'inherit)
+  :preface
+  (defvar yilin/flycheck--elisp-predicate nil
+    "The stock `emacs-lisp' checker predicate, before our wrapper.")
+
+  (defun yilin/flycheck-elisp-safe-p ()
+    "Non-nil if it is safe to run the `emacs-lisp' checker here.
+The checker macroexpands the buffer, which executes code (CVE-2024-53920),
+so restrict it to buffers inside a project -- i.e. code we presumably
+trust -- and honor `no-byte-compile'."
+    (and (not (bound-and-true-p no-byte-compile))
+         (project-current nil)
+         (or (null yilin/flycheck--elisp-predicate)
+             (funcall yilin/flycheck--elisp-predicate))))
   :config
-  (global-flycheck-eglot-mode 1))
+  (global-flycheck-eglot-mode 1)
+  ;; Rerunning the checker on every newline is excessive; `idle-change'
+  ;; and `save' already cover it.
+  (delq 'new-line flycheck-check-syntax-automatically)
+
+  ;; Fringe allocation: diff-hl owns the left fringe (see init-git.el), so
+  ;; give flycheck the right one -- otherwise the two indicators overlap.
+  ;; The stock double-arrow is also chunkier than it needs to be.
+  (setq flycheck-indication-mode 'right-fringe)
+  (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
+    [16 48 112 240 112 48 16] nil nil 'center)
+
+  ;; Wrap rather than replace the stock predicate, and only once, so
+  ;; reloading this file doesn't nest the wrapper. The `eval' guards
+  ;; against `setf' expanding before flycheck's gv setter exists, which
+  ;; matters if this file is ever byte-compiled.
+  (eval '(unless (eq (flycheck-checker-get 'emacs-lisp 'predicate)
+                     #'yilin/flycheck-elisp-safe-p)
+           (setq yilin/flycheck--elisp-predicate
+                 (flycheck-checker-get 'emacs-lisp 'predicate))
+           (setf (flycheck-checker-get 'emacs-lisp 'predicate)
+                 #'yilin/flycheck-elisp-safe-p))
+        t)
+
+  ;; Keep the error list a quarter-height window below the current one,
+  ;; and don't let it steal point.
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Flycheck error\\(?:s\\| messages\\)\\*\\'"
+                 (display-buffer-reuse-window display-buffer-below-selected)
+                 (window-height . 0.25)
+                 (dedicated . t)
+                 (inhibit-same-window . t))))
 
 (use-package prog-mode
   :ensure nil

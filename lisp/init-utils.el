@@ -52,7 +52,33 @@
     (`(t . t)
      (treemacs-git-mode 'deferred))
     (`(t . _)
-     (treemacs-git-mode 'simple))))
+     (treemacs-git-mode 'simple)))
+  ;; kqueue -- the `file-notify' backend on macOS and the BSDs -- only
+  ;; wakes when a directory itself is written, i.e. when an entry is
+  ;; created, deleted or renamed. Editing the contents of an existing file
+  ;; never touches the directory inode, so no event is delivered and
+  ;; `treemacs-filewatch-mode' never learns the file became modified; the
+  ;; stale change only surfaces much later, when something else happens to
+  ;; touch that directory. Push the update ourselves there.
+  ;;
+  ;; Linux uses inotify (which `file-notify--library' prefers over kqueue
+  ;; when both are available), and that does report content changes, so
+  ;; filewatch already handles this and the hook would only add a
+  ;; redundant git subprocess per save.
+  (require 'filenotify)
+  (when (eq file-notify--library 'kqueue)
+    (defun yilin/treemacs-update-git-state-on-save ()
+      "Refresh the just-saved file's git state in every treemacs buffer.
+`treemacs-update-single-file-git-state' is async, debounced, updates the
+parent directories too, and no-ops when the status is unchanged or the
+file isn't in the tree."
+      (when (and (bound-and-true-p treemacs-git-mode)
+                 buffer-file-name
+                 (not (file-remote-p buffer-file-name)))
+        (let ((file buffer-file-name))
+          (treemacs-run-in-every-buffer
+           (treemacs-update-single-file-git-state file)))))
+    (add-hook 'after-save-hook #'yilin/treemacs-update-git-state-on-save)))
 
 (use-package treemacs-nerd-icons
   :after nerd-icons

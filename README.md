@@ -39,9 +39,6 @@ Install the language servers you need:
 | Vue | `vue-language-server` |
 | Lua | `lua-language-server` |
 
-`eglot-booster` also requires
-[emacs-lsp-booster](https://github.com/blahgeek/emacs-lsp-booster).
-
 ## Editing with Meow
 
 The configuration uses Meow's QWERTY layout. Press `SPC ?` to open the full

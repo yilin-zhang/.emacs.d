@@ -82,6 +82,16 @@
     (add-hook 'completion-at-point-functions #'cape-file -10 t))
   (defun yilin/cape-add-dabbrev-capf ()
     (add-hook 'completion-at-point-functions #'cape-dabbrev 20 t))
+
+  (defvar yilin/dabbrev-buffer-size-limit (* 1 1024 1024)
+    "Skip other buffers larger than this many bytes when scanning for dabbrev.")
+
+  (defun yilin/dabbrev-friend-buffer-p (other-buffer)
+    "Non-nil if OTHER-BUFFER is worth scanning for dabbrev expansions.
+Keeps the stock same-major-mode restriction and adds a size ceiling, so
+having one huge file open doesn't slow down every completion."
+    (and (dabbrev--same-major-mode-p other-buffer)
+         (< (buffer-size other-buffer) yilin/dabbrev-buffer-size-limit)))
   :init
   (setq cape-dabbrev-check-other-buffers t)
   (add-hook 'prog-mode-hook #'yilin/cape-add-file-capf)
@@ -91,7 +101,20 @@
   ;; (tempel, file, dabbrev) in LSP buffers. Wrap it (and friends) as
   ;; non-exclusive so they compose instead of shadowing each other.
   (advice-add #'eglot-completion-at-point :around #'cape-wrap-nonexclusive)
-  (advice-add #'pcomplete-completions-at-point :around #'cape-wrap-nonexclusive))
+  (advice-add #'comint-completion-at-point :around #'cape-wrap-nonexclusive)
+  (advice-add #'pcomplete-completions-at-point :around #'cape-wrap-nonexclusive)
+  ;; `cape-dabbrev-check-other-buffers' above lets dabbrev roam beyond the
+  ;; current buffer, so bound what it is allowed to walk into: nothing
+  ;; oversized, no internal buffers, no TAGS tables, no rendered documents.
+  (with-eval-after-load 'dabbrev
+    (setq dabbrev-friend-buffer-function #'yilin/dabbrev-friend-buffer-p
+          dabbrev-ignored-buffer-regexps
+          '("\\` "                      ; internal buffers
+            "\\(?:\\(?:[EG]?\\|GR\\)TAGS\\|e?tags\\|GPATH\\)\\(<[0-9]+>\\)?")
+          ;; An all-caps prefix means the user is searching case-sensitively.
+          dabbrev-upcase-means-case-search t)
+    (dolist (mode '(pdf-view-mode doc-view-mode tags-table-mode))
+      (add-to-list 'dabbrev-ignored-buffer-modes mode))))
 
 (provide 'init-completion)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

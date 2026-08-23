@@ -147,13 +147,6 @@ trust -- and honor `no-byte-compile'."
                 (setq-local nobreak-char-display nil)))
           (message "No documentation for %s" (or hint "symbol at point")))))))
 
-;; `https://github.com/jdtsmith/eglot-booster'
-(use-package eglot-booster
-  :vc (:url "https://github.com/jdtsmith/eglot-booster.git")
-  :if (executable-find "emacs-lsp-booster")
-  :after eglot
-  :config (eglot-booster-mode))
-
 ;; Config reference: `https://github.com/svaante/dape?tab=readme-ov-file#configuration'
 (use-package dape
   :hook

@@ -15,7 +15,15 @@
   (setq magit-diff-refine-hunk t           ; word-level diff in the selected hunk
         magit-save-repository-buffers nil  ; don't autosave repo buffers (avoids
                                            ; surprise save-hooks / formatters)
-        magit-revision-insert-related-refs nil) ; less clutter in commit buffers
+        magit-revision-insert-related-refs nil ; less clutter in commit buffers
+        ;; Two checkouts whose directories share a name (A/src and B/src
+        ;; both shorten to "src") otherwise look like one project to magit,
+        ;; and their status buffers hijack each other. Naming buffers after
+        ;; the full path avoids the collision.
+        magit-uniquify-buffer-names nil
+        ;; PERF: on macOS magit re-resolves the git binary to an absolute
+        ;; path on every invocation. Resolve it once here.
+        magit-git-executable (or (executable-find magit-git-executable) "git"))
   ;; Turn URLs in process output into clickable buttons.
   (add-hook 'magit-process-mode-hook #'goto-address-mode)
   ;; A couple of switches common enough to want one keystroke away.

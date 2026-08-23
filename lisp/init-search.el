@@ -20,12 +20,22 @@
   (vertico-resize nil)
   (vertico-cycle t) ; Go from last to first candidate and first to last (cycle)?
   :bind
-  (:map vertico-map
-        ("<tab>" . vertico-insert)  ; Insert selected candidate into text area
-        ("<escape>" . minibuffer-keyboard-quit) ; Close minibuffer
-        ;; Cycle through candidate groups
-        ("C-M-n" . vertico-next-group)
-        ("C-M-p" . vertico-previous-group)))
+  (;; Re-run a past minibuffer session (needs `vertico-repeat-save' below).
+   ("C-c v" . vertico-repeat)
+   :map vertico-map
+   ("<tab>" . vertico-insert)  ; Insert selected candidate into text area
+   ("<escape>" . minibuffer-keyboard-quit) ; Close minibuffer
+   ;; Delete a whole directory component at once when completing file names.
+   ("DEL" . vertico-directory-delete-char)
+   ;; Cycle through candidate groups
+   ("C-M-n" . vertico-next-group)
+   ("C-M-p" . vertico-previous-group))
+  :config
+  ;; Tidy up shadowed file paths as you move between directories:
+  ;; `~/foo/bar///' collapses to `/', and `~/foo/bar/~/' to `~/'.
+  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+  ;; Record each session so `vertico-repeat' has something to resume.
+  (add-hook 'minibuffer-setup-hook #'vertico-repeat-save))
 
 (use-package emacs
   :ensure nil
@@ -52,7 +62,15 @@
 (use-package orderless
   :custom
   (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles partial-completion)))))
+  ;; Emacs ships per-category defaults (buffer, project-file, xref-location,
+  ;; info-menu, ...) that pin those categories to `basic'/`substring', and
+  ;; they take precedence over `completion-styles' -- so orderless would
+  ;; silently not apply to `C-x b', project file lookup, xref and friends.
+  ;; Clear them so orderless really is the completion style everywhere.
+  (completion-category-defaults nil)
+  ;; Keep `partial-completion' for its `/u/s/l' -> `/usr/share/lib' path
+  ;; expansion, but let orderless match file names too.
+  (completion-category-overrides '((file (styles orderless partial-completion)))))
 
 (use-package marginalia
   ;; Either bind `marginalia-cycle' globally or only in the minibuffer
@@ -142,7 +160,17 @@
    consult-source-recent-file consult-source-project-recent-file
    :preview-key '(:debounce 0.4 any))
 
-  (setq consult-narrow-key "<"))
+  (setq consult-narrow-key "<"
+        ;; Start searching one character sooner, and cut the throttling
+        ;; roughly in half, so async sources (ripgrep, find, ...) keep up
+        ;; with typing instead of lagging a beat behind.
+        consult-async-min-input 2         ; default 3
+        consult-async-input-throttle 0.2  ; default 0.5
+        consult-async-input-debounce 0.1  ; default 0.2
+        consult-async-refresh-delay 0.15  ; default 0.2
+        ;; Report line numbers relative to the whole buffer, not the
+        ;; current narrowing.
+        consult-line-numbers-widen t))
 
 (use-package embark
   :bind

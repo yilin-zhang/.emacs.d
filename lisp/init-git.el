@@ -123,7 +123,9 @@ Height tracks `frame-char-height', the buffer's text scale and
                  (if (floatp total-spacing)
                      (truncate (* (frame-char-height) total-spacing))
                    total-spacing)))
-           (w (min (frame-parameter nil (intern (format "%s-fringe" diff-hl-side)))
+           (w (min (or (frame-parameter
+                        nil (intern (format "%s-fringe" diff-hl-side)))
+                       diff-hl-bmp-max-width)
                    diff-hl-bmp-max-width))
            (_ (if (zerop w) (setq w diff-hl-bmp-max-width))))
       (define-fringe-bitmap 'diff-hl-bmp-middle

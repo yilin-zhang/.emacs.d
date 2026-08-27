@@ -66,10 +66,8 @@
 (use-package kind-nerd-icons
   :ensure nil
   :load-path yilin/site-lisp-directory
-  ;; No :demand t -- :after already guarantees this loads once both
-  ;; corfu and nerd-icons are loaded, at which point :config registers
-  ;; the margin formatter. Forcing eager load is unnecessary.
-  :after (corfu nerd-icons)
+  :after corfu
+  :demand t
   :config
   (add-to-list 'corfu-margin-formatters
                #'kind-nerd-icons-margin-formatter))

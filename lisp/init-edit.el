@@ -149,11 +149,21 @@
          (emacs-lisp-mode . yilin/maybe-enable-aggressive-indent)))
 
 ;; Vertical indentation guides, like VSCode/Zed. Tree-sitter aware, so
-;; the bars follow real scopes in `*-ts-mode' buffers (Python especially).
+;; the bars follow real scopes in `*-ts-mode' buffers when supported.
 (use-package indent-bars
+  :preface
+  (defconst yilin/indent-bars-excluded-modes
+    '(lisp-data-mode scheme-mode clojure-mode racket-mode fennel-mode hy-mode)
+    "Lisp-family modes where indentation guides should stay disabled.")
+
+  (defun yilin/maybe-enable-indent-bars ()
+    "Enable `indent-bars-mode' unless this is a Lisp-family buffer."
+    (indent-bars-mode
+     (if (apply #'derived-mode-p yilin/indent-bars-excluded-modes) -1 1)))
   :hook
-  ;; Enable it only for Python for now.
-  (python-ts-mode . indent-bars-mode)
+  ;; Enable indentation guides in programming buffers except Lisp dialects,
+  ;; whose nested forms become visually noisy with vertical guides.
+  (prog-mode . yilin/maybe-enable-indent-bars)
   :custom
   (indent-bars-treesit-support t)
   ;; Bitmaps are inexplicably slow on macOS; character-based bars are

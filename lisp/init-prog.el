@@ -119,6 +119,8 @@ trust -- and honor `no-byte-compile'."
         eldoc-echo-area-use-multiline-p 'truncate-sym-name-if-fit)
   (add-to-list 'eglot-server-programs
                '((json-mode json-ts-mode) . ("vscode-json-languageserver" "--stdio")))
+  (add-to-list 'eglot-server-programs
+               '(swift-mode . ("sourcekit-lsp")))
 
   ;; Documentation in a dedicated buffer, the way doom does it: the echo
   ;; area can't render LSP hover markdown, so mirror doom's
@@ -284,6 +286,14 @@ Requires `project-current' to identify the project."
 ;;                       Rust Configurations
 ;; --------------------------------------------------------------
 (use-package rust-mode)
+
+;; --------------------------------------------------------------
+;;                      Swift Configurations
+;; --------------------------------------------------------------
+;; `sourcekit-lsp' ships with Apple's Swift toolchain. Register it explicitly
+;; because Eglot has no built-in Swift server mapping.
+(use-package swift-mode
+  :mode "\\.swift\\'")
 
 ;; --------------------------------------------------------------
 ;;                       Zig Configurations

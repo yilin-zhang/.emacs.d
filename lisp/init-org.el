@@ -129,10 +129,14 @@ The buffer's major mode should be `org-mode'."
   (setq org-export-backends '(ascii html icalendar latex md)
         org-format-latex-options (plist-put org-format-latex-options :scale 2.3)
         org-latex-compiler "xelatex") ; Set XeLaTeX as the default LaTeX compiler
-  ;; Render LaTeX fragments as images as soon as a file is opened, so
-  ;; formulas never show up as raw source. `org-fragtog' below keeps
-  ;; them rendered while editing.
-  (setq org-startup-with-latex-preview t)
+  ;; Render LaTeX on demand rather than on open: `C-c C-c' toggles the
+  ;; fragment at point, or renders the current section when point is
+  ;; not on one. Org's `C-c C-c' has no case of its own for fragments,
+  ;; and this hook is the last guard before its "can do nothing useful
+  ;; here" error, so no existing binding is shadowed.
+  ;; `org-latex-preview' already returns nil when it declines to act,
+  ;; which is exactly the contract the hook wants.
+  (add-hook 'org-ctrl-c-ctrl-c-final-hook #'org-latex-preview)
   (setq org-agenda-log-mode-items '(closed clock state)) ; show when things get done in the log mode
   ;; Custom agenda views
   (setq org-agenda-block-separator nil)

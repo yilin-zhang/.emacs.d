@@ -287,6 +287,41 @@
 
 
 ;; --------------------------------------------------------------
+;;                            Editing
+;; --------------------------------------------------------------
+
+(defconst yilin/han-regexp
+  (rx (in (#x3400 . #x4DBF)     ; CJK Unified Ideographs Extension A
+          (#x4E00 . #x9FFF)     ; CJK Unified Ideographs
+          (#xF900 . #xFAFF)     ; CJK Compatibility Ideographs
+          (#x20000 . #x2A6DF))) ; CJK Unified Ideographs Extension B
+  "Regexp matching a single Han character.
+Deliberately not `\\cc', which also matches full-width punctuation --
+nothing should be inserted after the comma in \"中文，abc\".")
+
+(defun yilin/space-han-latin (&optional beg end)
+  "Separate Han characters from adjacent Latin letters and digits.
+Act on the region when one is active, on the whole buffer otherwise.
+BEG and END bound the text to walk when called from Lisp."
+  (interactive (if (use-region-p)
+                   (list (region-beginning) (region-end))
+                 (list (point-min) (point-max))))
+  (let* ((beg (or beg (point-min)))
+         ;; A marker, because every insertion shifts the end.
+         (end (copy-marker (or end (point-max))))
+         (latin "[A-Za-z0-9]")
+         (added 0))
+    (save-excursion
+      (dolist (pattern (list (concat "\\(" yilin/han-regexp "\\)\\(" latin "\\)")
+                             (concat "\\(" latin "\\)\\(" yilin/han-regexp "\\)")))
+        (goto-char beg)
+        (while (re-search-forward pattern end t)
+          (replace-match "\\1 \\2")
+          (setq added (1+ added)))))
+    (set-marker end nil)
+    (message "Inserted %d space%s" added (if (= added 1) "" "s"))))
+
+;; --------------------------------------------------------------
 ;;                            Terminal
 ;; --------------------------------------------------------------
 

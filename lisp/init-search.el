@@ -221,6 +221,16 @@
 (use-package breadcrumb
   :hook ((prog-mode org-mode) . breadcrumb-local-mode))
 
+;; A custom package: file and symbol-kind icons in the breadcrumb header
+;; line, sharing corfu's icon table so a symbol looks the same in both.
+(use-package breadcrumb-nerd-icons
+  :ensure nil
+  :load-path yilin/site-lisp-directory
+  :after breadcrumb
+  :demand t
+  :config
+  (breadcrumb-nerd-icons-mode 1))
+
 (provide 'init-search)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-search.el ends here

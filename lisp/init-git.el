@@ -10,20 +10,24 @@
   :commands (transient-insert-suffix magit-status)
   :bind ("C-x g" . magit-status)
   :init
+  ;; Set before Magit loads so disabling its global mode stays lazy.
   (setq magit-auto-revert-mode nil)
+  :custom
+  (magit-diff-refine-hunk t)           ; word-level diff in the selected hunk
+  ;; Don't autosave repo buffers (avoids surprise save-hooks / formatters).
+  (magit-save-repository-buffers nil)
+  (magit-revision-insert-related-refs nil) ; less clutter in commit buffers
+  ;; Two checkouts whose directories share a name (A/src and B/src
+  ;; both shorten to "src") otherwise look like one project to magit,
+  ;; and their status buffers hijack each other. Naming buffers after
+  ;; the full path avoids the collision.
+  (magit-uniquify-buffer-names nil)
   :config
-  (setq magit-diff-refine-hunk t           ; word-level diff in the selected hunk
-        magit-save-repository-buffers nil  ; don't autosave repo buffers (avoids
-                                           ; surprise save-hooks / formatters)
-        magit-revision-insert-related-refs nil ; less clutter in commit buffers
-        ;; Two checkouts whose directories share a name (A/src and B/src
-        ;; both shorten to "src") otherwise look like one project to magit,
-        ;; and their status buffers hijack each other. Naming buffers after
-        ;; the full path avoids the collision.
-        magit-uniquify-buffer-names nil
-        ;; PERF: on macOS magit re-resolves the git binary to an absolute
-        ;; path on every invocation. Resolve it once here.
-        magit-git-executable (or (executable-find magit-git-executable) "git"))
+  ;; PERF: on macOS magit re-resolves the git binary to an absolute
+  ;; path on every invocation. Resolve it once here. This expression
+  ;; reads Magit's existing value, so it belongs after Magit loads.
+  (setopt magit-git-executable
+          (or (executable-find magit-git-executable) "git"))
   ;; Turn URLs in process output into clickable buttons.
   (add-hook 'magit-process-mode-hook #'goto-address-mode)
   ;; A couple of switches common enough to want one keystroke away.
@@ -58,12 +62,13 @@
       (require 'git-commit)
       (git-commit-setup-check-buffer)))
   :hook (find-file . yilin/maybe-git-commit-setup)
+  :custom
+  (git-commit-summary-max-length 50)
+  (git-commit-style-convention-checks
+   '(overlong-summary-line non-empty-second-line))
   :config
-  (setq git-commit-summary-max-length 50
-        git-commit-style-convention-checks
-        '(overlong-summary-line non-empty-second-line))
   (add-hook 'git-commit-mode-hook
-            (lambda () (setq-local fill-column 72))))
+            (lambda () (setopt-local fill-column 72))))
 
 ;; Auto-enable smerge-mode when opening a file that already contains
 ;; conflict markers, so merge conflicts come with resolution UI (default
@@ -203,17 +208,18 @@ matching buffer is current, so resolve it explicitly."
     (let ((pt (point)))
       (prog1 (apply fn args)
         (goto-char pt))))
+  :custom
+  (diff-hl-update-async t)
+  ;; Better diff algorithm for what the gutter shows.
+  (vc-git-diff-switches '("--histogram"))
+  ;; Realtime gutter feedback after staging / unstaging hunks.
+  (diff-hl-show-staged-changes nil)
+  ;; Nothing to diff in a rendered image or PDF.
+  (diff-hl-global-modes '(not image-mode pdf-view-mode))
+  ;; The thin bar is its own border.
+  (diff-hl-draw-borders nil)
+  (diff-hl-fringe-bmp-function #'yilin/diff-hl-bmp-at-pos)
   :config
-  (setq diff-hl-update-async t
-        ;; Better diff algorithm for what the gutter shows.
-        vc-git-diff-switches '("--histogram")
-        ;; Realtime gutter feedback after staging / unstaging hunks.
-        diff-hl-show-staged-changes nil
-        ;; Nothing to diff in a rendered image or PDF.
-        diff-hl-global-modes '(not image-mode pdf-view-mode)
-        ;; The thin bar is its own border.
-        diff-hl-draw-borders nil
-        diff-hl-fringe-bmp-function #'yilin/diff-hl-bmp-at-pos)
   (advice-add 'diff-hl-define-bitmaps :after #'yilin/diff-hl-thin-bitmaps)
   (yilin/diff-hl-thin-bitmaps)
   ;; On-the-fly gutter updates -- but NOT on macOS, where newer versions
@@ -227,7 +233,8 @@ matching buffer is current, so resolve it explicitly."
         (with-eval-after-load 'meow
           (add-hook 'meow-insert-exit-hook #'yilin/diff-hl-update-maybe)))
     ;; Slightly more conservative than the 0.3 default.
-    (setq diff-hl-flydiff-delay 0.5)
+    (with-eval-after-load 'diff-hl-flydiff
+      (setopt diff-hl-flydiff-delay 0.5))
     (add-hook 'diff-hl-mode-hook #'diff-hl-flydiff-mode))
   (yilin/diff-hl-restyle-faces)
   (add-hook 'enable-theme-functions #'yilin/diff-hl-restyle-faces)
@@ -247,11 +254,11 @@ matching buffer is current, so resolve it explicitly."
 ;; Open the current file / line on the remote forge (GitHub, GitLab, ...).
 (use-package browse-at-remote
   :bind ("C-c g b" . browse-at-remote)
-  :config
+  :custom
   ;; Only add a line number when a region is selected, and produce
   ;; permalinks (commit hash) rather than branch-relative URLs.
-  (setq browse-at-remote-add-line-number-if-no-region-selected nil
-        browse-at-remote-prefer-symbolic nil))
+  (browse-at-remote-add-line-number-if-no-region-selected nil)
+  (browse-at-remote-prefer-symbolic nil))
 
 (provide 'init-git)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

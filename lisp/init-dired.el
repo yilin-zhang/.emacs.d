@@ -52,26 +52,26 @@ yields a blank dired buffer or unsortable entries."
   ;; dired to stop trying `--dired' so the warning goes away, and stick to
   ;; the switches BSD ls understands.
   (if (not (eq system-type 'darwin))
-      (setq dired-listing-switches yilin/dired-gnu-switches)
+      (setopt dired-listing-switches yilin/dired-gnu-switches)
     (let ((gls (or (executable-find "gls")
                    (seq-find #'file-executable-p
                              '("/opt/homebrew/bin/gls" "/usr/local/bin/gls")))))
       (if gls
-          (setq insert-directory-program gls
-                dired-listing-switches yilin/dired-gnu-switches)
-        (setq dired-use-ls-dired nil
-              dired-listing-switches yilin/dired-portable-switches)))))
+          (setopt insert-directory-program gls
+                  dired-listing-switches yilin/dired-gnu-switches)
+        (setopt dired-use-ls-dired nil
+                dired-listing-switches yilin/dired-portable-switches)))))
 
 (use-package async
-  :init
-  (setq dired-async-message-function
-        (lambda (text face &rest args)
-          "Notify end of operation in `mode-line'."
-          (message (propertize
-                    (if args
-                        (apply #'format text args)
-                      text)
-                    'face face))))
+  :custom
+  (dired-async-message-function
+   (lambda (text face &rest args)
+     "Notify end of operation in `mode-line'."
+     (message (propertize
+               (if args
+                   (apply #'format text args)
+                 text)
+               'face face))))
   :after dired
   :hook (dired-mode . dired-async-mode))
 

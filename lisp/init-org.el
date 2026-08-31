@@ -29,6 +29,9 @@ The buffer's major mode should be `org-mode'."
     (unless (derived-mode-p 'org-mode)
       (user-error "org-mode should be enabled in the current buffer."))
 
+    ;; `org-set-emph-re' is still a two-argument Customize setter, so it
+    ;; cannot be used by Emacs 31's `setopt-local'.  Keep this assignment
+    ;; buffer-local and rebuild Org's emphasis regexp explicitly below.
     (setq-local org-emphasis-alist '(("*" bold)
                                      ("/" italic)
                                      ("_" underline)
@@ -91,44 +94,107 @@ The buffer's major mode should be `org-mode'."
   :hook
   (org-mode . org-indent-mode)
   (org-mode . auto-fill-mode)
-  (org-mode . (lambda () (setq truncate-lines nil)))
+  (org-mode . (lambda () (setopt-local truncate-lines nil)))
   (org-mode . yilin/prettify-org-buffer)
   (org-mode . (lambda () (corfu-mode -1)))
   (org-agenda-finalize . yilin/org-agenda-time-grid-spacing)
   (org-after-todo-state-change . yilin/org-remove-priority-when-done-or-cancel)
+  :custom
+  (org-log-done 'time)                 ; add time stamp after an item is DONE
+  (org-log-into-drawer t)              ; put log notes into drawer by default
+  (org-log-reschedule 'time)           ; log reschedule by default
+  (org-src-fontify-natively t)         ; fontify code in code blocks
+  (org-startup-indented t)             ; indent at startup
+  (org-hide-emphasis-markers t)        ; hide emphasis markers
+  (org-pretty-entities t)              ; make special character format visible
+  (org-ellipsis "⤵")
+  (org-image-actual-width nil)         ; make org support image scaling
+  (org-edit-src-content-indentation 0)
+  (org-priority-faces `((?A . (:foreground ,(face-foreground 'error)))
+                        (?B . (:foreground ,(face-foreground 'warning)))
+                        (?C . (:foreground ,(face-foreground 'success)))))
+  (org-export-backends '(ascii html icalendar latex md))
+  (org-latex-compiler "xelatex")      ; Set XeLaTeX as the default LaTeX compiler
+  (org-agenda-log-mode-items '(closed clock state))
+  ;; Custom agenda views
+  (org-agenda-block-separator nil)
+  (org-agenda-custom-commands
+   '(("g" "Daily review"
+      ((todo "DOING"
+             ((org-agenda-overriding-header "⏳ In Progress\n")))
+       (agenda ""
+               ((org-agenda-span 'day)
+                (org-agenda-entry-types '(:scheduled))
+                (org-agenda-format-date "")
+                (org-agenda-skip-function
+                 ;; these entires are included in other categories
+                 '(org-agenda-skip-entry-if 'todo '("DOING" "WAITING" "DONE" "CANCEL")))
+                (org-agenda-overriding-header "\n📅 Scheduled")))
+       (todo "TODO"
+             ((org-agenda-overriding-header "\n📥 Backlog\n")
+              (org-agenda-skip-function
+               ;; these entires are included in other categories
+               '(org-agenda-skip-entry-if 'scheduled))))
+       (todo "WAITING"
+             ((org-agenda-overriding-header "\n🚧 Blocked\n")))
+       (agenda ""
+               ((org-agenda-span 'day)
+                (org-agenda-entry-types '(:deadline))
+                (org-agenda-format-date "")
+                ;; (org-deadline-warning-days 7)
+                (org-agenda-skip-function
+                 '(org-agenda-skip-entry-if 'todo 'done))
+                (org-agenda-overriding-header "\n⏰ Deadlines")))
+       (agenda ""
+               ((org-agenda-span 'day)
+                (org-agenda-entry-types '(:closed :state))
+                (org-agenda-format-date "")
+                (org-agenda-use-time-grid nil)
+                (org-agenda-overriding-header "\n🎉 Completed")))
+       (agenda ""
+               ((org-agenda-span 'day)
+                (org-agenda-entry-types '(:timestamp))
+                (org-agenda-format-date "")
+                (org-agenda-overriding-header "\n💭 Notes")))))))
+  ;; Remove the category prefix for a clearer view ("%c").
+  (org-agenda-prefix-format '((agenda . " %i %?-12t% s")
+                              (todo . " %i")
+                              (tags . " %i")
+                              (search . " %i")))
+  ;; Tags (adapt from Bullet Journal)
+  (org-tag-alist '(("event" . ?e)
+                   ("task" . ?t)
+                   ("note" . ?n)))
+  ;; Each item only belongs to one category, one key stroke is sufficient.
+  (org-fast-tag-selection-single-key t)
+  ;; Org capture
+  (org-capture-templates
+   '(("l" "Log" entry (file org-default-notes-file) "* %?\n")))
+  ;; Keywords
+  (org-todo-keywords '((sequence "TODO(t)" "DOING(i)" "WAITING(w)" "HANGUP(h)"
+                                 "|" "DONE(d)" "CANCEL(c)")))
+  (org-todo-keyword-faces '(("WAITING" . warning)
+                            ("HANGUP" . warning)))
+  ;; Calendar
+  (calendar-chinese-all-holidays-flag t)
   :config
   ;; Make ~SPC ,~ work, reference:
   ;; http://stackoverflow.com/questions/24169333/how-can-i-emphasize-or-verbatim-quote-a-comma-in-org-mode
   (setcar (nthcdr 2 org-emphasis-regexp-components) " \t\n")
   (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
   (setq system-time-locale "C")       ; make sure the time stamps are in English
-  (setq org-log-done 'time            ; add time stamp after an item is DONE
-        org-log-into-drawer t         ; put log notes into drawer by default
-        org-log-reschedule 'time      ; log reschedule by default
-        org-src-fontify-natively t    ; fontify code in code blocks
-        org-startup-indented t        ; indent at startup
-        org-hide-emphasis-markers t   ; hide emphasis markers
-        org-pretty-entities t         ; make special character format visible
-        org-ellipsis "⤵"
-        org-image-actual-width nil      ; make org support image scaling
-        org-edit-src-content-indentation 0
-        )
-  ;; Priority
-  (setq org-priority-faces `((?A . (:foreground ,(face-foreground 'error)))
-                             (?B . (:foreground ,(face-foreground 'warning)))
-                             (?C . (:foreground ,(face-foreground 'success)))))
   ;; Load habit module, then force `org-modules' to be loaded right
   ;; now (during this :config block) instead of lazily on first
   ;; `org-mode' activation. Combined with the incremental loader
   ;; pre-`require'ing `org' itself during idle, this moves the entire
   ;; `org-load-modules-maybe' cascade off the user's first `C-c a' --
   ;; profiling showed it was ~44% of that command's CPU time.
-  (add-to-list 'org-modules 'org-habit t)
+  (setopt org-modules (append (remove 'org-habit org-modules)
+                              '(org-habit)))
   (org-load-modules-maybe)
-  ;; Latex preview scale
-  (setq org-export-backends '(ascii html icalendar latex md)
-        org-format-latex-options (plist-put org-format-latex-options :scale 2.3)
-        org-latex-compiler "xelatex") ; Set XeLaTeX as the default LaTeX compiler
+  ;; This value depends on Org's existing plist, so set it after Org loads.
+  (setopt org-format-latex-options
+          (plist-put org-format-latex-options :scale 2.3))
   ;; Render LaTeX on demand rather than on open: `C-c C-c' toggles the
   ;; fragment at point, or renders the current section when point is
   ;; not on one. Org's `C-c C-c' has no case of its own for fragments,
@@ -137,89 +203,22 @@ The buffer's major mode should be `org-mode'."
   ;; `org-latex-preview' already returns nil when it declines to act,
   ;; which is exactly the contract the hook wants.
   (add-hook 'org-ctrl-c-ctrl-c-final-hook #'org-latex-preview)
-  (setq org-agenda-log-mode-items '(closed clock state)) ; show when things get done in the log mode
-  ;; Custom agenda views
-  (setq org-agenda-block-separator nil)
-  (setq org-agenda-custom-commands
-        '(("g" "Daily review"
-           ((todo "DOING"
-                  ((org-agenda-overriding-header "⏳ In Progress\n")))
-            (agenda ""
-                    ((org-agenda-span 'day)
-                     (org-agenda-entry-types '(:scheduled))
-                     (org-agenda-format-date "")
-                     (org-agenda-skip-function
-                      ;; these entires are included in other categories
-                      '(org-agenda-skip-entry-if 'todo '("DOING" "WAITING" "DONE" "CANCEL")))
-                     (org-agenda-overriding-header "\n📅 Scheduled")))
-            (todo "TODO"
-                  ((org-agenda-overriding-header "\n📥 Backlog\n")
-                   (org-agenda-skip-function
-                    ;; these entires are included in other categories
-                    '(org-agenda-skip-entry-if 'scheduled))
-
-                   ))
-            (todo "WAITING"
-                  ((org-agenda-overriding-header "\n🚧 Blocked\n")))
-            (agenda ""
-                    ((org-agenda-span 'day)
-                     (org-agenda-entry-types '(:deadline))
-                     (org-agenda-format-date "")
-                     ;; (org-deadline-warning-days 7)
-                     (org-agenda-skip-function
-                      '(org-agenda-skip-entry-if 'todo 'done))
-                     (org-agenda-overriding-header "\n⏰ Deadlines")))
-            (agenda ""
-                    ((org-agenda-span 'day)
-                     (org-agenda-entry-types '(:closed :state))
-                     (org-agenda-format-date "")
-                     (org-agenda-use-time-grid nil)
-                     (org-agenda-overriding-header "\n🎉 Completed")))
-            (agenda ""
-                    ((org-agenda-span 'day)
-                     (org-agenda-entry-types '(:timestamp))
-                     (org-agenda-format-date "")
-                     (org-agenda-overriding-header "\n💭 Notes")))))))
-
-  ;; uncomment the 2 settings below to enable breadcrumbs
-  ;; (setq org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s %b")
-  ;;                                  (todo . " %i %-12:c %b")
-  ;;                                  (tags . " %i %-12:c")
-  ;;                                  (search . " %i %-12:c")))
-  ;; (setq org-agenda-breadcrumbs-separator " » ")
-
-  ;; Remove the category prefix for a clearer view ("%c")
-  (setq org-agenda-prefix-format '((agenda . " %i %?-12t% s")
-                                   (todo . " %i")
-                                   (tags . " %i")
-                                   (search . " %i")))
-  ;; Tags (adapt from Bullet Journal)
-  (setq org-tag-alist '(("event" . ?e)
-                        ("task" . ?t)
-                        ("note" . ?n))
-        ;; Each item only belongs to one category, one key stroke is sufficient
-        org-fast-tag-selection-single-key t)
-  ;; Org capture
-  (setq org-capture-templates
-        '(("l" "Log" entry (file org-default-notes-file) "* %?\n")))
-  ;; Keywords
-  (setq org-todo-keywords '((sequence "TODO(t)" "DOING(i)" "WAITING(w)" "HANGUP(h)"
-                                      "|" "DONE(d)" "CANCEL(c)"))
-        org-todo-keyword-faces '(("WAITING" . warning)
-                                 ("HANGUP" . warning)))
-  ;; Calendar
-  (setq calendar-chinese-all-holidays-flag t))
+  ;; Uncomment the 2 settings below to enable breadcrumbs.
+  ;; (setopt org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s %b")
+  ;;                                    (todo . " %i %-12:c %b")
+  ;;                                    (tags . " %i %-12:c")
+  ;;                                    (search . " %i %-12:c")))
+  ;; (setopt org-agenda-breadcrumbs-separator " » ")
+  )
 
 ;; Bullet beautification
 (use-package org-superstar
   :hook (org-mode . org-superstar-mode)
-  :config
-  (setq org-superstar-headline-bullets-list
-        '("✱" "◉" "○" "▷"))
-  (setq org-superstar-item-bullet-alist
-        '((?+ . ?•)
-          (?* . ?➤)
-          (?- . ?–))))
+  :custom
+  (org-superstar-headline-bullets-list '("✱" "◉" "○" "▷"))
+  (org-superstar-item-bullet-alist '((?+ . ?•)
+                                     (?* . ?➤)
+                                     (?- . ?–))))
 
 ;; Auto hide and appear markers
 (use-package org-appear

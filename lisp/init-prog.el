@@ -24,6 +24,9 @@
   ;; text of a truncated message still reaches the echo area.
   (flycheck-annotate-current-line-style 'sideline)
   (flycheck-annotate-other-lines-style 'sideline)
+  ;; diff-hl owns the left fringe (see init-git.el), so give flycheck the
+  ;; right one -- otherwise the two indicators overlap.
+  (flycheck-indication-mode 'right-fringe)
   :custom-face
   ;; Out of the box these inherit the error-list faces, which are the theme's
   ;; full-strength red/yellow/green -- too loud for text sitting in the margin
@@ -51,10 +54,7 @@ trust -- and honor `no-byte-compile'."
   ;; and `save' already cover it.
   (delq 'new-line flycheck-check-syntax-automatically)
 
-  ;; Fringe allocation: diff-hl owns the left fringe (see init-git.el), so
-  ;; give flycheck the right one -- otherwise the two indicators overlap.
-  ;; The stock double-arrow is also chunkier than it needs to be.
-  (setq flycheck-indication-mode 'right-fringe)
+  ;; The stock double-arrow is chunkier than it needs to be.
   (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
     [16 48 112 240 112 48 16] nil nil 'center)
 
@@ -93,19 +93,19 @@ trust -- and honor `no-byte-compile'."
 ;; which makes buffers look "flat" / under-highlighted compared to
 ;; VSCode/Zed. Level 4 colors them by category. Must be set before any
 ;; `*-ts-mode' fontifies a buffer.
-(setq treesit-font-lock-level 4)
+(setopt treesit-font-lock-level 4)
 
-(setq major-mode-remap-alist
-      '(;; markup lang
-        (yaml-mode . yaml-ts-mode)
-        (json-mode . json-ts-mode)
-        (css-mode . css-ts-mode)
-        ;; programming
-        (bash-mode . bash-ts-mode)
-        (python-mode . python-ts-mode)
-        (js-mode . js-ts-mode)
-        (typescript-mode . typescript-ts-mode)
-        (rust-mode . rust-ts-mode)))
+(setopt major-mode-remap-alist
+        '(;; markup lang
+          (yaml-mode . yaml-ts-mode)
+          (json-mode . json-ts-mode)
+          (css-mode . css-ts-mode)
+          ;; programming
+          (bash-mode . bash-ts-mode)
+          (python-mode . python-ts-mode)
+          (js-mode . js-ts-mode)
+          (typescript-mode . typescript-ts-mode)
+          (rust-mode . rust-ts-mode)))
 
 ;; --------------------------------------------------------------
 ;;                             LSP
@@ -122,16 +122,17 @@ trust -- and honor `no-byte-compile'."
               ;; The echo area is only a one-line glance; this opens the
               ;; full, rendered docs for the symbol at point in a buffer.
               ("C-c C-d" . yilin/eglot-documentation-at-point))
+  :custom
+  (eglot-events-buffer-config '(:size 0 :format full))
+  ;; Nothing ignored: we want hover docs (a quick glance in the echo
+  ;; area) AND documentHighlight (same-symbol highlighting) both on.
+  (eglot-ignored-server-capabilities nil)
+  (eglot-autoshutdown t)
+  ;; Keep the echo-area glance to a tidy single line. The echo area
+  ;; can't render markdown (no wrapping/fontification), so multi-line
+  ;; there is just a "blob" -- real docs go to the buffer below.
+  (eldoc-echo-area-use-multiline-p 'truncate-sym-name-if-fit)
   :config
-  (setq eglot-events-buffer-config '(:size 0 :format full)
-        ;; Nothing ignored: we want hover docs (a quick glance in the echo
-        ;; area) AND documentHighlight (same-symbol highlighting) both on.
-        eglot-ignored-server-capabilities nil
-        eglot-autoshutdown t
-        ;; Keep the echo-area glance to a tidy single line. The echo area
-        ;; can't render markdown (no wrapping/fontification), so multi-line
-        ;; there is just a "blob" -- real docs go to the buffer below.
-        eldoc-echo-area-use-multiline-p 'truncate-sym-name-if-fit)
   (add-to-list 'eglot-server-programs
                '((json-mode json-ts-mode) . ("vscode-json-languageserver" "--stdio")))
   (add-to-list 'eglot-server-programs
@@ -168,18 +169,19 @@ trust -- and honor `no-byte-compile'."
 (use-package dape
   :hook
   (dape-repl-mode . yilin/disable-meow)
+  :custom
+  ;; Info buffers to the left.
+  (dape-buffer-window-arrangement 'left)
+  ;; Show inlay hints.
+  (dape-inlay-hints t)
   :config
   ;; Save breakpoints on quit, but only after dape has actually been used.
   ;; A top-level `kill-emacs' hook would autoload dape during every shutdown.
   (add-hook 'kill-emacs-hook #'dape-breakpoint-save)
   ;; Turn on global bindings for setting breakpoints with mouse
   (dape-breakpoint-global-mode)
-  ;; Info buffers to the left
-  (setq dape-buffer-window-arrangement 'left)
   ;; Pulse source line (performance hit)
   ;; (add-hook 'dape-display-source-hook 'pulse-momentary-highlight-one-line)
-  ;; Showing inlay hints
-  (setq dape-inlay-hints t)
   ;; Save buffers on startup, useful for interpreted languages
   (add-hook 'dape-start-hook (lambda () (save-some-buffers t t)))
   ;; Kill compile buffer on build success
@@ -267,7 +269,7 @@ Requires `project-current' to identify the project."
    ("\\.mustache\\'" . web-mode)
    ("\\.djhtml\\'" . web-mode))
   :hook
-  (web-mode . (lambda () (setq-local tab-width web-mode-indent-style)))
+  (web-mode . (lambda () (setopt-local tab-width web-mode-indent-style)))
   :custom
   (web-mode-auto-close-style 2)
   (web-mode-markup-indent-offset 2)
@@ -343,7 +345,7 @@ Requires `project-current' to identify the project."
                             (beginning-of-line)
                             (1- (point)))))))
   :hook
-  (pico8-mode . (lambda () (setq-local lua-indent-level 1)))
+  (pico8-mode . (lambda () (setopt-local lua-indent-level 1)))
   (pico8-mode . yilin/pico8-narrow-buffer)
   :config
   (set-face-attribute 'pico8--non-lua-overlay nil

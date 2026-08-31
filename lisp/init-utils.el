@@ -29,16 +29,16 @@
          :map treemacs-mode-map
          ([mouse-1]   . treemacs-single-click-expand-action))
   :config
-  (setq treemacs-collapse-dirs           (if treemacs-python-executable 3 0)
-        treemacs-missing-project-action  'remove
-        ;; Case-insensitive so `Zebra' doesn't sort before `apple'.
-        treemacs-sorting                 'alphabetic-case-insensitive-asc
-        treemacs-follow-after-init       t
-        treemacs-width                   30
-        ;; Skip the sidebar when cycling windows (`C-x o' etc.) so the
-        ;; cursor never lands in the file tree by accident.
-        treemacs-is-never-other-window   t
-        treemacs-no-png-images           nil)
+  (setopt treemacs-collapse-dirs           (if treemacs-python-executable 3 0)
+          treemacs-missing-project-action  'remove
+          ;; Case-insensitive so `Zebra' doesn't sort before `apple'.
+          treemacs-sorting                 'alphabetic-case-insensitive-asc
+          treemacs-follow-after-init       t
+          treemacs-width                   30
+          ;; Skip the sidebar when cycling windows (`C-x o' etc.) so the
+          ;; cursor never lands in the file tree by accident.
+          treemacs-is-never-other-window   t
+          treemacs-no-png-images           nil)
   ;; Continuous follow-mode (auto-locating the current file on every
   ;; buffer switch) is too jarring -- the tree keeps jumping around.
   ;; `treemacs-follow-after-init' still does a one-time locate on open,
@@ -203,9 +203,10 @@ Intended to be registered on `org-agenda-compose-functions'."
 ;; --------------------------------------------------------------
 (use-package auto-save
   :vc (:url "https://github.com/manateelazycat/auto-save.git")
+  :custom
+  (auto-save-silent t)             ; quietly save
   :hook (after-init . auto-save-enable)
   :config
-  (setq auto-save-silent t)             ; quietly save
   ;; (setq auto-save-delete-trailing-whitespace t) ; automatically delete spaces at the end of the line when saving
   (setq auto-save-disable-predicates
         '((lambda ()

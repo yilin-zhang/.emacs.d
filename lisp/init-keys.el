@@ -31,10 +31,10 @@
 
 (use-package fcitx
   :if (eq system-type 'gnu/linux)
+  :custom
+  (fcitx-use-dbus t)
   :init
-  (fcitx-aggressive-setup)
-  :config
-  (setq fcitx-use-dbus t))
+  (fcitx-aggressive-setup))
 
 ;; --------------------------------------------------------------
 ;;                            Meow
@@ -61,6 +61,8 @@
   ;; rely on autoloads alone because the keymap helpers
   ;; (`meow-motion-define-key', `meow-leader-define-key', ...) are
   ;; defined in meow-helpers.el but not registered as autoloads.
+  :custom
+  (meow-use-clipboard t)
   :preface
   (defun yilin/disable-meow ()
     "Turn `meow-mode' off in the current buffer.
@@ -71,7 +73,6 @@ modal editing gets in the way."
   (defun meow-setup ()
     (require 'meow)
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-    (setq meow-use-clipboard t)
     (meow-motion-define-key
      '("j" . meow-next)
      '("k" . meow-prev)

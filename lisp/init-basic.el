@@ -11,10 +11,10 @@
 ;; settings from Centaur Emacs
 (use-package gcmh
   :hook emacs-startup
-  :init
-  (setq gcmh-idle-delay 'auto
-        gcmh-auto-idle-delay-factor 10
-        gcmh-high-cons-threshold #x1000000)) ; 16MB
+  :custom
+  (gcmh-idle-delay 'auto)
+  (gcmh-auto-idle-delay-factor 10)
+  (gcmh-high-cons-threshold #x1000000)) ; 16MB
 
 ;; Warm up heavy multi-file packages on idle time after startup, so
 ;; the first interactive use (e.g. `C-c a' for `org-agenda') doesn't
@@ -42,45 +42,43 @@
   :init
   ;; The setting of this variable must come before enable
   ;; display-time-mode, or it will not work.
-  (setq display-time-24hr-format t
-        display-time-string-forms
-        '((propertize (concat 24-hours ":" minutes " ")
-                      'face 'font-lock-constant-face)))
+  (setopt display-time-24hr-format t
+          display-time-string-forms
+          '((propertize (concat 24-hours ":" minutes " ")
+                        'face 'font-lock-constant-face)))
   ;; UI: window-divider defaults moved to early-init.el.
   ;; Confirmation
-  (setq use-short-answers t) ; Emacs 28+: replaces (fset 'yes-or-no-p 'y-or-n-p)
-  (setq confirm-kill-emacs 'yes-or-no-p)
+  (setopt use-short-answers t) ; Emacs 28+: replaces (fset 'yes-or-no-p 'y-or-n-p)
+  (setopt confirm-kill-emacs 'yes-or-no-p)
   ;; Editing
-  (setq-default major-mode 'text-mode
-                fill-column 80
-                truncate-lines t)
+  (setopt major-mode 'text-mode
+          fill-column 80
+          truncate-lines t)
   ;; ring-bell-function moved to early-init.el.
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
-  (setq tab-always-indent 'complete)
+  (setopt tab-always-indent 'complete)
   ;; Cursor and scrolling
-  (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)) ; one line at a time
-        mouse-wheel-progressive-speed nil            ; don't accelerate scrolling
-        mouse-wheel-follow-mouse 't                  ; scroll window under mouse
-        scroll-step 1
-        scroll-conservatively 100000                 ; keyboard scroll one line at a time
-        scroll-preserve-screen-position 'always      ; lock cursor position when scrolling
-        )
+  (setopt mouse-wheel-scroll-amount '(1 ((shift) . 1)) ; one line at a time
+          mouse-wheel-progressive-speed nil            ; don't accelerate scrolling
+          mouse-wheel-follow-mouse t                    ; scroll window under mouse
+          scroll-step 1
+          scroll-conservatively 100000                  ; keyboard scroll one line at a time
+          scroll-preserve-screen-position 'always)      ; lock cursor position when scrolling
   ;; Frame: frame-resize-pixelwise moved to early-init.el.
   ;; File saving
-  (setq make-backup-files nil  ; disable backup file
-        auto-save-default nil  ; disable auto-save
-        )
+  (setopt make-backup-files nil  ; disable backup file
+          auto-save-default nil) ; disable auto-save
   ;; Resolve symlinks when visiting files, so buffers always point at
   ;; the canonical path (also keeps doom-modeline's buffer name honest).
-  (setq find-file-visit-truename t)
+  (setopt find-file-visit-truename t)
   ;; Warning handling
-  (setq warning-suppress-types '((emacs)))
+  (setopt warning-suppress-types '((emacs)))
   ;; Misc QoL tweaks (from emacsredux "stealing from the best configs").
-  (setq set-mark-command-repeat-pop t  ; keep popping the mark ring with C-SPC
-        help-window-select t           ; focus help/helpful windows when they open
-        ffap-machine-p-known 'reject   ; never ping hostnames on find-file-at-point
-        reb-re-syntax 'string)         ; readable string syntax in `re-builder'
+  (setopt set-mark-command-repeat-pop t  ; keep popping the mark ring with C-SPC
+          help-window-select t           ; focus help/helpful windows when they open
+          ffap-machine-p-known 'reject   ; never ping hostnames on find-file-at-point
+          reb-re-syntax 'string)         ; readable string syntax in `re-builder'
   :hook
   (after-init . global-so-long-mode)
   (after-init . delete-selection-mode)
@@ -128,14 +126,14 @@
   ;; shell's environment already. `:if' is evaluated at use-package
   ;; expansion time, so the whole block is dropped on non-GUI Emacs.
   :if (memq window-system '(mac ns x))
-  :init
+  :custom
   ;; The default `exec-path-from-shell-arguments' is ("-l" "-i"), but
   ;; `-i' forces loading ~/.zshrc / ~/.bashrc, which typically runs
   ;; slow plugin init (nvm, rbenv, oh-my-zsh, conda init, ...) and can
   ;; cost 100-500ms at startup. `-l' alone still reads ~/.zprofile /
   ;; ~/.zlogin / /etc/profile, which by convention is where env
   ;; variables belong. Put env vars in .zprofile, not .zshrc.
-  (setq exec-path-from-shell-arguments '("-l"))
+  (exec-path-from-shell-arguments '("-l"))
   :hook (after-init . exec-path-from-shell-initialize))
 
 ;; --------------------------------------------------------------
@@ -213,12 +211,12 @@
         (let ((auto-revert-mode t))
           (auto-revert-handler)))))
   :hook after-init
-  :config
-  (setq auto-revert-verbose t ; let us know when it happens
-        auto-revert-use-notify nil
-        auto-revert-stop-on-user-input nil
-        ;; Only prompts for confirmation when buffer is unsaved.
-        revert-without-query (list ".")))
+  :custom
+  (auto-revert-verbose t) ; let us know when it happens
+  (auto-revert-use-notify nil)
+  (auto-revert-stop-on-user-input nil)
+  ;; Only prompts for confirmation when buffer is unsaved.
+  (revert-without-query (list ".")))
 
 ;; --------------------------------------------------------------
 ;;                              Files

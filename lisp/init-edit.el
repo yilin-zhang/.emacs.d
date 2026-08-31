@@ -89,9 +89,9 @@
 (use-package emacs
   :ensure nil
   :init
-  (setq-default c-basic-offset 4
-                tab-width 4
-                indent-tabs-mode nil))
+  (setopt c-basic-offset 4
+          tab-width 4
+          indent-tabs-mode nil))
 
 ;; Visualize TAB, (HARD) SPACE, NEWLINE
 ;; `https://github.com/condy0919/emacs-newbie/blob/master/introduction-to-builtin-modes.md'
@@ -205,38 +205,32 @@
 ;; --------------------------------------------------------------
 ;; Highlight TODO and similar keywords in comments and strings
 (use-package hl-todo
+  :custom
+  ;; Highlight ":" after the keyword too, like doom.
+  (hl-todo-highlight-punctuation ":")
+  ;; Semantic, distinctly-colored faces (instead of flattening everything
+  ;; into just error/warning red+yellow). Borrowed from doom's keyword set
+  ;; and extended with my own keywords.
+  (hl-todo-keyword-faces
+   '(("TODO" warning bold)
+     ("FIXME" error bold)
+     ("BUG" error bold)
+     ("DEFECT" error bold)
+     ("ISSUE" error bold)
+     ("REVIEW" font-lock-keyword-face bold)
+     ("WIP" font-lock-keyword-face bold)
+     ("HACK" font-lock-constant-face bold)
+     ("WORKAROUND" font-lock-constant-face bold)
+     ("TRICK" font-lock-constant-face bold)
+     ("DEPRECATED" font-lock-doc-face bold)
+     ("NOTE" success bold)))
   :custom-face (hl-todo ((t (:box t :inherit))))
   :bind (:map hl-todo-mode-map
               ([C-f3] . hl-todo-occur)
               ("C-c t p" . hl-todo-previous)
               ("C-c t n" . hl-todo-next)
               ("C-c t o" . hl-todo-occur))
-  :hook (after-init . global-hl-todo-mode)
-  :config
-  ;; Highlight ":" after the keyword too, like doom.
-  (setq hl-todo-highlight-punctuation ":")
-  ;; Semantic, distinctly-colored faces (instead of flattening everything
-  ;; into just error/warning red+yellow). Borrowed from doom's keyword set
-  ;; and extended with my own keywords.
-  (setq hl-todo-keyword-faces
-        '(;; needs doing later
-          ("TODO" warning bold)
-          ;; broken / unimplemented / actively wrong
-          ("FIXME" error bold)
-          ("BUG" error bold)
-          ("DEFECT" error bold)
-          ("ISSUE" error bold)
-          ;; revisit / reconsider, not necessarily broken
-          ("REVIEW" font-lock-keyword-face bold)
-          ("WIP" font-lock-keyword-face bold)
-          ;; intentional smell / questionable-but-works
-          ("HACK" font-lock-constant-face bold)
-          ("WORKAROUND" font-lock-constant-face bold)
-          ("TRICK" font-lock-constant-face bold)
-          ;; going away
-          ("DEPRECATED" font-lock-doc-face bold)
-          ;; informational aside
-          ("NOTE" success bold))))
+  :hook (after-init . global-hl-todo-mode))
 
 ;; Make the cursor have a tail, which is easier for
 ;; users to locate the cursor.

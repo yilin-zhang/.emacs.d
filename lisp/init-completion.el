@@ -91,6 +91,8 @@ having one huge file open doesn't slow down every completion."
     (and (dabbrev--same-major-mode-p other-buffer)
          (< (buffer-size other-buffer) yilin/dabbrev-buffer-size-limit)))
   :init
+  ;; This was removed as a user option in current Cape, so keep the legacy
+  ;; assignment as plain package state for compatibility with older versions.
   (setq cape-dabbrev-check-other-buffers t)
   (add-hook 'prog-mode-hook #'yilin/cape-add-file-capf)
   (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook comint-mode-hook))
@@ -105,12 +107,12 @@ having one huge file open doesn't slow down every completion."
   ;; current buffer, so bound what it is allowed to walk into: nothing
   ;; oversized, no internal buffers, no TAGS tables, no rendered documents.
   (with-eval-after-load 'dabbrev
-    (setq dabbrev-friend-buffer-function #'yilin/dabbrev-friend-buffer-p
-          dabbrev-ignored-buffer-regexps
-          '("\\` "                      ; internal buffers
-            "\\(?:\\(?:[EG]?\\|GR\\)TAGS\\|e?tags\\|GPATH\\)\\(<[0-9]+>\\)?")
-          ;; An all-caps prefix means the user is searching case-sensitively.
-          dabbrev-upcase-means-case-search t)
+    (setopt dabbrev-friend-buffer-function #'yilin/dabbrev-friend-buffer-p
+            dabbrev-ignored-buffer-regexps
+            '("\\` "                      ; internal buffers
+              "\\(?:\\(?:[EG]?\\|GR\\)TAGS\\|e?tags\\|GPATH\\)\\(<[0-9]+>\\)?")
+            ;; An all-caps prefix means the user is searching case-sensitively.
+            dabbrev-upcase-means-case-search t)
     (dolist (mode '(pdf-view-mode doc-view-mode tags-table-mode))
       (add-to-list 'dabbrev-ignored-buffer-modes mode))))
 

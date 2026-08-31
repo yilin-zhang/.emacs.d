@@ -52,12 +52,11 @@
   (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
   ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+  (setopt minibuffer-prompt-properties
+          '(read-only t cursor-intangible t face minibuffer-prompt))
 
   ;; Enable recursive minibuffers
-  (setq enable-recursive-minibuffers t))
+  (setopt enable-recursive-minibuffers t))
 
 (use-package orderless
   :custom
@@ -83,6 +82,18 @@
   :hook (after-init . marginalia-mode))
 
 (use-package consult
+  :custom
+  (consult-narrow-key "<")
+  ;; Start searching one character sooner, and cut the throttling roughly in
+  ;; half, so async sources (ripgrep, find, ...) keep up with typing instead
+  ;; of lagging a beat behind.
+  (consult-async-min-input 2)         ; default 3
+  (consult-async-input-throttle 0.2)  ; default 0.5
+  (consult-async-input-debounce 0.1)  ; default 0.2
+  (consult-async-refresh-delay 0.15)  ; default 0.2
+  ;; Report line numbers relative to the whole buffer, not the current
+  ;; narrowing.
+  (consult-line-numbers-widen t)
   ;; Replace bindings. Lazily loaded by `use-package'.
   :bind (("C-s" . consult-line)
          ("C-c i" . consult-minor-mode-menu)
@@ -141,14 +152,13 @@
   :hook (completion-list-mode . consult-preview-at-point-mode)
 
   :init
-  ;; Better register preview UI (thin lines, sorting, no mode line).
-  (setq register-preview-delay 0.5
-        register-preview-function #'consult-register-format)
+  ;; These core options must take effect before Consult itself is loaded.
+  (setopt register-preview-delay 0.5
+          xref-show-xrefs-function #'consult-xref
+          xref-show-definitions-function #'consult-xref)
+  ;; This is runtime plumbing rather than a user option.
+  (setq register-preview-function #'consult-register-format)
   (advice-add #'register-preview :override #'consult-register-window)
-
-  ;; Use Consult to select xref locations with preview.
-  (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
 
   :config
   ;; Debounce preview for the more expensive commands.
@@ -158,19 +168,7 @@
    consult-bookmark consult-recent-file consult-xref
    consult-source-bookmark consult-source-file-register
    consult-source-recent-file consult-source-project-recent-file
-   :preview-key '(:debounce 0.4 any))
-
-  (setq consult-narrow-key "<"
-        ;; Start searching one character sooner, and cut the throttling
-        ;; roughly in half, so async sources (ripgrep, find, ...) keep up
-        ;; with typing instead of lagging a beat behind.
-        consult-async-min-input 2         ; default 3
-        consult-async-input-throttle 0.2  ; default 0.5
-        consult-async-input-debounce 0.1  ; default 0.2
-        consult-async-refresh-delay 0.15  ; default 0.2
-        ;; Report line numbers relative to the whole buffer, not the
-        ;; current narrowing.
-        consult-line-numbers-widen t))
+   :preview-key '(:debounce 0.4 any)))
 
 (use-package embark
   :bind
@@ -179,8 +177,7 @@
    ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
 
   :init
-
-  ;; Optionally replace the key help with a completing-read interface
+  ;; This command variable is not a Customize user option.
   (setq prefix-help-command #'embark-prefix-help-command)
 
   :config

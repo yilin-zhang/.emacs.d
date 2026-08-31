@@ -38,12 +38,12 @@
 (require 'package)
 ;; package-enable-at-startup is set to nil in early-init.el, where it
 ;; actually takes effect.
-(setq package-native-compile t)
+(setopt package-native-compile t)
 
 ;; Configure package sources
-(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ("nongnu" . "https://elpa.nongnu.org/nongnu/")
-                         ("melpa" . "https://melpa.org/packages/")))
+(setopt package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                           ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+                           ("melpa" . "https://melpa.org/packages/")))
 ;;(setq package-archives '(("gnu" . "https://elpa.emacs-china.org/gnu/")
 ;;                         ("melpa" . "https://elpa.emacs-china.org/melpa/")))
 

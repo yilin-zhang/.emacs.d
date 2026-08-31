@@ -35,30 +35,23 @@
   :group 'breadcrumb)
 
 (defcustom breadcrumb-nerd-icons-kind-aliases
-  '((package . "nf-cod-package")
-    (type . class)
+  '((type . class)
     (section . nil))
-  "Imenu headings whose name differs from the kind that fits them.
-The car is the singular, downcased heading.  The cdr is a key into
-`kind-nerd-icons--icons', or a codicon name for `nerd-icons-codicon'
-when no kind fits -- there is no `package' kind, and the nearest one,
-`module', draws a submodule folder -- or nil for no icon at all."
+  "Imenu headings whose name is not the kind that fits them.
+The car is the singular, downcased heading; the cdr is a key into
+`kind-nerd-icons--icons', or nil for no icon at all.  A heading whose
+name already is a kind -- \"Packages\", \"Variables\" -- needs no entry."
   :type '(alist :key-type symbol
                 :value-type (choice (symbol :tag "Kind")
-                                    (string :tag "Codicon name")
                                     (const :tag "No icon" nil)))
   :group 'breadcrumb-nerd-icons)
 
 (defun breadcrumb-nerd-icons--icon (kind)
   "Return the icon for symbol kind KIND, or nil when there is none.
-KIND is a key into `kind-nerd-icons--icons', or a codicon name that
-`breadcrumb-nerd-icons-kind-aliases' supplied for a heading no kind
-fits.  An unknown kind, and a nil KIND, get no icon rather than a
-generic one: a column of identical glyphs carries no information."
-  (cond ((null kind) nil)
-        ((stringp kind)
-         (nerd-icons-codicon kind :face 'font-lock-preprocessor-face))
-        (t (cdr (assq kind kind-nerd-icons--icons)))))
+KIND is a key into `kind-nerd-icons--icons'.  An unknown kind, and a nil
+KIND, get no icon rather than a generic one: a column of identical
+glyphs carries no information."
+  (and kind (cdr (assq kind kind-nerd-icons--icons))))
 
 (defun breadcrumb-nerd-icons--kind-from-label (label)
   "Return the symbol kind the imenu heading LABEL stands for, or nil.

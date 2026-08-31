@@ -37,19 +37,17 @@
   ;; Record each session so `vertico-repeat' has something to resume.
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save))
 
+(use-package crm
+  :ensure nil
+  :demand t
+  :custom
+  (crm-prompt "[CRM%s] %p"))
+
 (use-package emacs
   :ensure nil
   :init
-  ;; Add prompt indicator to `completing-read-multiple'.
-  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-  (defun crm-indicator (args)
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string
-                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                   crm-separator)
-                  (car args))
-          (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+  ;; Keep native `*Completions*' readable when Vertico isn't in use.
+  (setopt completions-format 'one-column)
 
   ;; Do not allow the cursor in the minibuffer prompt
   (setopt minibuffer-prompt-properties

@@ -95,17 +95,9 @@ trust -- and honor `no-byte-compile'."
 ;; `*-ts-mode' fontifies a buffer.
 (setopt treesit-font-lock-level 4)
 
-(setopt major-mode-remap-alist
-        '(;; markup lang
-          (yaml-mode . yaml-ts-mode)
-          (json-mode . json-ts-mode)
-          (css-mode . css-ts-mode)
-          ;; programming
-          (bash-mode . bash-ts-mode)
-          (python-mode . python-ts-mode)
-          (js-mode . js-ts-mode)
-          (typescript-mode . typescript-ts-mode)
-          (rust-mode . rust-ts-mode)))
+;; Prefer every tree-sitter mode known to Emacs.  Missing grammars are
+;; offered for installation according to `treesit-auto-install-grammar'.
+(setopt treesit-enabled-modes t)
 
 ;; --------------------------------------------------------------
 ;;                             LSP

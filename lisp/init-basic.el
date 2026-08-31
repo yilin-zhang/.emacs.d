@@ -161,38 +161,12 @@
         (display-battery-mode 1)))
     (toggle-frame-fullscreen))
 
-  ;; Set key-binding for switching from a horizontal
-  ;; split to a vertical split and vice versa.
-  (defun yilin/toggle-window-split ()
-    (interactive)
-    (if (= (count-windows) 2)
-        (let* ((this-win-buffer (window-buffer))
-               (next-win-buffer (window-buffer (next-window)))
-               (this-win-edges (window-edges (selected-window)))
-               (next-win-edges (window-edges (next-window)))
-               (this-win-2nd (not (and (<= (car this-win-edges)
-                                           (car next-win-edges))
-                                       (<= (cadr this-win-edges)
-                                           (cadr next-win-edges)))))
-               (splitter
-                (if (= (car this-win-edges)
-                       (car (window-edges (next-window))))
-                    'split-window-right
-                  'split-window-below)))
-          (delete-other-windows)
-          (let ((first-win (selected-window)))
-            (funcall splitter)
-            (if this-win-2nd (other-window 1))
-            (set-window-buffer (selected-window) this-win-buffer)
-            (set-window-buffer (next-window) next-win-buffer)
-            (select-window first-win)
-            (if this-win-2nd (other-window 1))))))
   :bind
   ;; Focus on the new window after splitting
   ([remap split-window-right] . (lambda () (interactive) (split-window-right) (other-window 1)))
   ([remap split-window-below] . (lambda () (interactive) (split-window-below) (other-window 1)))
   ("<f12>" . yilin/toggle-frame-fullscreen)
-  ("C-x |" . yilin/toggle-window-split)
+  ("C-x |" . window-layout-rotate-clockwise)
   )
 
 (use-package popwin

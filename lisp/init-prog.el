@@ -17,6 +17,21 @@
   ;; a config file refreshes the state of several buffers at once.
   (flycheck-buffer-switch-check-intermediate-buffers t)
   (flycheck-emacs-lisp-load-path 'inherit)
+  ;; Annotate both the current line and the rest in the `sideline' style:
+  ;; flushed right, and truncated with an ellipsis when the code leaves too
+  ;; little room, rather than wrapped. The stock `below' style on the current
+  ;; line pushes the code around, which is distracting while typing; the full
+  ;; text of a truncated message still reaches the echo area.
+  (flycheck-annotate-current-line-style 'sideline)
+  (flycheck-annotate-other-lines-style 'sideline)
+  :custom-face
+  ;; Out of the box these inherit the error-list faces, which are the theme's
+  ;; full-strength red/yellow/green -- too loud for text sitting in the margin
+  ;; of every other line. The level is still legible from the right-fringe
+  ;; indicator and the underline on the code itself.
+  (flycheck-annotate-error ((t (:inherit shadow))))
+  (flycheck-annotate-warning ((t (:inherit shadow))))
+  (flycheck-annotate-info ((t (:inherit shadow))))
   :preface
   (defvar yilin/flycheck--elisp-predicate nil
     "The stock `emacs-lisp' checker predicate, before our wrapper.")

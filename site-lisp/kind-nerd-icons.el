@@ -1,6 +1,12 @@
 ;;; kind-nerd-icons.el  -*- lexical-binding: t; -*-
 
 (require 'nerd-icons)
+(require 'seq)
+(require 'subr-x)
+
+(defgroup kind-nerd-icons nil
+  "Nerd Font icons for completion and symbol kinds."
+  :group 'convenience)
 
 (defvar kind-nerd-icons--cache nil
   "The cache of styled and padded label (text or icon).
@@ -62,6 +68,49 @@ An alist.")
     (string . ,(nerd-icons-codicon "nf-cod-symbol_string" :face 'font-lock-string-face))
     ;; Anything unlisted.
     (t . ,(nerd-icons-codicon "nf-cod-code" :face 'font-lock-warning-face))))
+
+(defun kind-nerd-icons-icon (kind)
+  "Return the icon for symbol kind KIND, or nil when the table has none.
+An unknown kind gets nothing rather than the fallback icon: a caller
+that decorates a whole column wants the column to stay informative."
+  (and kind (cdr (assq kind kind-nerd-icons--icons))))
+
+(defcustom kind-nerd-icons-label-aliases
+  '((type . class)
+    (section . nil))
+  "Imenu headings whose name is not the kind that fits them.
+The car is the singular, downcased heading; the cdr is a key into
+`kind-nerd-icons--icons', or nil for no icon at all.  A heading whose
+name already is a kind -- \"Packages\", \"Variables\" -- needs no entry."
+  :type '(alist :key-type symbol
+                :value-type (choice (symbol :tag "Kind")
+                                    (const :tag "No icon" nil)))
+  :group 'kind-nerd-icons)
+
+(defun kind-nerd-icons-from-label (label)
+  "Return the symbol kind the imenu heading LABEL stands for, or nil.
+Headings are plural and kinds are singular, and which letters to drop is
+not decidable from the ending alone -- \"variables\" ends in \"es\" as
+surely as \"classes\" does -- so every candidate is tried in turn.
+
+This is for indexes that label nothing themselves and only group symbols
+under headings.  A language server states each symbol\='s kind outright,
+and that always wins over a guess made from a heading."
+  (let* ((name (downcase (string-trim label)))
+         (candidates
+          (delq nil (list name
+                          (and (string-suffix-p "s" name) (substring name 0 -1))
+                          (and (string-suffix-p "es" name) (substring name 0 -2)))))
+         ;; Wrapped in a list so that an alias to nil still counts as a
+         ;; hit and stops the search.
+         (hit (seq-some
+               (lambda (n)
+                 (let ((sym (intern n)))
+                   (cond ((assq sym kind-nerd-icons-label-aliases)
+                          (list (cdr (assq sym kind-nerd-icons-label-aliases))))
+                         ((assq sym kind-nerd-icons--icons) (list sym)))))
+               candidates)))
+    (car hit)))
 
 (defsubst kind-nerd-icons--metadata-get (metadata type-name)
   "Get METADATA for keyword TYPE-NAME from the completion properties."

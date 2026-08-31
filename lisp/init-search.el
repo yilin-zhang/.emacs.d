@@ -198,7 +198,24 @@
 
 (use-package nerd-icons-completion
   :after vertico
-  :hook vertico-mode)
+  :hook vertico-mode
+  ;; `:preface', not `:config': the byte-compiler must see the shared
+  ;; icon table's functions before it compiles the method below.
+  :preface (require 'kind-nerd-icons)
+  :config
+  (cl-defmethod nerd-icons-completion-get-icon (cand (_cat (eql imenu)))
+    "Return the icon for the `consult-imenu' candidate CAND.
+Two sources, in order of authority.  A language server states the kind
+of every symbol it reports, and imenu keeps that on the node as
+`imenu-kind'.  Failing that, `consult-imenu' flattens the index into
+\"HEADING name\", so the heading -- one of the type names
+`consult-imenu-config' lists for the mode -- says what the symbol is."
+    (let* ((pos (text-property-not-all 0 (length cand) 'imenu-kind nil cand))
+           (kind (if pos
+                     (intern (downcase (get-text-property pos 'imenu-kind cand)))
+                   (kind-nerd-icons-from-label (car (split-string cand " ")))))
+           (icon (kind-nerd-icons-icon kind)))
+      (if icon (concat icon " ") ""))))
 
 (use-package color-rg
   :vc (:url "https://github.com/manateelazycat/color-rg.git")

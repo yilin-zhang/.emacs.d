@@ -15,9 +15,10 @@
 ;; Kinds come from the language server, which labels every node it
 ;; reports.  A plain imenu index carries no such labels, so two rules
 ;; fill the gap: a node with no label of its own takes the kind of the
-;; imenu heading above it ("Variables", "Packages"), and a lone
-;; top-level node in a Lisp buffer is a function -- that is precisely
-;; what the nil menu titles in `lisp-imenu-generic-expression' mean.
+;; imenu heading above it, read by `kind-nerd-icons-from-label', and a
+;; lone top-level node in a Lisp buffer is a function -- that is
+;; precisely what the nil menu titles in `lisp-imenu-generic-expression'
+;; mean.
 ;;
 ;; Breadcrumb draws plain text and offers no hook for decorating a
 ;; crumb, so all of this is installed as advice.
@@ -34,46 +35,6 @@
   "Nerd Font icons for `breadcrumb' crumbs."
   :group 'breadcrumb)
 
-(defcustom breadcrumb-nerd-icons-kind-aliases
-  '((type . class)
-    (section . nil))
-  "Imenu headings whose name is not the kind that fits them.
-The car is the singular, downcased heading; the cdr is a key into
-`kind-nerd-icons--icons', or nil for no icon at all.  A heading whose
-name already is a kind -- \"Packages\", \"Variables\" -- needs no entry."
-  :type '(alist :key-type symbol
-                :value-type (choice (symbol :tag "Kind")
-                                    (const :tag "No icon" nil)))
-  :group 'breadcrumb-nerd-icons)
-
-(defun breadcrumb-nerd-icons--icon (kind)
-  "Return the icon for symbol kind KIND, or nil when there is none.
-KIND is a key into `kind-nerd-icons--icons'.  An unknown kind, and a nil
-KIND, get no icon rather than a generic one: a column of identical
-glyphs carries no information."
-  (and kind (cdr (assq kind kind-nerd-icons--icons))))
-
-(defun breadcrumb-nerd-icons--kind-from-label (label)
-  "Return the symbol kind the imenu heading LABEL stands for, or nil.
-Headings are plural and kinds are singular, and which letters to drop is
-not decidable from the ending alone -- \"variables\" ends in \"es\" as
-surely as \"classes\" does -- so every candidate is tried in turn."
-  (let* ((name (downcase (string-trim label)))
-         (candidates
-          (delq nil (list name
-                          (and (string-suffix-p "s" name) (substring name 0 -1))
-                          (and (string-suffix-p "es" name) (substring name 0 -2)))))
-         ;; Wrapped in a list so that an alias to nil still counts as a
-         ;; hit and stops the search.
-         (hit (seq-some
-               (lambda (n)
-                 (let ((sym (intern n)))
-                   (cond ((assq sym breadcrumb-nerd-icons-kind-aliases)
-                          (list (cdr (assq sym breadcrumb-nerd-icons-kind-aliases))))
-                         ((assq sym kind-nerd-icons--icons) (list sym)))))
-               candidates)))
-    (car hit)))
-
 (defun breadcrumb-nerd-icons--resolve-kinds (ipath)
   "Tag every node of IPATH with the symbol kind it stands for.
 Filter-return advice for `breadcrumb-ipath'.  The kind is stored under
@@ -85,7 +46,7 @@ Filter-return advice for `breadcrumb-ipath'.  The kind is stored under
      (lambda (p)
        (let* ((own (get-text-property 0 'breadcrumb-kind p))
               (kind (or (and own (intern (downcase own)))
-                        (breadcrumb-nerd-icons--kind-from-label
+                        (kind-nerd-icons-from-label
                          (substring-no-properties p))
                         inherited
                         (and lispp lone 'function))))
@@ -122,9 +83,10 @@ the window is too narrow to hold them."
 
 (defun breadcrumb-nerd-icons--imenu-node (crumb)
   "Prefix CRUMB, an imenu node, with an icon for its symbol kind.
-Filter-return advice for `breadcrumb--format-ipath-node'."
+Filter-return advice for `breadcrumb--format-ipath-node'.  A node whose
+kind is unknown gets no icon at all."
   (breadcrumb-nerd-icons--decorate
-   (breadcrumb-nerd-icons--icon
+   (kind-nerd-icons-icon
     (get-text-property 0 'breadcrumb-nerd-icons-kind crumb))
    crumb))
 

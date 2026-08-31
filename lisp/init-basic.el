@@ -285,6 +285,41 @@
   (when (display-graphic-p)
     (yilin/set-fonts)))
 
+
+;; --------------------------------------------------------------
+;;                            Terminal
+;; --------------------------------------------------------------
+
+;; Under `modifyOtherKeys' a terminal stops folding Ctrl combinations into
+;; their C0 control characters and reports them as escape sequences instead.
+;; Emacs asks for that mode (`xterm--init-modify-other-keys'), but decodes
+;; only a fixed table of such sequences, and Ctrl-[ (codepoint 91) and
+;; Ctrl-] (93) are missing from it -- the table stops at Ctrl-\ (92). The
+;; undecoded sequence then self-inserts, so `C-[' types "[91;5u" instead of
+;; acting as ESC. Ghostty sends the short CSI-u form; xterm's own
+;; formatOtherKeys=0 form is bound too, since both reach the same keymap.
+;;
+;; C-[ produces `escape', not the ESC character: translations through
+;; `input-decode-map' are not rescanned, so a bare ESC would slip past the
+;; filter `meow-esc-mode' installs there -- the one that turns a lone ESC
+;; into `escape' -- and modal state would never exit. `function-key-map'
+;; still maps `escape' to ESC, so its prefix use (C-[ x for M-x) is intact.
+(defconst yilin/xterm-csi-u-control-keys
+  '((91 . escape)       ; C-[  ->  <escape>
+    (93 . ?\C-\]))       ; C-]  ->  GS
+  "Codepoints Emacs fails to decode under `modifyOtherKeys', and their keys.
+Each entry maps the ASCII codepoint of a Ctrl combination to the key that
+combination stands for.")
+
+(defun yilin/xterm-decode-csi-u-control-keys ()
+  "Teach `input-decode-map' the Ctrl sequences the xterm table omits."
+  (pcase-dolist (`(,code . ,key) yilin/xterm-csi-u-control-keys)
+    ;; 5 is the modifier encoding for Ctrl (1 + 4).
+    (define-key input-decode-map (format "\e[%d;5u" code) (vector key))
+    (define-key input-decode-map (format "\e[27;5;%d~" code) (vector key))))
+
+(add-hook 'terminal-init-xterm-hook #'yilin/xterm-decode-csi-u-control-keys)
+
 (provide 'init-basic)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-basic.el ends here

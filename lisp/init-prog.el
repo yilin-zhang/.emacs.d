@@ -253,26 +253,36 @@ resolve imports against."
   (add-hook 'python-base-mode-hook #'yilin/python-activate-venv))
 
 (defun yilin/generate-pyrightconfig ()
-  "Generate a pyrightconfig.json file in the current directory."
+  "Generate a pyrightconfig.json file in the current directory.
+
+When the directory holds a usable `.venv\\=', record it as venvPath/venv so
+that a bare `pyright\\=' in a terminal resolves imports against the same
+interpreter eglot uses; `yilin/python-activate-venv\\=' only reaches the
+server eglot starts.  The pair is omitted when there is no venv, since
+pyright reports a venv it cannot find."
   (interactive)
-  (let ((pyrightconfig-path (concat default-directory "pyrightconfig.json")))
-    (if (file-exists-p pyrightconfig-path)
+  (let ((path (expand-file-name "pyrightconfig.json")))
+    (if (file-exists-p path)
         (message "pyrightconfig.json already exists.")
-      (progn
-        ;; write string to pyrightconfig-path
-        (with-temp-file pyrightconfig-path
-          (insert "{
-  \"reportGeneralTypeIssues\": \"warning\",
-  \"reportOptionalSubscript\": \"warning\",
-  \"reportOptionalMemberAccess\": \"warning\",
-  \"reportOptionalCall\": \"warning\",
-  \"reportOptionalIterable\": \"warning\",
-  \"reportOptionalContextManager\": \"warning\",
-  \"reportOptionalOperand\": \"warning\",
-  \"reportArgumentType\": \"warning\",
-  \"extraPaths\": []
-}"))
-        (message "pyrightconfig.json generated.")))))
+      (let ((config
+             (append
+              (when (file-executable-p
+                     (expand-file-name ".venv/bin/python" default-directory))
+                '((venvPath . ".") (venv . ".venv")))
+              '((reportGeneralTypeIssues . "warning")
+                (reportOptionalSubscript . "warning")
+                (reportOptionalMemberAccess . "warning")
+                (reportOptionalCall . "warning")
+                (reportOptionalIterable . "warning")
+                (reportOptionalContextManager . "warning")
+                (reportOptionalOperand . "warning")
+                (reportArgumentType . "warning")
+                (extraPaths . [])))))
+        (with-temp-file path
+          (insert (json-serialize config))
+          (json-pretty-print-buffer))
+        (message "pyrightconfig.json generated%s."
+                 (if (assq 'venvPath config) " with .venv" ""))))))
 
 ;; --------------------------------------------------------------
 ;;                      Web Configuration

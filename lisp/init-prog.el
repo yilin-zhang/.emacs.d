@@ -269,7 +269,6 @@ resolve imports against."
   \"reportOptionalIterable\": \"warning\",
   \"reportOptionalContextManager\": \"warning\",
   \"reportOptionalOperand\": \"warning\",
-  \"reportOptionalVariable\": \"warning\",
   \"reportArgumentType\": \"warning\",
   \"extraPaths\": []
 }"))

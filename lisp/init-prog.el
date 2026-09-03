@@ -129,6 +129,11 @@ trust -- and honor `no-byte-compile'."
                '((json-mode json-ts-mode) . ("vscode-json-languageserver" "--stdio")))
   (add-to-list 'eglot-server-programs
                '(swift-mode . ("sourcekit-lsp")))
+  ;; Eglot's built-in Ruby entry offers solargraph first and falls back
+  ;; to ruby-lsp; pin ruby-lsp so the choice never depends on what
+  ;; happens to be installed. `add-to-list' prepends, so this wins.
+  (add-to-list 'eglot-server-programs
+               '((ruby-mode ruby-ts-mode) . ("ruby-lsp")))
 
   ;; Documentation in a dedicated buffer, the way doom does it: the echo
   ;; area can't render LSP hover markdown, so mirror doom's
@@ -200,29 +205,52 @@ trust -- and honor `no-byte-compile'."
 ;; --------------------------------------------------------------
 ;;                       Python Configurations
 ;; --------------------------------------------------------------
-(use-package pyvenv
+(use-package python
+  :ensure nil
   :init
-  (defun yilin/pyvenv-activate-project (&optional path)
-    "Activate Python virtual environment for a project.
-With prefix arg, prompt for a directory and activate its project's venv.
-Otherwise, activate venv for the current project.
+  (defun yilin/python--venv-dir ()
+    "Return the `.venv' directory governing `default-directory', or nil.
+Only a venv with a usable interpreter counts."
+    (when-let* ((root (locate-dominating-file default-directory ".venv"))
+                (venv (expand-file-name ".venv" root))
+                ((file-executable-p (expand-file-name "bin/python" venv))))
+      venv))
 
-Assumes a '.venv' directory exists at the project root.
-Requires `project-current' to identify the project."
-    (interactive (list (when current-prefix-arg
-                         (read-directory-name "Project path: "))))
-    (let* ((dir (or path default-directory))
-           (proj (project-current nil dir))
-           (root (when proj (project-root proj)))
-           (venv-dir (when root (expand-file-name ".venv" root))))
-      (cond
-       ((not proj)
-        (user-error "No project found for %s" dir))
-       ((not (file-directory-p venv-dir))
-        (user-error "No .venv directory at %s" venv-dir))
-       (t
-        (pyvenv-activate venv-dir)
-        (message "%s activated" venv-dir))))))
+  (defun yilin/python-activate-venv ()
+    "Point this buffer at its project\\='s `.venv', buffer-locally.
+
+Unlike `pyvenv-activate', nothing global is mutated: the environment
+lives in this buffer only, so several projects can be open at once and
+each still gets its own interpreter.  Because this runs from
+`python-base-mode-hook', the environment is already in place whenever
+\\[eglot] is called later: eglot inherits the buffer\\='s
+`process-environment' and `exec-path' when it launches the server, and
+`eglot-workspace-configuration' tells pyright which interpreter to
+resolve imports against."
+    (when-let* ((venv (yilin/python--venv-dir))
+                (bin (expand-file-name "bin" venv))
+                (python (expand-file-name "python" bin)))
+      (setq-local exec-path (cons bin exec-path))
+      (setq-local process-environment
+                  (append (list (concat "VIRTUAL_ENV=" venv)
+                                (concat "PATH=" bin path-separator (getenv "PATH"))
+                                ;; A stray PYTHONHOME breaks a venv.
+                                "PYTHONHOME")
+                          process-environment))
+      (setq-local python-shell-interpreter python)
+      (setq-local python-shell-virtualenv-root venv)
+      (setq-local eglot-workspace-configuration
+                  `(:python (:pythonPath ,python
+                             :venvPath ,(directory-file-name
+                                         (file-name-directory
+                                          (directory-file-name venv)))
+                             :venv ".venv")
+                    :basedpyright (:analysis (:diagnosticMode "openFilesOnly"))))))
+
+  ;; Plain `add-hook' rather than use-package's `:hook': the latter would
+  ;; autoload `yilin/python-activate-venv' from `python', where it does
+  ;; not live.
+  (add-hook 'python-base-mode-hook #'yilin/python-activate-venv))
 
 (defun yilin/generate-pyrightconfig ()
   "Generate a pyrightconfig.json file in the current directory."
@@ -290,6 +318,17 @@ Requires `project-current' to identify the project."
          ("\\.tsx\\'" . tsx-ts-mode))
   :custom
   (typescript-ts-mode-indent-offset 2))
+
+;; --------------------------------------------------------------
+;;                       Ruby Configurations
+;; --------------------------------------------------------------
+;; RBS is Ruby's type-signature language, and it is not a subset of Ruby --
+;; `def []: (int start, ?int length) -> String?' is unparseable by
+;; `ruby-mode', which mangles indentation and fontification. Signature files
+;; get their own mode. Reading only: the language server for RBS itself is
+;; Steep, not ruby-lsp, so nothing is registered with Eglot here.
+(use-package rbs-mode
+  :mode "\\.rbs\\'")
 
 ;; --------------------------------------------------------------
 ;;                       Rust Configurations

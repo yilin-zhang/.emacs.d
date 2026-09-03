@@ -136,6 +136,23 @@
   (exec-path-from-shell-arguments '("-l"))
   :hook (after-init . exec-path-from-shell-initialize))
 
+;; mise manages the Ruby toolchain (ruby-lsp, bundle, solargraph, ...),
+;; but its shim directory is only on PATH inside an interactive shell
+;; that ran `mise activate', so a GUI Emacs never sees it and
+;; `executable-find' misses every mise-managed tool. Each shim resolves
+;; the tool version from the mise config covering `default-directory',
+;; so a subprocess started in a project gets that project's Ruby.
+;; Depth 90 puts this after `exec-path-from-shell-initialize' on
+;; `after-init-hook', which replaces `exec-path' wholesale.
+(defun yilin/add-mise-shims-to-path ()
+  "Add mise's shim directory to `exec-path' and PATH."
+  (let ((dir (expand-file-name "~/.local/share/mise/shims")))
+    (when (file-directory-p dir)
+      (add-to-list 'exec-path dir)
+      (setenv "PATH" (concat dir path-separator (getenv "PATH"))))))
+
+(add-hook 'after-init-hook #'yilin/add-mise-shims-to-path 90)
+
 ;; --------------------------------------------------------------
 ;;                            Server
 ;; --------------------------------------------------------------

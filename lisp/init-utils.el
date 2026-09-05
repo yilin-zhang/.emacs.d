@@ -38,7 +38,14 @@
           ;; Skip the sidebar when cycling windows (`C-x o' etc.) so the
           ;; cursor never lands in the file tree by accident.
           treemacs-is-never-other-window   t
-          treemacs-no-png-images           nil)
+          treemacs-no-png-images           nil
+          ;; treemacs ships deliberately lazy refresh defaults: 2000ms of
+          ;; collecting filewatch events before anything is redrawn, then
+          ;; another 0.5s of *idle* before deferred git-mode paints the
+          ;; faces.  On a sidebar whose whole job is showing git state
+          ;; that reads as broken rather than as batching.
+          treemacs-file-event-delay        500
+          treemacs-deferred-git-apply-delay 0.2)
   ;; Continuous follow-mode (auto-locating the current file on every
   ;; buffer switch) is too jarring -- the tree keeps jumping around.
   ;; `treemacs-follow-after-init' still does a one-time locate on open,
@@ -89,11 +96,54 @@ file isn't in the tree."
 
 (use-package treemacs-magit
   :after (treemacs magit)
-  :hook ((magit-post-commit
-          git-commit-post-finish
-          magit-post-stage
-          magit-post-unstage)
-         . treemacs-magit--schedule-update))
+  :demand t
+  ;; The definitions sit in `:preface' rather than `:config' so the
+  ;; byte-compiler sees them before compiling the registrations below,
+  ;; which use-package wraps in a `with-eval-after-load' form.
+  :preface
+  (defun yilin/treemacs--update-git-state (root)
+    "Re-read git state under ROOT in every treemacs buffer.
+Dispatches the same way `treemacs-magit--schedule-update\\=' does, minus its
+`run-with-idle-timer\\=' -- three seconds of idle that never elapse while
+you keep typing."
+    (when-let* (((bound-and-true-p treemacs-git-mode))
+                (root (and root (treemacs-canonical-path root))))
+      (pcase treemacs--git-mode
+        ('simple (treemacs-magit--simple-git-mode-update root))
+        ((or 'extended 'deferred)
+         (treemacs-magit--extended-git-mode-update root)))))
+
+  (defun yilin/treemacs-update-git-state-now ()
+    "Update git state for the repository the current buffer belongs to."
+    (yilin/treemacs--update-git-state (magit-toplevel)))
+
+  (defvar yilin/treemacs--last-focus-update 0
+    "When `yilin/treemacs-update-git-state-on-focus\\=' last ran.")
+
+  (defun yilin/treemacs-update-git-state-on-focus ()
+    "Update git state for every project when the frame regains focus.
+Committing, staging or checking out rewrites .git/index without creating,
+deleting or renaming any tracked file, so neither filewatch nor
+`after-save-hook\\=' sees it.  For git run outside Emacs there is no magit
+hook either, and the tree simply stays stale.  Coming back to the frame
+is the moment that matters, so refresh there -- throttled, since focus
+events fire in bursts, and skipped entirely when no tree is open."
+    (when (and (frame-focus-state)
+               (treemacs-get-local-buffer)
+               (> (float-time (time-since yilin/treemacs--last-focus-update)) 1))
+      (setq yilin/treemacs--last-focus-update (float-time))
+      (dolist (project (treemacs-workspace->projects (treemacs-current-workspace)))
+        (yilin/treemacs--update-git-state (treemacs-project->path project)))))
+
+  :config
+  (dolist (hook '(magit-post-commit-hook
+                  git-commit-post-finish-hook
+                  magit-post-stage-hook
+                  magit-post-unstage-hook))
+    (add-hook hook #'yilin/treemacs-update-git-state-now))
+
+  (add-function :after after-focus-change-function
+                #'yilin/treemacs-update-git-state-on-focus))
 
 ;; --------------------------------------------------------------
 ;;                         Better Writing

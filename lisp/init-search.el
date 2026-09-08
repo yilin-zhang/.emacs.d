@@ -41,7 +41,7 @@
   :ensure nil
   :demand t
   :custom
-  (crm-prompt "[CRM%s] %p"))
+  (crm-prompt "[CRM] %p"))
 
 (use-package emacs
   :ensure nil

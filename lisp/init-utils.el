@@ -218,7 +218,8 @@ Intended to be registered on `org-agenda-compose-functions'."
     (require 'denote)
     (let ((re (concat "_" (regexp-quote yilin/denote-agenda-keyword)
                       ".*\\.org\\'")))
-      (directory-files denote-directory t re)))
+      (when (file-directory-p denote-directory)
+        (directory-files denote-directory t re))))
 
   ;; Register denote as a dynamic source for `org-agenda-files'. The
   ;; actual scan happens lazily inside `org-agenda-compose-refresh'

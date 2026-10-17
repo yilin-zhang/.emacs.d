@@ -17,7 +17,10 @@
          (prog-mode . jinx-mode))
   :bind
   ("C-;" . jinx-correct)
-  ("C-M-;" . jinx-languages))
+  ("C-M-;" . jinx-languages)
+  :config
+  ;; English dictionaries cannot validate Chinese text.
+  (cl-pushnew "\\cc+" (alist-get t jinx-exclude-regexps) :test #'equal))
 
 ;; --------------------------------------------------------------
 ;;                         Template
@@ -138,6 +141,7 @@
 
 ;; Minor mode to aggressively keep your code always indented
 (use-package aggressive-indent
+  :commands aggressive-indent-mode
   :preface
   (defun yilin/maybe-enable-aggressive-indent ()
     "Enable `aggressive-indent-mode' unless the buffer is large."
@@ -151,6 +155,7 @@
 ;; Vertical indentation guides, like VSCode/Zed. Tree-sitter aware, so
 ;; the bars follow real scopes in `*-ts-mode' buffers when supported.
 (use-package indent-bars
+  :commands indent-bars-mode
   :preface
   (defconst yilin/indent-bars-excluded-modes
     '(lisp-data-mode scheme-mode clojure-mode racket-mode fennel-mode hy-mode)
@@ -158,8 +163,8 @@
 
   (defun yilin/maybe-enable-indent-bars ()
     "Enable `indent-bars-mode' unless this is a Lisp-family buffer."
-    (indent-bars-mode
-     (if (apply #'derived-mode-p yilin/indent-bars-excluded-modes) -1 1)))
+    (unless (apply #'derived-mode-p yilin/indent-bars-excluded-modes)
+      (indent-bars-mode 1)))
   :hook
   ;; Enable indentation guides in programming buffers except Lisp dialects,
   ;; whose nested forms become visually noisy with vertical guides.

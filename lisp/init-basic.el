@@ -158,7 +158,11 @@
 ;; --------------------------------------------------------------
 (use-package server
   :ensure nil
-  :hook after-init)
+  :hook (after-init . (lambda ()
+                        ;; Another Emacs (e.g. an `emacs -nw') may already own the server.
+                        (require 'server)
+                        (unless (server-running-p)
+                          (server-start)))))
 
 ;; --------------------------------------------------------------
 ;;                            Window
@@ -260,7 +264,9 @@
                               yilin/default-font-size)))
       (set-face-attribute 'default nil :font (font-spec :family yilin/fixed-pitch-font :size actual-font-size))
       (set-face-attribute 'fixed-pitch nil :font (font-spec :family yilin/fixed-pitch-font :size actual-font-size))
-      (set-face-attribute 'variable-pitch nil :font (font-spec :family yilin/variable-pitch-font :size (+ 2 actual-font-size)))
+      (if (find-font (font-spec :family yilin/variable-pitch-font))
+          (set-face-attribute 'variable-pitch nil :font (font-spec :family yilin/variable-pitch-font :size (+ 2 actual-font-size)))
+        (message "Font %s not found, keeping default variable-pitch" yilin/variable-pitch-font))
       ;; Nerd Font fallback for PUA glyphs (nerd-icons, markview callouts, etc.)
       (when (find-font (font-spec :family "Symbols Nerd Font Mono"))
         (set-fontset-font t 'symbol "Symbols Nerd Font Mono" nil 'append)

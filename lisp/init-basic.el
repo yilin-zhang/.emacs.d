@@ -164,6 +164,30 @@
                         (unless (server-running-p)
                           (server-start)))))
 
+;; Emacs's native macOS trash fails on iCloud Drive files with
+;; "Removing old name: Attribute not found", leaving the file in place.
+;; trash(1) run from Emacs fails the same way (no permission), but
+;; Finder, which owns iCloud's trash, succeeds, so retry through it.  The
+;; advice goes on `move-file-to-trash' rather than the
+;; `system-move-file-to-trash' primitive: natively compiled files.el
+;; calls that primitive directly, bypassing any advice on it.
+(when (eq system-type 'darwin)
+  (defun yilin/trash-with-macos-fallback (orig file)
+    "Call ORIG on FILE; on `file-error', retry by asking Finder."
+    (condition-case err
+        (funcall orig file)
+      (file-error
+       (unless (and (not (file-remote-p file))
+                    (zerop (call-process
+                            "osascript" nil nil nil
+                            "-e" "on run argv"
+                            "-e" "tell application \"Finder\" to delete ((POSIX file (item 1 of argv)) as alias)"
+                            "-e" "end run"
+                            (expand-file-name file))))
+         (signal (car err) (cdr err))))))
+  (advice-add 'move-file-to-trash :around
+              #'yilin/trash-with-macos-fallback))
+
 ;; --------------------------------------------------------------
 ;;                            Window
 ;; --------------------------------------------------------------

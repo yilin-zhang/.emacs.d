@@ -84,7 +84,7 @@
   ;; remain unsafe because the option is passed to a shell command.
   (put 'typst-ts-compile-options 'safe-local-variable
        (lambda (value)
-         (equal value "--font-path fonts"))))
+         (equal value '("--font-path" "fonts")))))
 
 (provide 'init-markup)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

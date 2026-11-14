@@ -37,14 +37,34 @@
   ;; and MathJax renders math.
   (markdown-content-type "application/xhtml+xml")
   (markdown-css-paths
-   '("https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css"
-     "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/github.min.css"))
+   '("https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css"))
+  ;; The highlight.js theme follows the system's light/dark setting, as
+  ;; github-markdown-css does. %1$s is the highlight.js build URL.
   (markdown-xhtml-header-content
-   (concat "<meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>"
-           "<style> body { box-sizing: border-box; max-width: 740px; width: 100%; margin: 40px auto; padding: 0 10px; } </style>"
-           "<script id='MathJax-script' async src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>"
-           "<script src='https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js'></script>"
-           "<script>document.addEventListener('DOMContentLoaded', () => { document.body.classList.add('markdown-body'); document.querySelectorAll('pre[lang] > code').forEach((code) => { code.classList.add(code.parentElement.lang); }); document.querySelectorAll('pre > code').forEach((code) => { hljs.highlightBlock(code); }); });</script>"))
+   (format "\
+<meta name='viewport' content='width=device-width, initial-scale=1'/>
+<style>
+  body { box-sizing: border-box; max-width: 740px; width: 100%%;
+         margin: 40px auto; padding: 0 10px; }
+</style>
+<link rel='stylesheet' media='(prefers-color-scheme: light)'
+      href='%1$s/styles/github.min.css'/>
+<link rel='stylesheet' media='(prefers-color-scheme: dark)'
+      href='%1$s/styles/github-dark.min.css'/>
+<script id='MathJax-script' async
+        src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>
+<script src='%1$s/highlight.min.js'></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.body.classList.add('markdown-body');
+    for (const code of document.querySelectorAll('pre > code')) {
+      const lang = code.parentElement.lang;
+      if (lang) code.classList.add(lang);
+      hljs.highlightElement(code);
+    }
+  });
+</script>"
+           "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build"))
   :config
   ;; Fontify rust/python code blocks with the tree-sitter modes, so they
   ;; pick up the same (level 4) highlighting as real source buffers.

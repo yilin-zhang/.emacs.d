@@ -28,7 +28,23 @@
          ("C-x t M-t" . treemacs-find-tag)
          :map treemacs-mode-map
          ([mouse-1]   . treemacs-single-click-expand-action))
+  :preface
+  (defun yilin/treemacs-cache-git-under-key (btn path buffer git-future)
+    "Also cache PATH's git status under BTN's key, where it is read back.
+A collapsed directory such as src/pkg has key src and path src/pkg.
+`treemacs--apply-annotations-deferred' caches under the path but reads
+under the key, so the children of a collapsed directory went uncolored."
+    (when (and (eq treemacs--git-mode 'deferred) (buffer-live-p buffer))
+      (with-current-buffer buffer
+        (when-let* (((<= (point-min) btn (point-max)))
+                    ((equal (treemacs-button-get btn :path) path))
+                    (key (treemacs-button-get btn :key))
+                    ((not (equal key path))))
+          (ht-set! treemacs--git-cache key
+                   (treemacs--get-or-parse-git-result git-future))))))
   :config
+  (advice-add 'treemacs--apply-annotations-deferred :before
+              #'yilin/treemacs-cache-git-under-key)
   (setopt treemacs-collapse-dirs           (if treemacs-python-executable 3 0)
           treemacs-missing-project-action  'remove
           ;; Case-insensitive so `Zebra' doesn't sort before `apple'.
@@ -59,33 +75,20 @@
     (`(t . t)
      (treemacs-git-mode 'deferred))
     (`(t . _)
-     (treemacs-git-mode 'simple)))
-  ;; kqueue -- the `file-notify' backend on macOS and the BSDs -- only
-  ;; wakes when a directory itself is written, i.e. when an entry is
-  ;; created, deleted or renamed. Editing the contents of an existing file
-  ;; never touches the directory inode, so no event is delivered and
-  ;; `treemacs-filewatch-mode' never learns the file became modified; the
-  ;; stale change only surfaces much later, when something else happens to
-  ;; touch that directory. Push the update ourselves there.
-  ;;
-  ;; Linux uses inotify (which `file-notify--library' prefers over kqueue
-  ;; when both are available), and that does report content changes, so
-  ;; filewatch already handles this and the hook would only add a
-  ;; redundant git subprocess per save.
-  (require 'filenotify)
-  (when (eq file-notify--library 'kqueue)
-    (defun yilin/treemacs-update-git-state-on-save ()
-      "Refresh the just-saved file's git state in every treemacs buffer.
-`treemacs-update-single-file-git-state' is async, debounced, updates the
-parent directories too, and no-ops when the status is unchanged or the
-file isn't in the tree."
-      (when (and (bound-and-true-p treemacs-git-mode)
-                 buffer-file-name
-                 (not (file-remote-p buffer-file-name)))
-        (let ((file buffer-file-name))
-          (treemacs-run-in-every-buffer
-           (treemacs-update-single-file-git-state file)))))
-    (add-hook 'after-save-hook #'yilin/treemacs-update-git-state-on-save)))
+     (treemacs-git-mode 'simple))))
+
+;; kqueue, the `file-notify' backend on macOS, never reports writes to the
+;; contents of an existing file, and treemacs never watches .git, so git
+;; faces went stale after edits made outside Emacs and after git run in a
+;; terminal. treemacs-fswatch feeds treemacs FSEvents through fswatch
+;; (`brew install fswatch'). Linux's inotify does report content changes.
+(use-package treemacs-fswatch
+  :ensure nil
+  :load-path yilin/site-lisp-directory
+  :if (eq system-type 'darwin)
+  :after treemacs
+  :demand t
+  :config (treemacs-fswatch-mode))
 
 (use-package treemacs-nerd-icons
   :after nerd-icons
@@ -96,54 +99,7 @@ file isn't in the tree."
 
 (use-package treemacs-magit
   :after (treemacs magit)
-  :demand t
-  ;; The definitions sit in `:preface' rather than `:config' so the
-  ;; byte-compiler sees them before compiling the registrations below,
-  ;; which use-package wraps in a `with-eval-after-load' form.
-  :preface
-  (defun yilin/treemacs--update-git-state (root)
-    "Re-read git state under ROOT in every treemacs buffer.
-Dispatches the same way `treemacs-magit--schedule-update\\=' does, minus its
-`run-with-idle-timer\\=' -- three seconds of idle that never elapse while
-you keep typing."
-    (when-let* (((bound-and-true-p treemacs-git-mode))
-                (root (and root (treemacs-canonical-path root))))
-      (pcase treemacs--git-mode
-        ('simple (treemacs-magit--simple-git-mode-update root))
-        ((or 'extended 'deferred)
-         (treemacs-magit--extended-git-mode-update root)))))
-
-  (defun yilin/treemacs-update-git-state-now ()
-    "Update git state for the repository the current buffer belongs to."
-    (yilin/treemacs--update-git-state (magit-toplevel)))
-
-  (defvar yilin/treemacs--last-focus-update 0
-    "When `yilin/treemacs-update-git-state-on-focus\\=' last ran.")
-
-  (defun yilin/treemacs-update-git-state-on-focus ()
-    "Update git state for every project when the frame regains focus.
-Committing, staging or checking out rewrites .git/index without creating,
-deleting or renaming any tracked file, so neither filewatch nor
-`after-save-hook\\=' sees it.  For git run outside Emacs there is no magit
-hook either, and the tree simply stays stale.  Coming back to the frame
-is the moment that matters, so refresh there -- throttled, since focus
-events fire in bursts, and skipped entirely when no tree is open."
-    (when (and (frame-focus-state)
-               (treemacs-get-local-buffer)
-               (> (float-time (time-since yilin/treemacs--last-focus-update)) 1))
-      (setq yilin/treemacs--last-focus-update (float-time))
-      (dolist (project (treemacs-workspace->projects (treemacs-current-workspace)))
-        (yilin/treemacs--update-git-state (treemacs-project->path project)))))
-
-  :config
-  (dolist (hook '(magit-post-commit-hook
-                  git-commit-post-finish-hook
-                  magit-post-stage-hook
-                  magit-post-unstage-hook))
-    (add-hook hook #'yilin/treemacs-update-git-state-now))
-
-  (add-function :after after-focus-change-function
-                #'yilin/treemacs-update-git-state-on-focus))
+  :demand t)
 
 ;; --------------------------------------------------------------
 ;;                         Better Writing

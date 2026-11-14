@@ -16,7 +16,7 @@ Emacs installs the Elisp packages on first launch. Install the external
 dependencies on macOS:
 
 ```sh
-brew install coreutils ripgrep enchant pkgconf
+brew install coreutils ripgrep enchant pkgconf fswatch
 brew install --cask font-sarasa-gothic font-open-dyslexic-nerd-font
 ```
 

@@ -105,10 +105,20 @@ a missing file."
   ;; area) AND documentHighlight (same-symbol highlighting) both on.
   (eglot-ignored-server-capabilities nil)
   (eglot-autoshutdown t)
+  ;; Announce available code actions in the Eldoc line only. The default
+  ;; also puts a marker in the left fringe, which diff-hl already uses,
+  ;; and another in the margin.
+  (eglot-code-action-indications '(eldoc-hint))
   ;; Keep the echo-area glance to a tidy single line. The echo area
   ;; can't render markdown (no wrapping/fontification), so multi-line
   ;; there is just a "blob" -- real docs go to the buffer below.
   (eldoc-echo-area-use-multiline-p 'truncate-sym-name-if-fit)
+  :custom-face
+  ;; Unused code (rust-analyzer's dead_code and friends) is greyed out by
+  ;; default through `shadow', which hides the syntax colors and makes the
+  ;; name hard to read. Keep the colors and mark it with a dotted underline
+  ;; in the text's own color instead.
+  (eglot-diagnostic-tag-unnecessary-face ((t (:inherit nil :underline (:style dots)))))
   :config
   (add-to-list 'eglot-server-programs
                '((json-mode json-ts-mode) . ("vscode-json-languageserver" "--stdio")))

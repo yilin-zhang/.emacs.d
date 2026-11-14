@@ -103,7 +103,16 @@
 ;; ring-bell-function, or it will not work.
 (use-package doom-themes
   :demand t
+  :preface
+  (defun yilin/doom-gruvbox-faces (theme)
+    "Color new files in treemacs when THEME is doom-gruvbox.
+Its untracked face is a beige close to plain file names."
+    (when (eq theme 'doom-gruvbox)
+      (doom-themes-set-faces 'doom-gruvbox
+        '(treemacs-git-untracked-face :foreground green)
+        '(treemacs-git-added-face     :foreground blue))))
   :config
+  (add-hook 'enable-theme-functions #'yilin/doom-gruvbox-faces)
   (load-theme 'doom-gruvbox t)
   ;; Disable visual bell because it causes buffer selecting error
   ;; when it works with dired-async

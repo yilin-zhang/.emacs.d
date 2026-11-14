@@ -15,10 +15,6 @@
              treemacs-git-mode)
   :custom-face
   (cfrs-border-color ((t (:inherit posframe-border))))
-  ;; doom-gruvbox leaves `treemacs-git-untracked-face' completely
-  ;; unstyled, so untracked files look identical to normal ones. Give
-  ;; them a visible (green) face, consistent with "new" elsewhere.
-  (treemacs-git-untracked-face ((t (:inherit font-lock-string-face))))
   :bind (([f8]        . treemacs)
          ("M-0"       . treemacs-select-window)
          ("C-x t 1"   . treemacs-delete-other-windows)
@@ -29,6 +25,12 @@
          :map treemacs-mode-map
          ([mouse-1]   . treemacs-single-click-expand-action))
   :preface
+  (defun yilin/treemacs-set-indentation ()
+    "Indent each level by the width of a chevron plus its tab.
+That puts each chevron under its parent's icon. With nerd-icons the
+pair spans three columns in a GUI frame and two in a terminal."
+    (setq-local treemacs-indentation (if (display-graphic-p) 3 2)))
+
   (defun yilin/treemacs-cache-git-under-key (btn path buffer git-future)
     "Also cache PATH's git status under BTN's key, where it is read back.
 A collapsed directory such as src/pkg has key src and path src/pkg.
@@ -42,6 +44,7 @@ under the key, so the children of a collapsed directory went uncolored."
                     ((not (equal key path))))
           (ht-set! treemacs--git-cache key
                    (treemacs--get-or-parse-git-result git-future))))))
+  :hook (treemacs-mode . yilin/treemacs-set-indentation)
   :config
   (advice-add 'treemacs--apply-annotations-deferred :before
               #'yilin/treemacs-cache-git-under-key)
@@ -95,7 +98,27 @@ under the key, so the children of a collapsed directory went uncolored."
   ;; Defer icon registration until treemacs is actually opened.
   ;; Was on `after-init', which configured icons at every startup
   ;; even when treemacs was never used.
-  :hook (treemacs-mode . treemacs-nerd-icons-config))
+  :hook (treemacs-mode . treemacs-nerd-icons-config)
+  :preface
+  (defun yilin/treemacs-nerd-icons-pad-files ()
+    "Shift file icons one column right to line up with folder icons.
+A directory line starts with a chevron and a tab, a file line with a
+space and a tab. The chevron is wider than a column, so its tab jumps
+one stop further and file icons and names end up a column left."
+    (let ((icons (treemacs-theme->gui-icons (treemacs--find-theme "nerd-icons"))))
+      (maphash
+       (lambda (key icon)
+         (let ((display (get-text-property 0 'display icon)))
+           (cond
+            ((string-prefix-p " \t" icon)
+             (puthash key (concat " " icon) icons))
+            ((and (stringp display) (string-prefix-p " \t" display))
+             (setq icon (copy-sequence icon))
+             (put-text-property 0 1 'display (concat " " display) icon)
+             (puthash key icon icons)))))
+       icons)))
+  :config
+  (yilin/treemacs-nerd-icons-pad-files))
 
 (use-package treemacs-magit
   :after (treemacs magit)

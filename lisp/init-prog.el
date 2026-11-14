@@ -188,6 +188,16 @@ trust -- and honor `no-byte-compile'."
 ;; --------------------------------------------------------------
 ;;                        C/C++ Configurations
 ;; --------------------------------------------------------------
+(use-package cc-mode
+  :ensure nil
+  :custom (c-basic-offset 4))
+
+(use-package c-ts-mode
+  :ensure nil
+  :custom
+  (c-ts-mode-indent-offset 4)
+  (c-ts-mode-indent-style 'k&r))
+
 (use-package cmake-mode)
 
 ;; --------------------------------------------------------------

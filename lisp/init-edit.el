@@ -92,8 +92,7 @@
 (use-package emacs
   :ensure nil
   :init
-  (setopt c-basic-offset 4
-          tab-width 4
+  (setopt tab-width 4
           indent-tabs-mode nil))
 
 ;; Visualize TAB, (HARD) SPACE, NEWLINE

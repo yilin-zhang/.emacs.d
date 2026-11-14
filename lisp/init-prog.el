@@ -229,9 +229,9 @@ lives in this buffer only, so several projects can be open at once and
 each still gets its own interpreter.  Because this runs from
 `python-base-mode-hook', the environment is already in place whenever
 \\[eglot] is called later: eglot inherits the buffer\\='s
-`process-environment' and `exec-path' when it launches the server, and
-`eglot-workspace-configuration' tells pyright which interpreter to
-resolve imports against."
+`process-environment' and `exec-path' when it launches the server.
+The interpreter pyright resolves imports against is sent separately,
+by `yilin/eglot-workspace-configuration'."
     (when-let* ((venv (yilin/python--venv-dir))
                 (bin (expand-file-name "bin" venv))
                 (python (expand-file-name "python" bin)))
@@ -243,14 +243,7 @@ resolve imports against."
                                 "PYTHONHOME")
                           process-environment))
       (setq-local python-shell-interpreter python)
-      (setq-local python-shell-virtualenv-root venv)
-      (setq-local eglot-workspace-configuration
-                  `(:python (:pythonPath ,python
-                             :venvPath ,(directory-file-name
-                                         (file-name-directory
-                                          (directory-file-name venv)))
-                             :venv ".venv")
-                    :basedpyright (:analysis (:diagnosticMode "openFilesOnly"))))))
+      (setq-local python-shell-virtualenv-root venv)))
 
   ;; Plain `add-hook' rather than use-package's `:hook': the latter would
   ;; autoload `yilin/python-activate-venv' from `python', where it does
@@ -359,16 +352,27 @@ pyright reports a venv it cannot find."
   (setq major-mode-remap-alist
         (delete '(rust-mode . rust-ts-mode) major-mode-remap-alist)))
 
-;; Code that is written but not called yet is normal mid-edit, so turn
-;; rustc's unused-code warnings into hints. They are still marked through
-;; the `unnecessary' tag, and `cargo build' still reports them.
 ;; Eglot reads this variable from its global value or from .dir-locals.el,
-;; never from a buffer-local value set in a mode hook.
-(setopt eglot-workspace-configuration
-        '(:rust-analyzer
-          (:diagnostics
-           (:warningsAsHint ["dead_code" "unused_variables" "unused_imports"
-                             "unused_mut" "unused_assignments"]))))
+;; never from a buffer-local value set in a mode hook. As a function it is
+;; called in a temporary buffer at the project root, which is enough to
+;; find a Python project's .venv.
+(defun yilin/eglot-workspace-configuration (_server)
+  "Settings eglot sends to language servers."
+  `(;; Code that is written but not called yet is normal mid-edit, so
+    ;; turn rustc's unused-code warnings into hints. They are still
+    ;; marked through the `unnecessary' tag, and `cargo build' still
+    ;; reports them.
+    :rust-analyzer
+    (:diagnostics
+     (:warningsAsHint ["dead_code" "unused_variables" "unused_imports"
+                       "unused_mut" "unused_assignments"]))
+    ;; Resolve imports against the project's .venv.
+    :python
+    (:analysis (:typeCheckingMode "standard")
+     ,@(when-let* ((venv (yilin/python--venv-dir)))
+         `(:pythonPath ,(expand-file-name "bin/python" venv))))))
+
+(setopt eglot-workspace-configuration #'yilin/eglot-workspace-configuration)
 
 ;; A solid underline under mutable bindings, the way RustRover marks them.
 ;; rust-analyzer tags them with its own `mutable' semantic-token modifier;

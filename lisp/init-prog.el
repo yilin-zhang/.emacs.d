@@ -6,74 +6,59 @@
 
 ;;; Code:
 
-(use-package flycheck
-  :hook ((prog-mode . flycheck-mode)
-         (prog-mode . flycheck-annotate-mode))
+(use-package flymake
+  :ensure nil
+  :hook (prog-mode . flymake-mode)
+  ;; The same keys flycheck uses under its C-c ! prefix.
+  :bind (:map flymake-mode-map
+              ("C-c ! n" . flymake-goto-next-error)
+              ("C-c ! p" . flymake-goto-prev-error)
+              ("C-c ! l" . flymake-show-buffer-diagnostics)
+              ("C-c ! L" . flymake-show-project-diagnostics))
   :custom
-  (flycheck-idle-change-delay 1)
-  ;; Surface the error message faster once point lands on it (0.9 default).
-  (flycheck-display-errors-delay 0.25)
-  ;; Also check buffers we only pass through briefly, so that e.g. editing
-  ;; a config file refreshes the state of several buffers at once.
-  (flycheck-buffer-switch-check-intermediate-buffers t)
-  (flycheck-emacs-lisp-load-path 'inherit)
-  ;; Annotate both the current line and the rest in the `sideline' style:
-  ;; flushed right, and truncated with an ellipsis when the code leaves too
-  ;; little room, rather than wrapped. The stock `below' style on the current
-  ;; line pushes the code around, which is distracting while typing; the full
-  ;; text of a truncated message still reaches the echo area.
-  (flycheck-annotate-current-line-style 'sideline)
-  (flycheck-annotate-other-lines-style 'sideline)
-  ;; diff-hl owns the left fringe (see init-git.el), so give flycheck the
-  ;; right one -- otherwise the two indicators overlap.
-  (flycheck-indication-mode 'right-fringe)
-  :custom-face
-  ;; Out of the box these inherit the error-list faces, which are the theme's
-  ;; full-strength red/yellow/green -- too loud for text sitting in the margin
-  ;; of every other line. The level is still legible from the right-fringe
-  ;; indicator and the underline on the code itself.
-  (flycheck-annotate-error ((t (:inherit shadow))))
-  (flycheck-annotate-warning ((t (:inherit shadow))))
-  (flycheck-annotate-info ((t (:inherit shadow))))
-  :preface
-  (defvar yilin/flycheck--elisp-predicate nil
-    "The stock `emacs-lisp' checker predicate, before our wrapper.")
-
-  (defun yilin/flycheck-elisp-safe-p ()
-    "Non-nil if it is safe to run the `emacs-lisp' checker here.
-The checker macroexpands the buffer, which executes code (CVE-2024-53920),
-so restrict it to buffers inside a project -- i.e. code we presumably
-trust -- and honor `no-byte-compile'."
-    (and (not (bound-and-true-p no-byte-compile))
-         (project-current nil)
-         (or (null yilin/flycheck--elisp-predicate)
-             (funcall yilin/flycheck--elisp-predicate))))
+  ;; diff-hl owns the left fringe (see init-git.el), so give flymake the
+  ;; right one, or the two indicators overlap.
+  (flymake-fringe-indicator-position 'right-fringe)
+  ;; Messages show through Eldoc in the echo area once point is on the
+  ;; diagnostic, never as text at the end of the line.
+  (flymake-show-diagnostics-at-end-of-line nil)
+  ;; The elisp checker byte-compiles the buffer, which runs its macros
+  ;; (CVE-2024-53920), so flymake only runs it on trusted files.
+  (trusted-content '("~/.emacs.d/"))
   :config
-  (global-flycheck-eglot-mode 1)
-  ;; Rerunning the checker on every newline is excessive; `idle-change'
-  ;; and `save' already cover it.
-  (delq 'new-line flycheck-check-syntax-automatically)
+  ;; One underline style for every level: dots instead of the theme's
+  ;; waves. Errors and warnings keep the theme's level color so they still
+  ;; stand out; notes, where the rustc lints demoted in the Rust section
+  ;; land, use the text's own color like
+  ;; `eglot-diagnostic-tag-unnecessary-face'. Themes define these faces,
+  ;; so reapply after each theme is enabled.
+  (defun yilin/flymake-restyle-faces (&rest _)
+    (pcase-dolist (`(,face . ,source) '((flymake-error . error)
+                                        (flymake-warning . warning)
+                                        (flymake-note . nil)))
+      (set-face-attribute face nil
+                          :underline
+                          (list :style 'dots
+                                :color (if source
+                                           (face-foreground source nil t)
+                                         'foreground-color)))))
+  (yilin/flymake-restyle-faces)
+  (add-hook 'enable-theme-functions #'yilin/flymake-restyle-faces)
 
-  ;; The stock double-arrow is chunkier than it needs to be.
-  (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
-    [16 48 112 240 112 48 16] nil nil 'center)
+  (defun yilin/elisp-flymake-inherit-load-path (fn &rest args)
+    "Call FN with ARGS, letting the elisp checker see `load-path'.
+Without this, every `require' of an installed package is reported as
+a missing file."
+    (let ((elisp-flymake-byte-compile-load-path
+           (append elisp-flymake-byte-compile-load-path load-path)))
+      (apply fn args)))
+  (advice-add 'elisp-flymake-byte-compile :around
+              #'yilin/elisp-flymake-inherit-load-path)
 
-  ;; Wrap rather than replace the stock predicate, and only once, so
-  ;; reloading this file doesn't nest the wrapper. The `eval' guards
-  ;; against `setf' expanding before flycheck's gv setter exists, which
-  ;; matters if this file is ever byte-compiled.
-  (eval '(unless (eq (flycheck-checker-get 'emacs-lisp 'predicate)
-                     #'yilin/flycheck-elisp-safe-p)
-           (setq yilin/flycheck--elisp-predicate
-                 (flycheck-checker-get 'emacs-lisp 'predicate))
-           (setf (flycheck-checker-get 'emacs-lisp 'predicate)
-                 #'yilin/flycheck-elisp-safe-p))
-        t)
-
-  ;; Keep the error list a quarter-height window below the current one,
-  ;; and don't let it steal point.
+  ;; Keep the diagnostics list a quarter-height window below the current
+  ;; one, and don't let it steal point.
   (add-to-list 'display-buffer-alist
-               '("\\`\\*Flycheck error\\(?:s\\| messages\\)\\*\\'"
+               '("\\`\\*Flymake diagnostics for "
                  (display-buffer-reuse-window display-buffer-below-selected)
                  (window-height . 0.25)
                  (dedicated . t)

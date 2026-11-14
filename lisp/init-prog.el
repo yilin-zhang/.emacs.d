@@ -347,11 +347,21 @@ pyright reports a venv it cannot find."
 ;; --------------------------------------------------------------
 ;;                       Rust Configurations
 ;; --------------------------------------------------------------
-(use-package rust-mode)
+(use-package rust-mode
+  :init
+  ;; Build `rust-mode' on top of `rust-ts-mode', so .rs files get
+  ;; tree-sitter highlighting and rust-mode's commands (C-c C-c C-u/C-k/
+  ;; C-t/C-r/C-l for cargo, C-c C-d for dbg!, `rust-format-on-save').
+  ;; Must be set before rust-mode loads.
+  (setopt rust-mode-treesitter-derive t)
+  ;; `treesit-enabled-modes' remaps `rust-mode' to `rust-ts-mode', which
+  ;; would skip rust-mode again.
+  (setq major-mode-remap-alist
+        (delete '(rust-mode . rust-ts-mode) major-mode-remap-alist)))
 
 ;; Code that is written but not called yet is normal mid-edit, so turn
-;; rustc's unused-code warnings into hints. They are still greyed out
-;; through the `unnecessary' tag, and `cargo build' still reports them.
+;; rustc's unused-code warnings into hints. They are still marked through
+;; the `unnecessary' tag, and `cargo build' still reports them.
 ;; Eglot reads this variable from its global value or from .dir-locals.el,
 ;; never from a buffer-local value set in a mode hook.
 (setopt eglot-workspace-configuration

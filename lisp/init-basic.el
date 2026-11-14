@@ -84,8 +84,6 @@
   (after-init . delete-selection-mode)
   (after-init . global-hl-line-mode) ; highlight the current line
   (after-init . pixel-scroll-precision-mode)
-  ;; Make saved files that start with a shebang executable automatically.
-  (after-save . executable-make-buffer-file-executable-if-script-p)
   (window-setup . window-divider-mode)
   (emacs-startup . yilin/display-startup-time)
   )

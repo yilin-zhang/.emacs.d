@@ -103,6 +103,7 @@
          ;; Ships with diff-hl (autoloaded from diff-hl-dired).
          (dired-mode . diff-hl-dired-mode-unless-remote))
   :preface
+  (require 'color)                      ; for the staged-change colors
   (defvar diff-hl-flydiff-delay)        ; lives in diff-hl-flydiff.el
   ;; ---------------------------------------------------------------
   ;; Gutter appearance
@@ -147,14 +148,25 @@ Height tracks `frame-char-height', the buffer's text scale and
   ;; doom-gruvbox gives the diff-hl faces backgrounds we don't want (the
   ;; bar should be a colored stroke, not a highlighted cell). Re-derive
   ;; the colors from the semantic faces. Must re-run after every theme
-  ;; load, otherwise the new theme wins.
+  ;; load, otherwise the new theme wins. Staged changes use the same
+  ;; colors blended halfway into the background.
+  (defun yilin/diff-hl--dim (color)
+    "Return COLOR blended halfway into the default background."
+    (let ((bg (color-name-to-rgb (face-background 'default))))
+      (if bg
+          (pcase-let ((`(,r ,g ,b) (color-blend (color-name-to-rgb color) bg 0.5)))
+            (color-rgb-to-hex r g b 2))
+        color)))
+
   (defun yilin/diff-hl-restyle-faces (&rest _)
-    (pcase-dolist (`(,face . ,source) '((diff-hl-change . warning)
-                                        (diff-hl-insert . success)
-                                        (diff-hl-delete . error)))
-      (set-face-attribute face nil
-                          :background 'unspecified
-                          :foreground (face-foreground source))))
+    (pcase-dolist (`(,face ,staged-face ,source)
+                   '((diff-hl-change diff-hl-reference-change warning)
+                     (diff-hl-insert diff-hl-reference-insert success)
+                     (diff-hl-delete diff-hl-reference-delete error)))
+      (let ((color (face-foreground source)))
+        (set-face-attribute face nil :background 'unspecified :foreground color)
+        (set-face-attribute staged-face nil :background 'unspecified
+                            :foreground (yilin/diff-hl--dim color)))))
 
   ;; ---------------------------------------------------------------
   ;; Refreshing the gutter
@@ -212,8 +224,10 @@ matching buffer is current, so resolve it explicitly."
   (diff-hl-update-async t)
   ;; Better diff algorithm for what the gutter shows.
   (vc-git-diff-switches '("--histogram"))
-  ;; Realtime gutter feedback after staging / unstaging hunks.
+  ;; Mark staged changes apart from unstaged ones. The stock reference
+  ;; highlighter draws an empty bitmap, which hides staged changes.
   (diff-hl-show-staged-changes nil)
+  (diff-hl-highlight-reference-function #'diff-hl-highlight-on-fringe)
   ;; Nothing to diff in a rendered image or PDF.
   (diff-hl-global-modes '(not image-mode pdf-view-mode))
   ;; The thin bar is its own border.

@@ -374,28 +374,6 @@ pyright reports a venv it cannot find."
 
 (setopt eglot-workspace-configuration #'yilin/eglot-workspace-configuration)
 
-;; A solid underline under mutable bindings, the way RustRover marks them.
-;; rust-analyzer tags them with its own `mutable' semantic-token modifier;
-;; eglot only paints modifiers listed in `eglot-semantic-token-modifiers',
-;; each with the face `eglot-semantic-<name>', so add both. Only servers
-;; that send `mutable' are affected, which in practice is rust-analyzer.
-(with-eval-after-load 'eglot
-  (defface eglot-semantic-mutable '((t :underline t))
-    "Face for the `mutable' semantic-token modifier from rust-analyzer."
-    :group 'eglot-semantic-faces)
-  (add-to-list 'eglot-semantic-token-modifiers "mutable" t)
-
-  ;; rust-analyzer also marks compound assignments such as `+=' as
-  ;; `mutable'; keep the underline on names only. The token decoder
-  ;; returns ((TYPE . MODIFIERS) . FACES).
-  (defun yilin/eglot-semtok-unmark-mutable-operators (decoded)
-    "Drop the mutable face from operator tokens in DECODED."
-    (if (equal (caar decoded) "operator")
-        (cons (car decoded) (remq 'eglot-semantic-mutable (cdr decoded)))
-      decoded))
-  (advice-add 'eglot--semtok-decode-token :filter-return
-              #'yilin/eglot-semtok-unmark-mutable-operators))
-
 ;; --------------------------------------------------------------
 ;;                      Swift Configurations
 ;; --------------------------------------------------------------

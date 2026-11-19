@@ -79,9 +79,11 @@
   :custom
   (electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit))
 
-;; rainbow parentheses
+;; Rainbow parentheses, only where parens carry the structure.
+;; `lisp-data-mode' is the parent of Emacs Lisp, Lisp Interaction and
+;; Common Lisp modes.
 (use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
+  :hook ((lisp-data-mode scheme-mode) . rainbow-delimiters-mode))
 
 ;; --------------------------------------------------------------
 ;;         Whitespace, Indentation, Delete and Folding

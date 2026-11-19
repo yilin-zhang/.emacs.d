@@ -100,6 +100,8 @@
   :bind (:map diff-hl-command-map
               ("SPC" . diff-hl-mark-hunk))
   :hook ((after-init . global-diff-hl-mode)
+         ;; Clicking a gutter bar shows that hunk inline.
+         (after-init . global-diff-hl-show-hunk-mouse-mode)
          ;; Ships with diff-hl (autoloaded from diff-hl-dired).
          (dired-mode . diff-hl-dired-mode-unless-remote))
   :preface

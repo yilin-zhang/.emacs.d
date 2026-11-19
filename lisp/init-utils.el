@@ -125,6 +125,20 @@ one stop further and file icons and names end up a column left."
   :demand t)
 
 ;; --------------------------------------------------------------
+;;                           Minimap
+;; --------------------------------------------------------------
+;; Patched copy of GNU ELPA's minimap: draws code as colored bars and
+;; mirrors the diff-hl gutter. See site-lisp/minimap.el.
+(use-package minimap
+  :ensure nil
+  :load-path yilin/site-lisp-directory
+  :commands minimap-mode
+  :custom
+  (minimap-major-modes '(prog-mode))
+  ;; Each minimap fontifies its whole buffer, about 0.1s per 100KB.
+  (minimap-max-buffer-size 100000))
+
+;; --------------------------------------------------------------
 ;;                         Better Writing
 ;; --------------------------------------------------------------
 (use-package olivetti

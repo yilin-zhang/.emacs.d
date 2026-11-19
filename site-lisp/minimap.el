@@ -1,4 +1,4 @@
-;;; minimap.el --- Sidebar showing a "mini-map" of a buffer
+;;; minimap.el --- Sidebar showing a "mini-map" of a buffer  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2009-2020 Free Software Foundation, Inc.
 
@@ -34,6 +34,22 @@
 ;; Simply use M-x minimap-mode to toggle activation of the minimap.
 ;; Use 'M-x customize-group RET minimap RET' to adapt minimap to your
 ;; needs.
+
+;;; Local modifications:
+
+;; This is a modified copy of minimap 1.4 from GNU ELPA, changed by
+;; Yilin Zhang in November 2026:
+;;
+;; - Draw every visible character as a half block in its own face, so
+;;   lines of code show as colored bars instead of tiny text.  Function
+;;   names are no longer enlarged by default.
+;; - Mirror the diff-hl gutter: turn on `diff-hl-mode' in the minimap
+;;   buffer and copy diff-hl's fringe bars when syncing overlays.
+;; - Highlight the current line with the theme's current-line-number
+;;   color, across the full width.
+;; - New option `minimap-max-buffer-size' to skip large buffers.
+;; - Default to a narrower window on the right.
+;; - Enable lexical binding.
 
 ;;; KNOWN BUGS:
 
@@ -93,6 +109,7 @@
 (declare-function semantic-tag-class "semantic/tag")
 (declare-function semantic-tag-overlay "semantic/tag")
 (declare-function semantic-tag-name "semantic/tag")
+(declare-function diff-hl-mode "diff-hl")
 
 (defgroup minimap nil
   "A minimap sidebar for Emacs."
@@ -150,18 +167,18 @@ By default, this is only a different background color."
 	     :height 2.75 :background "gray90")))
   "Face used for types in the semantic overlay.")
 
-(defcustom minimap-width-fraction 0.15
+(defcustom minimap-width-fraction 0.1
   "Fraction of width which should be used for minimap sidebar."
   :type 'number
   :group 'minimap)
 
-(defcustom minimap-minimum-width 30
+(defcustom minimap-minimum-width 20
   "Minimum width of minimap in characters (default size).
 Use nil to disable."
   :type 'number
   :group 'minimap)
 
-(defcustom minimap-window-location 'left
+(defcustom minimap-window-location 'right
   "Location of the minimap window.
 Can be either the symbol `left' or `right'."
   :type '(choice (const :tag "Left" left)
@@ -245,7 +262,7 @@ fallback."
   :type 'boolean
   :group 'minimap)
 
-(defcustom minimap-enlarge-certain-faces 'as-fallback
+(defcustom minimap-enlarge-certain-faces nil
   "Whether certain faces should be enlarged in the minimap.
 All faces listed in `minimap-normal-height-faces' will be
 displayed using the default font height, allowing you to still
@@ -288,6 +305,13 @@ minimap buffer."
 This can also be a parent mode like 'prog-mode.
 If nil, a minimap must be explicitly created for each buffer."
   :type '(repeat symbol)
+  :group 'minimap)
+
+(defcustom minimap-max-buffer-size nil
+  "Largest buffer, in characters, that gets a minimap.
+Each new minimap fontifies its whole buffer, which stalls on big
+files.  If nil, there is no limit."
+  :type '(choice (const :tag "No limit" nil) integer)
   :group 'minimap)
 
 (defcustom minimap-recreate-window t
@@ -349,6 +373,14 @@ from `minimap-major-modes' (excluding the minibuffer)."
 (defvar minimap-pointmin-overlay nil)
 ;; Line overlay
 (defvar minimap-line-overlay nil)
+;; Draws every visible character as a half block in the text's own
+;; face, so each line of code reads as a colored bar.
+(defvar minimap-bar-display-table
+  (let ((table (make-display-table))
+	(bar (vector (make-glyph-code ?\u2580))))
+    (set-char-table-range table '(?! . ?~) bar)
+    (set-char-table-range table (cons #xA1 (max-char t)) bar)
+    table))
 
 
 ;;; Helpers
@@ -424,6 +456,13 @@ If REMOVE is non-nil, remove minimap from other modes."
 
 ;;; Minimap creation / killing
 
+(defun minimap-wanted-p ()
+  "Whether the current buffer should get a minimap."
+  (and minimap-major-modes
+       (apply #'derived-mode-p minimap-major-modes)
+       (or (null minimap-max-buffer-size)
+	   (<= (buffer-size) minimap-max-buffer-size))))
+
 ;;;###autoload
 (define-minor-mode minimap-mode
   "Toggle minimap mode."
@@ -432,8 +471,7 @@ If REMOVE is non-nil, remove minimap from other modes."
   :lighter " MMap"
   (if minimap-mode
       (progn
-	(when (and minimap-major-modes
-		   (apply 'derived-mode-p minimap-major-modes))
+	(when (minimap-wanted-p)
 	  (unless (minimap-get-window)
 	    (minimap-create-window))
 	  ;; Create minimap.
@@ -518,6 +556,12 @@ Re-use already existing minimap window if possible."
 		 linum-mode)
 	(linum-mode 0))
       (setq buffer-read-only t)
+      (setq buffer-display-table minimap-bar-display-table)
+      ;; diff-hl redraws every indirect buffer of a file that has
+      ;; `diff-hl-mode' on, so this keeps the minimap's bars current.
+      (when (with-current-buffer currentbuffer
+	      (bound-and-true-p diff-hl-mode))
+	(diff-hl-mode 1))
       ;; Calculate the actual number of lines displayable with the minimap face.
       (setq minimap-numlines
 	    (floor
@@ -547,8 +591,7 @@ When FORCE, enforce update of the active region."
 	;; We are still in the same buffer, so just update the minimap.
 	(minimap-update-current-buffer force)
       ;; The buffer was switched, check if the minimap should switch, too.
-      (if (and minimap-major-modes
-	       (apply 'derived-mode-p minimap-major-modes))
+      (if (minimap-wanted-p)
 	  (progn
 	    ;; Create window if necessary...
 	    (unless (minimap-get-window)
@@ -625,10 +668,13 @@ This depends on `minimap-automatically-delete-window'."
   (unless minimap-line-overlay
     (setq minimap-line-overlay (make-overlay (point) (1+ (point)) nil t))
     (overlay-put minimap-line-overlay 'priority 6))
+  ;; The theme's current-line-number color, full width: themes tend to
+  ;; give the current-line face the same color as the active region,
+  ;; which hides it.
   (overlay-put
    minimap-line-overlay 'face
-   `(:background ,(face-background 'minimap-current-line-face)
-		 :foreground ,(face-foreground 'minimap-current-line-face)))
+   `(:background ,(face-foreground 'line-number-current-line nil t)
+		 :extend t))
   (move-overlay minimap-line-overlay (point) (line-beginning-position 2)))
 
 ;;; Overlay movement
@@ -808,17 +854,20 @@ Apply semantic overlays or face enlargement if necessary."
 	  (move-overlay minimap-pointmin-overlay (point-min) (1+ (point-min)))
 	  ;; Re-apply font overlay
 	  (move-overlay minimap-base-overlay (point-min) (point-max)))
-	;; Face enlargement
-	(when (and font-lock-mode
-		   (or (eq minimap-enlarge-certain-faces 'always)
-		       (and (eq minimap-enlarge-certain-faces 'as-fallback)
-			    (or (not minimap-display-semantic-overlays)
-				(not semantic)))))
+	;; Fontify the whole buffer: the minimap's bars take their
+	;; colors from it, and jit-lock only covers what the base
+	;; buffer's own windows show.
+	(when font-lock-mode
 	  (when (eq font-lock-support-mode 'jit-lock-mode)
 	    (condition-case nil
 		(jit-lock-fontify-now)
 	      (error nil)))
-	  (minimap-enlarge-faces))
+	  ;; Face enlargement
+	  (when (or (eq minimap-enlarge-certain-faces 'always)
+		    (and (eq minimap-enlarge-certain-faces 'as-fallback)
+			 (or (not minimap-display-semantic-overlays)
+			     (not semantic))))
+	    (minimap-enlarge-faces)))
 	;; Semantic overlays
 	(when (and semantic
 		   minimap-display-semantic-overlays)
@@ -831,14 +880,22 @@ You can specify those properties with
   (let ((syncprops minimap-sync-overlay-properties))
     (when minimap-tag-only
       (setq syncprops (delq 'face syncprops)))
-    (delq nil
-	  (mapcar
-	   (lambda (p)
-	     (let ((val (overlay-get ov p)))
-	       (if val
-		   (list p val)
-		 nil)))
-	   syncprops))))
+    (nconc
+     (delq nil
+	   (mapcar
+	    (lambda (p)
+	      (let ((val (overlay-get ov p)))
+		(if val
+		    (list p val)
+		  nil)))
+	    syncprops))
+     ;; diff-hl gutter bar: its fringe bitmap lives in `before-string'.
+     ;; Keep the `diff-hl' mark so diff-hl clears the copy on its next
+     ;; redraw.
+     (when (and (overlay-get ov 'diff-hl)
+		(overlay-get ov 'before-string))
+       (list (list 'diff-hl t)
+	     (list 'before-string (overlay-get ov 'before-string)))))))
 
 (defun minimap-enlarge-faces ()
   "Apply default font to all faces in `minimap-normal-height-faces'."

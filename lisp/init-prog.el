@@ -130,6 +130,23 @@ a missing file."
   (add-to-list 'eglot-server-programs
                '((ruby-mode ruby-ts-mode) . ("ruby-lsp")))
 
+  ;; For Rust: paint rust-analyzer's own token types and the `trait'
+  ;; modifier too, so `self', lifetimes, derives and trait method calls
+  ;; can be told apart. No other server here sends these names. Eglot
+  ;; only paints names on these lists, through a face named after each;
+  ;; the faces start empty and gruvbox-jb colors them in Rust buffers.
+  (dolist (name '("selfKeyword" "lifetime" "typeAlias" "union" "derive"
+                  "macroBang" "trait"))
+    (custom-declare-face (intern (concat "eglot-semantic-" name)) '((t))
+                         (format "Face for the `%s' LSP semantic token." name)
+                         :group 'eglot-semantic-fontification))
+  (setq eglot-semantic-token-types
+        (append eglot-semantic-token-types
+                '("selfKeyword" "lifetime" "typeAlias" "union" "derive"
+                  "macroBang")))
+  (setq eglot-semantic-token-modifiers
+        (append eglot-semantic-token-modifiers '("trait")))
+
   ;; Documentation in a dedicated buffer, the way doom does it: the echo
   ;; area can't render LSP hover markdown, so mirror doom's
   ;; `+eglot-lookup-documentation' -- fetch hover synchronously and show
@@ -350,7 +367,10 @@ pyright reports a venv it cannot find."
   ;; `treesit-enabled-modes' remaps `rust-mode' to `rust-ts-mode', which
   ;; would skip rust-mode again.
   (setq major-mode-remap-alist
-        (delete '(rust-mode . rust-ts-mode) major-mode-remap-alist)))
+        (delete '(rust-mode . rust-ts-mode) major-mode-remap-alist))
+  ;; RustRover's Rust-only colors; see site-lisp/gruvbox-jb-theme.el.
+  (autoload 'gruvbox-jb-rust-faces "gruvbox-jb-theme")
+  (add-hook 'rust-mode-hook #'gruvbox-jb-rust-faces))
 
 ;; Eglot reads this variable from its global value or from .dir-locals.el,
 ;; never from a buffer-local value set in a mode hook. As a function it is

@@ -113,7 +113,11 @@ Its untracked face is a beige close to plain file names."
         '(treemacs-git-added-face     :foreground blue))))
   :config
   (add-hook 'enable-theme-functions #'yilin/doom-gruvbox-faces)
-  (load-theme 'doom-gruvbox t)
+  ;; doom-gruvbox recolored after the JetBrains Gruvbox plugin; set
+  ;; `gruvbox-jb-variant' for the hard or soft background. See
+  ;; site-lisp/gruvbox-jb-theme.el.
+  (add-to-list 'custom-theme-load-path yilin/site-lisp-directory)
+  (load-theme 'gruvbox-jb t)
   ;; Disable visual bell because it causes buffer selecting error
   ;; when it works with dired-async
   ;; (doom-themes-visual-bell-config)

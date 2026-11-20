@@ -65,12 +65,7 @@ under the key, so the children of a collapsed directory went uncolored."
           ;; that reads as broken rather than as batching.
           treemacs-file-event-delay        500
           treemacs-deferred-git-apply-delay 0.2)
-  ;; Continuous follow-mode (auto-locating the current file on every
-  ;; buffer switch) is too jarring -- the tree keeps jumping around.
-  ;; `treemacs-follow-after-init' still does a one-time locate on open,
-  ;; and `treemacs-project-follow-mode' keeps the tree scoped to the
-  ;; current project, which is the part worth keeping.
-  (treemacs-follow-mode -1)
+  (treemacs-follow-mode t)
   (treemacs-filewatch-mode t)
   (treemacs-project-follow-mode t)
   (pcase (cons (not (null (executable-find "git")))

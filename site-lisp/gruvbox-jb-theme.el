@@ -206,7 +206,7 @@ Meant for `python-ts-mode-hook'."
 
    (org-quote `(,(doom-lighten (car bg) 0.05) "#1f1f1f")))
 
-     ;;;; Base theme face overrides
+  ;;;; Base theme face overrides
   (;;;; JetBrains editor colors
    (default :background bg :foreground fg) ; TEXT is fg0; gruvbox text is fg1
    (cursor :background fg-hard)
@@ -220,7 +220,7 @@ Meant for `python-ts-mode-hook'."
    ;; One step above the selection, so both show inside it.
    (show-paren-match :background base4)    ; MATCHED_BRACE #3b514d
    ((show-paren-mismatch &override) :foreground 'unspecified :background error)
-      ;;;; JetBrains syntax colors
+   ;;;; JetBrains syntax colors
    (font-lock-comment-face       :foreground comments :slant 'italic)
    ;; The plugin's #83786e is darker than comments; use the same gray.
    (font-lock-doc-face           :foreground comments :slant 'normal)
@@ -229,11 +229,11 @@ Meant for `python-ts-mode-hook'."
    (font-lock-property-name-face :foreground variables) ; DEFAULT_INSTANCE_FIELD
    (font-lock-property-use-face  :foreground variables)
    (font-lock-bracket-face       :foreground fg)        ; DEFAULT_BRACES #f8e1aa
-   (font-lock-delimiter-face     :foreground fg)        ; DEFAULT_COMMA, _SEMICOLON
+   (font-lock-delimiter-face     :foreground fg)        ; DEFAULT_COMMA etc.
    (font-lock-punctuation-face   :foreground fg)        ; DEFAULT_DOT
    (font-lock-escape-face        :foreground dark-yellow)
    (font-lock-preprocessor-face  :foreground teal)      ; DEFAULT_METADATA
-      ;;;; eglot
+   ;;;; eglot
    ;; IDENTIFIER_UNDER_CARET #3a4337.  Its nearest, bg1, is the
    ;; current-line color, and the cursor sits on this symbol; bg2 is
    ;; the selection, so one step above that.
@@ -257,8 +257,8 @@ Meant for `python-ts-mode-hook'."
    (eglot-semantic-operator  :foreground operators)
    ;; DEFAULT_METADATA, like the preprocessor.
    (eglot-semantic-decorator :inherit 'font-lock-preprocessor-face)
-      ;;;; Rust, from RustRover's Darcula additions (see the top of
-      ;;;; gruvbox-jb-themes.el); originals in comments
+   ;;;; Rust, from RustRover's Darcula additions (see the top of
+   ;;;; gruvbox-jb-theme.el); originals in comments
    (gruvbox-jb-rust-enum         :foreground dark-cyan :slant 'italic) ; 86985d
    (gruvbox-jb-rust-enum-member  :foreground dark-blue :slant 'italic) ; 6da1ab
    (gruvbox-jb-rust-struct       :foreground dark-cyan)                ; 86985d
@@ -269,15 +269,16 @@ Meant for `python-ts-mode-hook'."
    (gruvbox-jb-rust-lifetime     :foreground dark-blue :slant 'italic) ; 20999d
    (gruvbox-jb-rust-self         :foreground violet)                   ; d98eb3
    (gruvbox-jb-rust-trait-method :foreground yellow :slant 'italic)    ; ffc66d
-      ;;;; Python, from the plugin's PY.* colors
-   (gruvbox-jb-python-definition       :foreground dark-cyan)   ; PY.FUNC/CLASS_DEFINITION
-   (gruvbox-jb-python-decorator        :foreground dark-orange) ; PY.DECORATOR
-   (gruvbox-jb-python-self             :foreground blue)        ; PY.SELF_PARAMETER
-   (gruvbox-jb-python-keyword-argument :foreground fg)          ; PY.KEYWORD_ARGUMENT
-      ;;;; rainbow-delimiters: no red (unmatched parens), gray
-      ;;;; (comments) or bright aqua (functions); neighbors differ in
-      ;;;; hue.  1-6 are gruvbox's dimmer neutral colors, so parens stay
-      ;;;; below the code; 7-9 borrow bright ones to avoid repeats.
+   ;;;; Python, from the plugin's PY.* colors: FUNC/CLASS_DEFINITION,
+   ;;;; DECORATOR, SELF_PARAMETER and KEYWORD_ARGUMENT
+   (gruvbox-jb-python-definition       :foreground dark-cyan)
+   (gruvbox-jb-python-decorator        :foreground dark-orange)
+   (gruvbox-jb-python-self             :foreground blue)
+   (gruvbox-jb-python-keyword-argument :foreground fg)
+   ;;;; rainbow-delimiters: no red (unmatched parens), gray
+   ;;;; (comments) or bright aqua (functions); neighbors differ in
+   ;;;; hue.  1-6 are gruvbox's dimmer neutral colors, so parens stay
+   ;;;; below the code; 7-9 borrow bright ones to avoid repeats.
    (rainbow-delimiters-depth-1-face :foreground dark-yellow)
    (rainbow-delimiters-depth-2-face :foreground dark-blue)
    (rainbow-delimiters-depth-3-face :foreground dark-green)
@@ -287,30 +288,30 @@ Meant for `python-ts-mode-hook'."
    (rainbow-delimiters-depth-7-face :foreground yellow)
    (rainbow-delimiters-depth-8-face :foreground blue)
    (rainbow-delimiters-depth-9-face :foreground violet)
-      ;;;; consult: file paths borrow the function color by default;
-      ;;;; color them as strings
+   ;;;; consult: file paths borrow the function color by default;
+   ;;;; color them as strings
    (consult-file :foreground strings)
-      ;;;; blamer
+   ;;;; blamer
    (blamer-face :foreground yellow :background 'unspecified :slant 'italic)
-      ;;;; treemacs: the stock untracked face is a beige close to plain
-      ;;;; file names
+   ;;;; treemacs: the stock untracked face is a beige close to plain
+   ;;;; file names
    (treemacs-git-untracked-face :foreground green)
    (treemacs-git-added-face     :foreground blue)
-      ;;;; diff-hl: thin colored bars, not filled fringe cells; staged
-      ;;;; changes (the reference faces) a step darker
+   ;;;; diff-hl: thin colored bars, not filled fringe cells; staged
+   ;;;; changes (the reference faces) a step darker
    (diff-hl-change :foreground warning :background 'unspecified)
    (diff-hl-insert :foreground success :background 'unspecified)
    (diff-hl-delete :foreground error   :background 'unspecified)
    (diff-hl-reference-change :foreground dark-yellow)
    (diff-hl-reference-insert :foreground dark-green)
    (diff-hl-reference-delete :foreground dark-red)
-      ;;;; flymake: dotted underlines, not waves.  Notes, where the rustc
-      ;;;; lints demoted in init-prog.el land, take the text's own color
-      ;;;; like `eglot-diagnostic-tag-unnecessary-face'.
+   ;;;; flymake: dotted underlines, not waves.  Notes, where the rustc
+   ;;;; lints demoted in init-prog.el land, take the text's own color
+   ;;;; like `eglot-diagnostic-tag-unnecessary-face'.
    (flymake-error   :underline `(:style dots :color ,error))
    (flymake-warning :underline `(:style dots :color ,warning))
    (flymake-note    :underline '(:style dots :color foreground-color))
-      ;;;; whitespace: tabs and trailing spaces as quiet gray marks
+   ;;;; whitespace: tabs and trailing spaces as quiet gray marks
    (whitespace-tab      :foreground base4 :background 'unspecified)
    ;; doom's base gives these a red background and a red bold
    ;; foreground; drop both to keep syntax colors visible.
@@ -319,8 +320,8 @@ Meant for `python-ts-mode-hook'."
                         :weight 'normal :underline t)
    (whitespace-space-before-tab :foreground violet :background base3)
 
-      ;;;; The rest is doom-gruvbox's, minus its evil, helm, ivy, swiper,
-      ;;;; neotree, mu4e and vimish-fold faces
+   ;;;; The rest is doom-gruvbox's, minus its evil, helm, ivy, swiper,
+   ;;;; neotree, mu4e and vimish-fold faces
    (button :foreground cyan :underline t :weight 'bold)
    ((link &override) :foreground violet)
    (minibuffer-prompt :foreground cyan)
@@ -330,7 +331,7 @@ Meant for `python-ts-mode-hook'."
    (mode-line-inactive
     :background bg :foreground base4
     :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-inactive-bg)))
-      ;;;; company
+   ;;;; company
    (company-preview-common :foreground cyan)
    (company-tooltip-common :foreground cyan)
    (company-tooltip-common-selection :foreground cyan)
@@ -340,9 +341,9 @@ Meant for `python-ts-mode-hook'."
    (company-scrollbar-fg :background cyan)
    (company-tooltip-selection :background bg-alt2)
    (company-tooltip-mouse :background bg-alt2 :foreground nil)
-      ;;;; css-mode
+   ;;;; css-mode
    (css-proprietary-property :foreground keywords)
-      ;;;; doom-modeline
+   ;;;; doom-modeline
    (doom-modeline-project-dir :bold t :foreground cyan)
    (doom-modeline-buffer-path :inherit 'bold :foreground green)
    (doom-modeline-buffer-file :inherit 'bold :foreground fg)
@@ -352,32 +353,32 @@ Meant for `python-ts-mode-hook'."
    (doom-modeline-info :bold t :foreground cyan)
    (doom-modeline-bar :background dark-green)
    (doom-modeline-panel :background dark-green :foreground fg)
-      ;;;; emacs-lisp-mode
+   ;;;; emacs-lisp-mode
    (highlight-quoted-symbol :foreground dark-cyan)
-      ;;;; ediff
+   ;;;; ediff
    (ediff-fine-diff-A    :background (doom-blend red bg 0.4) :weight 'bold)
    (ediff-current-diff-A :background (doom-blend red bg 0.2))
-      ;;;; flycheck
+   ;;;; flycheck
    (flycheck-error   :underline `(:style wave :color ,red)    :background base3)
    (flycheck-warning :underline `(:style wave :color ,yellow) :background base3)
    (flycheck-info    :underline `(:style wave :color ,blue)   :background base3)
-      ;;;; dired
+   ;;;; dired
    (dired-directory :foreground cyan)
    (dired-marked :foreground yellow)
    (dired-symlink :foreground cyan)
    (dired-header :foreground cyan)
-      ;;;; highlight-thing / highlight-symbol
+   ;;;; highlight-thing / highlight-symbol
    (highlight-thing :background (doom-lighten base3 0.03) :distant-foreground fg-alt)
    (highlight-symbol-face :background (doom-lighten base3 0.03) :distant-foreground fg-alt)
-      ;;;; LaTeX-mode
+   ;;;; LaTeX-mode
    (font-latex-math-face :foreground dark-cyan)
-      ;;;; magit
+   ;;;; magit
    (magit-section-heading             :foreground cyan :weight 'bold)
    (magit-branch-current              :underline green :inherit 'magit-branch-local)
    (magit-diff-hunk-heading           :background base3 :foreground fg-alt)
    (magit-diff-hunk-heading-highlight :background bg-alt2 :foreground fg)
    (magit-diff-context                :foreground base3 :foreground fg-alt)
-      ;;;; markdown-mode
+   ;;;; markdown-mode
    (markdown-header-face :inherit 'bold :foreground green)
    (markdown-header-delimiter-face :foreground orange)
    (markdown-blockquote-face :inherit 'italic :foreground grey)
@@ -386,7 +387,7 @@ Meant for `python-ts-mode-hook'."
    (markdown-pre-face  :foreground cyan)
    (markdown-link-face :inherit 'underline :foreground grey)
    ((markdown-code-face &override) :background (doom-lighten base2 0.045))
-      ;;;; outline
+   ;;;; outline
    ((outline-1 &override) :foreground violet)
    ((outline-2 &override) :foreground cyan)
    ((outline-3 &override) :foreground green)
@@ -395,7 +396,7 @@ Meant for `python-ts-mode-hook'."
    ((outline-6 &override) :foreground (doom-lighten violet 0.4))
    ((outline-7 &override) :foreground (doom-lighten dark-cyan 0.5))
    ((outline-8 &override) :foreground (doom-lighten violet 0.6))
-      ;;;; org
+   ;;;; org
    ((org-code &override) :foreground orange)
    (org-date :foreground green)
    (org-document-info :foreground red)
@@ -410,16 +411,16 @@ Meant for `python-ts-mode-hook'."
    (org-tag :foreground (doom-darken comments 0.15) :weight 'normal)
    (org-todo :foreground green :bold 'inherit)
    (org-verbatim :foreground yellow)
-      ;;;; undo-tree
+   ;;;; undo-tree
    (undo-tree-visualizer-active-branch-face :foreground cyan)
    (undo-tree-visualizer-current-face :foreground yellow)
-      ;;;; web-mode
+   ;;;; web-mode
    (web-mode-html-tag-bracket-face :foreground blue)
    (web-mode-html-tag-face         :foreground cyan)
    (web-mode-html-attr-name-face   :foreground cyan)
    (web-mode-json-key-face         :foreground green)
    (web-mode-json-context-face     :foreground cyan)
-      ;;;; which-key
+   ;;;; which-key
    (which-key-key-face                   :foreground green)
    (which-key-group-description-face     :foreground red)
    (which-key-command-description-face   :foreground blue)

@@ -103,12 +103,14 @@ Meant for `rust-mode-hook'."
    (base8      '("#fbf1c7" "#fbfbfb" "brightwhite")) ; fg0
    (fg         '("#ebdbb2" "#dfdfdf" "brightwhite")) ; fg1
    (fg-alt     '("#d5c4a1" "#cccccc" "brightwhite")) ; fg2
+   (fg-hard    '("#f9f5d7" "#fbfbfb" "brightwhite")) ; light0_hard
 
    (grey        '("#928374" "#909090" "brightblack"))
    (red         '("#fb4934" "#e74c3c" "red"))
    (magenta     '("#b16286" "#b16286" "magenta"))
    (violet      '("#d3869b" "#d3869b" "brightmagenta"))
    (orange      '("#fe8019" "#fd971f" "orange"))
+   (dark-orange '("#d65d0e" "#d65d0e" "orange"))
    (yellow      '("#fabd2f" "#fabd2f" "yellow"))
    (dark-yellow '("#d79921" "#fabd2f" "yellow"))
    (teal        '("#8ec07c" "#8ec07c" "green"))
@@ -138,7 +140,7 @@ Meant for `rust-mode-hook'."
    (strings        green)
    (variables      blue)
    (numbers        violet)
-   (region         base4)                ; SELECTION_BACKGROUND
+   (region         bg-alt2)              ; doom-gruvbox's; the plugin's is base4
    (error          red)
    (warning        yellow)
    (success        green)
@@ -163,7 +165,7 @@ Meant for `rust-mode-hook'."
      ;;;; Base theme face overrides
   (;;;; JetBrains editor colors
    (default :background bg :foreground fg) ; TEXT is fg0; gruvbox text is fg1
-   (cursor :background "#f9f5d7")          ; gruvbox light bg0_h
+   (cursor :background fg-hard)
    (hl-line :background base3)             ; CARET_ROW_COLOR
    ((line-number &override) :foreground grey)
    ((line-number-current-line &override) :background base3 :foreground yellow)
@@ -171,11 +173,13 @@ Meant for `rust-mode-hook'."
    ;; SEARCH_RESULT #5d4d2a; bg3 is also the selection color, but
    ;; the two rarely show at once.
    (lazy-highlight :background base4 :foreground 'unspecified)
-   (show-paren-match :background bg-alt2)  ; MATCHED_BRACE #3b514d
-   ((show-paren-mismatch &override) :foreground 'unspecified :background red)
+   ;; One step above the selection, so both show inside it.
+   (show-paren-match :background base4)    ; MATCHED_BRACE #3b514d
+   ((show-paren-mismatch &override) :foreground 'unspecified :background error)
       ;;;; JetBrains syntax colors
    (font-lock-comment-face       :foreground comments :slant 'italic)
-   (font-lock-doc-face           :foreground base5)     ; DEFAULT_DOC_COMMENT #83786e
+   ;; The plugin's #83786e is darker than comments; use the same gray.
+   (font-lock-doc-face           :foreground comments :slant 'normal)
    (font-lock-function-call-face :foreground functions)
    (font-lock-variable-use-face  :foreground variables)
    (font-lock-property-name-face :foreground variables) ; DEFAULT_INSTANCE_FIELD
@@ -187,8 +191,9 @@ Meant for `rust-mode-hook'."
    (font-lock-preprocessor-face  :foreground teal)      ; DEFAULT_METADATA
       ;;;; eglot
    ;; IDENTIFIER_UNDER_CARET #3a4337.  Its nearest, bg1, is the
-   ;; current-line color, and the cursor sits on this symbol.
-   (eglot-highlight-symbol-face :background bg-alt2)
+   ;; current-line color, and the cursor sits on this symbol; bg2 is
+   ;; the selection, so one step above that.
+   (eglot-highlight-symbol-face :background base4)
    ;; Module paths read as plain text in JetBrains, not keywords.
    (eglot-semantic-namespace :foreground fg)
    ;; Eglot paints modifier faces over the token type's face, so
@@ -206,7 +211,8 @@ Meant for `rust-mode-hook'."
    ;; Stock eglot paints operators in the function color and
    ;; decorators (Rust attributes) in the type color.
    (eglot-semantic-operator  :foreground operators)
-   (eglot-semantic-decorator :foreground teal) ; DEFAULT_METADATA
+   ;; DEFAULT_METADATA, like the preprocessor.
+   (eglot-semantic-decorator :inherit 'font-lock-preprocessor-face)
       ;;;; Rust, from RustRover's Darcula additions (see the top of
       ;;;; gruvbox-jb-themes.el); originals in comments
    (gruvbox-jb-rust-enum         :foreground dark-cyan :slant 'italic) ; 86985d
@@ -219,16 +225,22 @@ Meant for `rust-mode-hook'."
    (gruvbox-jb-rust-lifetime     :foreground dark-blue :slant 'italic) ; 20999d
    (gruvbox-jb-rust-self         :foreground violet)                   ; d98eb3
    (gruvbox-jb-rust-trait-method :foreground yellow :slant 'italic)    ; ffc66d
-      ;;;; rainbow-delimiters: the plugin's "Rainbow Parens" levels
-   (rainbow-delimiters-depth-1-face :foreground grey)
-   (rainbow-delimiters-depth-2-face :foreground "#cc241d")
-   (rainbow-delimiters-depth-3-face :foreground "#d65d0e")
-   (rainbow-delimiters-depth-4-face :foreground dark-green)
-   (rainbow-delimiters-depth-5-face :foreground magenta)
-   (rainbow-delimiters-depth-6-face :foreground dark-blue)
-   (rainbow-delimiters-depth-7-face :foreground dark-cyan)
-   (rainbow-delimiters-depth-8-face :foreground dark-yellow)
-   (rainbow-delimiters-depth-9-face :foreground "#f9f5d7")
+      ;;;; rainbow-delimiters: no red (unmatched parens), gray
+      ;;;; (comments) or bright aqua (functions); neighbors differ in
+      ;;;; hue.  1-6 are gruvbox's dimmer neutral colors, so parens stay
+      ;;;; below the code; 7-9 borrow bright ones to avoid repeats.
+   (rainbow-delimiters-depth-1-face :foreground dark-yellow)
+   (rainbow-delimiters-depth-2-face :foreground dark-blue)
+   (rainbow-delimiters-depth-3-face :foreground dark-green)
+   (rainbow-delimiters-depth-4-face :foreground magenta)
+   (rainbow-delimiters-depth-5-face :foreground dark-orange)
+   (rainbow-delimiters-depth-6-face :foreground dark-cyan)
+   (rainbow-delimiters-depth-7-face :foreground yellow)
+   (rainbow-delimiters-depth-8-face :foreground blue)
+   (rainbow-delimiters-depth-9-face :foreground violet)
+      ;;;; consult: file paths borrow the function color by default;
+      ;;;; color them as strings
+   (consult-file :foreground strings)
       ;;;; treemacs: the stock untracked face is a beige close to plain
       ;;;; file names
    (treemacs-git-untracked-face :foreground green)

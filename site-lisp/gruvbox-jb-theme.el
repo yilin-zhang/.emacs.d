@@ -241,10 +241,20 @@ Meant for `rust-mode-hook'."
       ;;;; consult: file paths borrow the function color by default;
       ;;;; color them as strings
    (consult-file :foreground strings)
+      ;;;; blamer
+   (blamer-face :foreground yellow :background 'unspecified :slant 'italic)
       ;;;; treemacs: the stock untracked face is a beige close to plain
       ;;;; file names
    (treemacs-git-untracked-face :foreground green)
    (treemacs-git-added-face     :foreground blue)
+      ;;;; whitespace: tabs and trailing spaces as quiet gray marks
+   (whitespace-tab      :foreground base4 :background 'unspecified)
+   ;; doom's base gives these a red background and a red bold
+   ;; foreground; drop both to keep syntax colors visible.
+   (whitespace-trailing :foreground base4 :background 'unspecified :inherit nil)
+   (whitespace-line     :foreground 'unspecified :background base3
+                        :weight 'normal :underline t)
+   (whitespace-space-before-tab :foreground violet :background base3)
 
       ;;;; The rest is doom-gruvbox's, minus its evil, helm, ivy, swiper,
       ;;;; neotree, mu4e and vimish-fold faces

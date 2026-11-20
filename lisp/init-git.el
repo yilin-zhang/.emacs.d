@@ -89,11 +89,9 @@
   :custom
   (blamer-idle-time 0.3)
   (blamer-min-offset 70)
-  :custom-face
-  (blamer-face ((t :foreground ,(face-foreground 'warning)
-                   :background unspecified
-                   :height 140
-                   :italic t))))
+  :config
+  ;; Colors come from the theme; an override spec keeps the size on top.
+  (face-spec-set 'blamer-face '((t :height 140))))
 
 ;; Highlight uncommitted changes using VC
 (use-package diff-hl

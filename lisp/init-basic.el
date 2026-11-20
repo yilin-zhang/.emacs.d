@@ -103,16 +103,7 @@
 ;; ring-bell-function, or it will not work.
 (use-package doom-themes
   :demand t
-  :preface
-  (defun yilin/doom-gruvbox-faces (theme)
-    "Color new files in treemacs when THEME is doom-gruvbox.
-Its untracked face is a beige close to plain file names."
-    (when (eq theme 'doom-gruvbox)
-      (doom-themes-set-faces 'doom-gruvbox
-        '(treemacs-git-untracked-face :foreground green)
-        '(treemacs-git-added-face     :foreground blue))))
   :config
-  (add-hook 'enable-theme-functions #'yilin/doom-gruvbox-faces)
   ;; doom-gruvbox recolored after the JetBrains Gruvbox plugin; set
   ;; `gruvbox-jb-variant' for the hard or soft background. See
   ;; site-lisp/gruvbox-jb-theme.el.

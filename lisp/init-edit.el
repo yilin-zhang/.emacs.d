@@ -68,9 +68,7 @@
   :ensure nil
   :hook (after-init . show-paren-mode)
   :custom
-  (show-paren-style 'mixed)
-  :custom-face
-  (show-paren-match ((t (:background ,(face-foreground 'warning))))))
+  (show-paren-style 'mixed))
 
 ;; Automatic parenthesis pairing
 (use-package elec-pair
@@ -148,35 +146,7 @@ A font-lock matcher that does its own work and always returns nil."
   ;; block.  The dots live in their own property, aliased to `display'
   ;; as indent-bars does, so font-lock clears only them.
   (cl-pushnew 'yilin-whitespace-display
-              (alist-get 'display char-property-alias-alist))
-  ;; Don't use different background for tabs.
-  (face-spec-set 'whitespace-tab
-                 '((t :background unspecified)))
-  (face-spec-set 'whitespace-trailing
-                 '((t :background unspecified :foreground unspecified
-                      :inherit whitespace-tab)))
-  ;; Only use background and underline for long lines, so we can still have
-  ;; syntax highlight.
-
-  ;; For some reason use face-defface-spec as spec-type doesn't work.  My guess
-  ;; is it's due to the variables with the same name as the faces in
-  ;; whitespace.el.  Anyway, we have to manually set some attribute to
-  ;; unspecified here.
-  (face-spec-set 'whitespace-line
-                 '((((background light))
-                    :background "#d8d8d8" :foreground unspecified
-                    :underline t :weight unspecified)
-                   (t
-                    :background "#404040" :foreground unspecified
-                    :underline t :weight unspecified)))
-
-  ;; Use softer visual cue for space before tabs.
-  (face-spec-set 'whitespace-space-before-tab
-                 '((((background light))
-                    :background "#d8d8d8" :foreground "#de4da1")
-                   (t
-                    :inherit warning
-                    :background "#404040" :foreground "#ee6aa7"))))
+              (alist-get 'display char-property-alias-alist)))
 
 ;; Minor mode to aggressively keep your code always indented
 (use-package aggressive-indent

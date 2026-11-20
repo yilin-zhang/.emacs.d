@@ -16,11 +16,9 @@
 ;; but the Rust colors below, which get the same treatment.
 ;;
 ;; Emacs gets one face per category where JetBrains can tell languages
-;; apart, so a few language-specific colors don't carry over: Python
-;; def/class names (#689d6a in the plugin) and decorators (#d65d0e) use
-;; the general function and type colors.  `font-lock-preprocessor-face'
-;; takes DEFAULT_METADATA's aqua, which fits Rust attributes and macros
-;; but also colors C's #include.
+;; apart, so the Rust and Python colors below are drawn per buffer.
+;; `font-lock-preprocessor-face' takes DEFAULT_METADATA's aqua, which
+;; fits Rust attributes and macros but also colors C's #include.
 
 ;;; Code:
 
@@ -68,11 +66,56 @@ The plugin's three dark schemes differ only in background."
     (eglot-semantic-trait        . gruvbox-jb-rust-trait-method))
   "Eglot semantic faces and the Rust faces drawn over them.")
 
-(defun gruvbox-jb-rust-faces ()
+(defun gruvbox-jb-setup-rust-faces ()
   "Color this buffer's Rust semantic tokens the way RustRover does.
 Meant for `rust-mode-hook'."
   (pcase-dolist (`(,face . ,rust-face) gruvbox-jb-rust-remaps)
     (face-remap-add-relative face rust-face)))
+
+;;;; Python
+
+;; The plugin's PY.* colors.  `python-ts-mode' shares one face between
+;; decorators, class names and type hints, and one between `self' and
+;; the keywords, so those get tree-sitter rules of their own; def names
+;; and keyword arguments have a face to themselves and are remapped.
+
+(defface gruvbox-jb-python-definition '((t)) "Python def and class names.")
+(defface gruvbox-jb-python-decorator '((t)) "Python decorators.")
+(defface gruvbox-jb-python-self '((t)) "Python `self' and `cls'.")
+(defface gruvbox-jb-python-keyword-argument '((t))
+  "Python keyword argument names in calls.")
+
+(defun gruvbox-jb-setup-python-faces ()
+  "Color this buffer's Python the way PyCharm does.
+Meant for `python-ts-mode-hook'."
+  (face-remap-add-relative 'font-lock-function-name-face
+                           'gruvbox-jb-python-definition)
+  (face-remap-add-relative 'font-lock-property-name-face
+                           'gruvbox-jb-python-keyword-argument)
+  (setq-local treesit-font-lock-settings
+              (append treesit-font-lock-settings
+                      (treesit-font-lock-rules
+                       :language 'python
+                       :feature 'definition
+                       :override t
+                       '((class_definition
+                          name: (identifier) @gruvbox-jb-python-definition))
+                       :language 'python
+                       :feature 'decorator
+                       :override t
+                       '((decorator "@" @gruvbox-jb-python-decorator)
+                         (decorator [(identifier) (attribute)]
+                                    @gruvbox-jb-python-decorator)
+                         (decorator (call function: [(identifier) (attribute)]
+                                          @gruvbox-jb-python-decorator)))
+                       :language 'python
+                       :feature 'keyword
+                       :override t
+                       '(((identifier) @gruvbox-jb-python-self
+                          (:match "\\`\\(?:self\\|cls\\)\\'"
+                                  @gruvbox-jb-python-self))))))
+  ;; Turn the new rules on per `treesit-font-lock-level'.
+  (treesit-font-lock-recompute-features))
 
 ;;;; Theme
 
@@ -225,6 +268,11 @@ Meant for `rust-mode-hook'."
    (gruvbox-jb-rust-lifetime     :foreground dark-blue :slant 'italic) ; 20999d
    (gruvbox-jb-rust-self         :foreground violet)                   ; d98eb3
    (gruvbox-jb-rust-trait-method :foreground yellow :slant 'italic)    ; ffc66d
+      ;;;; Python, from the plugin's PY.* colors
+   (gruvbox-jb-python-definition       :foreground dark-cyan)   ; PY.FUNC/CLASS_DEFINITION
+   (gruvbox-jb-python-decorator        :foreground dark-orange) ; PY.DECORATOR
+   (gruvbox-jb-python-self             :foreground blue)        ; PY.SELF_PARAMETER
+   (gruvbox-jb-python-keyword-argument :foreground fg)          ; PY.KEYWORD_ARGUMENT
       ;;;; rainbow-delimiters: no red (unmatched parens), gray
       ;;;; (comments) or bright aqua (functions); neighbors differ in
       ;;;; hue.  1-6 are gruvbox's dimmer neutral colors, so parens stay

@@ -265,7 +265,10 @@ by `yilin/eglot-workspace-configuration'."
   ;; Plain `add-hook' rather than use-package's `:hook': the latter would
   ;; autoload `yilin/python-activate-venv' from `python', where it does
   ;; not live.
-  (add-hook 'python-base-mode-hook #'yilin/python-activate-venv))
+  (add-hook 'python-base-mode-hook #'yilin/python-activate-venv)
+  ;; PyCharm's Python-only colors; see site-lisp/gruvbox-jb-theme.el.
+  (autoload 'gruvbox-jb-setup-python-faces "gruvbox-jb-theme")
+  (add-hook 'python-ts-mode-hook #'gruvbox-jb-setup-python-faces))
 
 (defun yilin/generate-pyrightconfig ()
   "Generate a pyrightconfig.json file in the current directory.
@@ -369,8 +372,8 @@ pyright reports a venv it cannot find."
   (setq major-mode-remap-alist
         (delete '(rust-mode . rust-ts-mode) major-mode-remap-alist))
   ;; RustRover's Rust-only colors; see site-lisp/gruvbox-jb-theme.el.
-  (autoload 'gruvbox-jb-rust-faces "gruvbox-jb-theme")
-  (add-hook 'rust-mode-hook #'gruvbox-jb-rust-faces))
+  (autoload 'gruvbox-jb-setup-rust-faces "gruvbox-jb-theme")
+  (add-hook 'rust-mode-hook #'gruvbox-jb-setup-rust-faces))
 
 ;; Eglot reads this variable from its global value or from .dir-locals.el,
 ;; never from a buffer-local value set in a mode hook. As a function it is

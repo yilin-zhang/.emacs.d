@@ -150,6 +150,7 @@ Meant for `python-ts-mode-hook'."
 
    (grey        '("#928374" "#909090" "brightblack"))
    (red         '("#fb4934" "#e74c3c" "red"))
+   (dark-red    '("#cc241d" "#cc241d" "red"))
    (magenta     '("#b16286" "#b16286" "magenta"))
    (violet      '("#d3869b" "#d3869b" "brightmagenta"))
    (orange      '("#fe8019" "#fd971f" "orange"))
@@ -295,6 +296,20 @@ Meant for `python-ts-mode-hook'."
       ;;;; file names
    (treemacs-git-untracked-face :foreground green)
    (treemacs-git-added-face     :foreground blue)
+      ;;;; diff-hl: thin colored bars, not filled fringe cells; staged
+      ;;;; changes (the reference faces) a step darker
+   (diff-hl-change :foreground warning :background 'unspecified)
+   (diff-hl-insert :foreground success :background 'unspecified)
+   (diff-hl-delete :foreground error   :background 'unspecified)
+   (diff-hl-reference-change :foreground dark-yellow)
+   (diff-hl-reference-insert :foreground dark-green)
+   (diff-hl-reference-delete :foreground dark-red)
+      ;;;; flymake: dotted underlines, not waves.  Notes, where the rustc
+      ;;;; lints demoted in init-prog.el land, take the text's own color
+      ;;;; like `eglot-diagnostic-tag-unnecessary-face'.
+   (flymake-error   :underline `(:style dots :color ,error))
+   (flymake-warning :underline `(:style dots :color ,warning))
+   (flymake-note    :underline '(:style dots :color foreground-color))
       ;;;; whitespace: tabs and trailing spaces as quiet gray marks
    (whitespace-tab      :foreground base4 :background 'unspecified)
    ;; doom's base gives these a red background and a red bold

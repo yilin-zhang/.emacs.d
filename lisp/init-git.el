@@ -145,29 +145,6 @@ Height tracks `frame-char-height', the buffer's text scale and
   (defun yilin/diff-hl-bmp-at-pos (type _pos)
     (if (eq type 'delete) 'diff-hl-bmp-delete 'diff-hl-bmp-middle))
 
-  ;; doom-gruvbox gives the diff-hl faces backgrounds we don't want (the
-  ;; bar should be a colored stroke, not a highlighted cell). Re-derive
-  ;; the colors from the semantic faces. Must re-run after every theme
-  ;; load, otherwise the new theme wins. Staged changes use the same
-  ;; colors blended halfway into the background.
-  (defun yilin/diff-hl--dim (color)
-    "Return COLOR blended halfway into the default background."
-    (let ((bg (color-name-to-rgb (face-background 'default))))
-      (if bg
-          (pcase-let ((`(,r ,g ,b) (color-blend (color-name-to-rgb color) bg 0.5)))
-            (color-rgb-to-hex r g b 2))
-        color)))
-
-  (defun yilin/diff-hl-restyle-faces (&rest _)
-    (pcase-dolist (`(,face ,staged-face ,source)
-                   '((diff-hl-change diff-hl-reference-change warning)
-                     (diff-hl-insert diff-hl-reference-insert success)
-                     (diff-hl-delete diff-hl-reference-delete error)))
-      (let ((color (face-foreground source)))
-        (set-face-attribute face nil :background 'unspecified :foreground color)
-        (set-face-attribute staged-face nil :background 'unspecified
-                            :foreground (yilin/diff-hl--dim color)))))
-
   ;; ---------------------------------------------------------------
   ;; Refreshing the gutter
   ;; ---------------------------------------------------------------
@@ -250,8 +227,6 @@ matching buffer is current, so resolve it explicitly."
     (with-eval-after-load 'diff-hl-flydiff
       (setopt diff-hl-flydiff-delay 0.5))
     (add-hook 'diff-hl-mode-hook #'diff-hl-flydiff-mode))
-  (yilin/diff-hl-restyle-faces)
-  (add-hook 'enable-theme-functions #'yilin/diff-hl-restyle-faces)
   (advice-add 'diff-hl-diff-buffer-with-reference :around
               #'yilin/diff-hl-silence-temp-file-prompts)
   (advice-add 'diff-hl-revert-hunk :around #'yilin/diff-hl-save-excursion)

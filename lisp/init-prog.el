@@ -26,25 +26,6 @@
   ;; (CVE-2024-53920), so flymake only runs it on trusted files.
   (trusted-content '("~/.emacs.d/"))
   :config
-  ;; One underline style for every level: dots instead of the theme's
-  ;; waves. Errors and warnings keep the theme's level color so they still
-  ;; stand out; notes, where the rustc lints demoted in the Rust section
-  ;; land, use the text's own color like
-  ;; `eglot-diagnostic-tag-unnecessary-face'. Themes define these faces,
-  ;; so reapply after each theme is enabled.
-  (defun yilin/flymake-restyle-faces (&rest _)
-    (pcase-dolist (`(,face . ,source) '((flymake-error . error)
-                                        (flymake-warning . warning)
-                                        (flymake-note . nil)))
-      (set-face-attribute face nil
-                          :underline
-                          (list :style 'dots
-                                :color (if source
-                                           (face-foreground source nil t)
-                                         'foreground-color)))))
-  (yilin/flymake-restyle-faces)
-  (add-hook 'enable-theme-functions #'yilin/flymake-restyle-faces)
-
   (defun yilin/elisp-flymake-inherit-load-path (fn &rest args)
     "Call FN with ARGS, letting the elisp checker see `load-path'.
 Without this, every `require' of an installed package is reported as

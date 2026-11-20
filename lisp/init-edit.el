@@ -101,7 +101,8 @@
 ;; `https://github.com/condy0919/emacs-newbie/blob/master/introduction-to-builtin-modes.md'
 (use-package whitespace
   :ensure nil
-  :hook (prog-mode . whitespace-mode)
+  :hook ((prog-mode . whitespace-mode)
+         (whitespace-mode . yilin/whitespace-setup-trailing-dots))
   :custom
   (whitespace-line-column nil)
   (whitespace-style
@@ -113,10 +114,47 @@
      tabs                               ; tabs (show by face)
      tab-mark                           ; tabs (show by symbol)
      ))
+  :preface
+  (defun yilin/whitespace-trailing-dots-matcher (limit)
+    "Show each trailing space before LIMIT as a dot.
+A font-lock matcher that does its own work and always returns nil."
+    (while (re-search-forward "[ \t]+$" limit t)
+      (let ((end (match-end 0)))
+        (goto-char (match-beginning 0))
+        (while (< (point) end)
+          ;; Tabs keep their `tab-mark'.  One string per space: adjacent
+          ;; `eq' display strings would collapse into a single dot.
+          (when (eq (char-after) ?\s)
+            (put-text-property (point) (1+ (point)) 'yilin-whitespace-display
+                               (propertize "·" 'face 'whitespace-trailing)))
+          (forward-char))))
+    nil)
+
+  (defun yilin/whitespace-setup-trailing-dots ()
+    "Draw trailing spaces as dots while `whitespace-mode' is on."
+    (if whitespace-mode
+        (progn
+          (font-lock-add-keywords nil '((yilin/whitespace-trailing-dots-matcher)) t)
+          (setq-local font-lock-extra-managed-props
+                      (cl-adjoin 'yilin-whitespace-display
+                                 font-lock-extra-managed-props)))
+      (font-lock-remove-keywords nil '((yilin/whitespace-trailing-dots-matcher)))
+      (with-silent-modifications
+        (remove-text-properties (point-min) (point-max)
+                                '(yilin-whitespace-display nil))))
+    (font-lock-flush))
   :config
+  ;; Trailing spaces show as gray dots, like tabs, instead of a red
+  ;; block.  The dots live in their own property, aliased to `display'
+  ;; as indent-bars does, so font-lock clears only them.
+  (cl-pushnew 'yilin-whitespace-display
+              (alist-get 'display char-property-alias-alist))
   ;; Don't use different background for tabs.
   (face-spec-set 'whitespace-tab
                  '((t :background unspecified)))
+  (face-spec-set 'whitespace-trailing
+                 '((t :background unspecified :foreground unspecified
+                      :inherit whitespace-tab)))
   ;; Only use background and underline for long lines, so we can still have
   ;; syntax highlight.
 

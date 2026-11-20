@@ -135,6 +135,9 @@ one stop further and file icons and names end up a column left."
   :hook (after-init . minimap-mode)
   :custom
   (minimap-major-modes '(prog-mode))
+  ;; Follow every redisplay instead of waiting for 0.1s of idle time,
+  ;; which froze the minimap while scrolling.
+  (minimap-update-delay 0)
   ;; Each minimap fontifies its whole buffer, about 0.1s per 100KB.
   (minimap-max-buffer-size 100000))
 

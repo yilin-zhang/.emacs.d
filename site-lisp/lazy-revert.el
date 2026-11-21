@@ -28,11 +28,27 @@
     (let ((auto-revert-mode t))
       (auto-revert-handler))))
 
+(defun lazy-revert--sync-watches ()
+  "Turn on `auto-revert-mode' in exactly the file buffers shown in windows.
+Their files are then reverted as soon as they change on disk."
+  (let ((visible (lazy-revert--visible-buffers)))
+    ;; Copy: turning the mode off removes the buffer from this list.
+    (dolist (buf (copy-sequence auto-revert-buffer-list))
+      (unless (memq buf visible)
+        (with-current-buffer buf (auto-revert-mode -1))))
+    (dolist (buf visible)
+      (with-current-buffer buf
+        (when (and buffer-file-name
+                   (not (file-remote-p buffer-file-name))
+                   (not auto-revert-mode))
+          (auto-revert-mode 1))))))
+
 (defun lazy-revert--auto-revert-buffers ()
   "Auto revert stale buffers in visible windows, if necessary."
   (dolist (buf (lazy-revert--visible-buffers))
     (with-current-buffer buf
-      (lazy-revert--auto-revert-buffer))))
+      (lazy-revert--auto-revert-buffer)))
+  (lazy-revert--sync-watches))
 
 (defun lazy-revert--run (&optional _)
   (let ((gc-cons-threshold most-positive-fixnum)
@@ -58,7 +74,9 @@
   (remove-hook 'window-selection-change-functions #'lazy-revert--run-switch-window-or-frame)
   (remove-hook 'window-buffer-change-functions #'lazy-revert--run)
   (remove-function after-focus-change-function #'lazy-revert--run-switch-window-or-frame)
-  (remove-hook 'after-save-hook #'lazy-revert--run))
+  (remove-hook 'after-save-hook #'lazy-revert--run)
+  (dolist (buf (copy-sequence auto-revert-buffer-list))
+    (with-current-buffer buf (auto-revert-mode -1))))
 
 ;;;###autoload
 (define-minor-mode lazy-revert-mode

@@ -234,7 +234,13 @@
   :hook after-init
   :custom
   (auto-revert-verbose t) ; let us know when it happens
-  (auto-revert-use-notify nil)
+  ;; Files shown in windows are watched, so they revert as soon as they
+  ;; change, without also being polled.
+  (auto-revert-use-notify t)
+  (auto-revert-avoid-polling t)
+  ;; Replacing a file by rename drops its watch, and the buffer is polled
+  ;; until the watch is back; poll often, since few buffers ever are.
+  (auto-revert-interval 1)
   (auto-revert-stop-on-user-input nil)
   ;; Only prompts for confirmation when buffer is unsaved.
   (revert-without-query (list ".")))

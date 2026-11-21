@@ -103,8 +103,6 @@
          ;; Ships with diff-hl (autoloaded from diff-hl-dired).
          (dired-mode . diff-hl-dired-mode-unless-remote))
   :preface
-  (require 'color)                      ; for the staged-change colors
-  (defvar diff-hl-flydiff-delay)        ; lives in diff-hl-flydiff.el
   ;; ---------------------------------------------------------------
   ;; Gutter appearance
   ;; ---------------------------------------------------------------
@@ -145,46 +143,6 @@ Height tracks `frame-char-height', the buffer's text scale and
   (defun yilin/diff-hl-bmp-at-pos (type _pos)
     (if (eq type 'delete) 'diff-hl-bmp-delete 'diff-hl-bmp-middle))
 
-  ;; ---------------------------------------------------------------
-  ;; Refreshing the gutter
-  ;; ---------------------------------------------------------------
-  ;; flydiff is off on macOS (see below), which would leave the gutter
-  ;; only updating on save. Compensate the way doom does: refresh when
-  ;; you switch windows or leave meow's insert state, debounced against
-  ;; the file's cached VC state so we don't spawn a git process per
-  ;; keystroke.
-  (defvar-local yilin/diff-hl--last-state nil)
-
-  (defun yilin/diff-hl-update-maybe ()
-    "Refresh the diff-hl gutter unless nothing can have changed."
-    (when-let* (((or (bound-and-true-p diff-hl-mode)
-                     (bound-and-true-p diff-hl-dir-mode)))
-                ;; Refreshing over TRAMP is far too slow to do on a
-                ;; window switch.
-                ((not (file-remote-p default-directory)))
-                (file (buffer-file-name (buffer-base-buffer)))
-                ((not (equal (cons (point) yilin/diff-hl--last-state)
-                             (setq yilin/diff-hl--last-state
-                                   (cons (point)
-                                         (copy-sequence
-                                          (symbol-plist
-                                           (intern (expand-file-name file)
-                                                   vc-file-prop-obarray)))))))))
-      (ignore (diff-hl-update))))
-
-  (defun yilin/diff-hl-update-on-switch (&optional frame-or-window)
-    "Refresh the gutter of the newly selected window.
-`window-selection-change-functions' passes the frame for the global hook
-value and the window for a window-local one, and neither guarantees the
-matching buffer is current, so resolve it explicitly."
-    (let ((win (cond ((windowp frame-or-window) frame-or-window)
-                     ((framep frame-or-window)
-                      (frame-selected-window frame-or-window))
-                     (t (selected-window)))))
-      (when (window-live-p win)
-        (with-current-buffer (window-buffer win)
-          (yilin/diff-hl-update-maybe)))))
-
   ;; diff-hl builds its temp file paths through the auto-save mechanism,
   ;; which makes TRAMP buffers prompt "auto-save file in local temp dir,
   ;; continue?" every time the gutter updates.
@@ -213,20 +171,6 @@ matching buffer is current, so resolve it explicitly."
   :config
   (advice-add 'diff-hl-define-bitmaps :after #'yilin/diff-hl-thin-bitmaps)
   (yilin/diff-hl-thin-bitmaps)
-  ;; On-the-fly gutter updates -- but NOT on macOS, where newer versions
-  ;; choke on the many short-lived git subprocesses flydiff spawns (see
-  ;; doomemacs/core#8554); there we fall back to updating on save plus
-  ;; the switch/insert-exit hooks below.
-  (if (eq system-type 'darwin)
-      (progn
-        (add-hook 'window-selection-change-functions
-                  #'yilin/diff-hl-update-on-switch)
-        (with-eval-after-load 'meow
-          (add-hook 'meow-insert-exit-hook #'yilin/diff-hl-update-maybe)))
-    ;; Slightly more conservative than the 0.3 default.
-    (with-eval-after-load 'diff-hl-flydiff
-      (setopt diff-hl-flydiff-delay 0.5))
-    (add-hook 'diff-hl-mode-hook #'diff-hl-flydiff-mode))
   (advice-add 'diff-hl-diff-buffer-with-reference :around
               #'yilin/diff-hl-silence-temp-file-prompts)
   (advice-add 'diff-hl-revert-hunk :around #'yilin/diff-hl-save-excursion)
@@ -235,6 +179,18 @@ matching buffer is current, so resolve it explicitly."
     (with-eval-after-load 'magit
       (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
       (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))))
+
+(use-package diff-hl-refresh
+  :load-path yilin/site-lisp-directory
+  ;; Catch git commands run outside Emacs, such as an agent's commit.
+  :hook (after-init . diff-hl-refresh-mode)
+  :config
+  ;; No flydiff: its many short-lived git processes choke Emacs on macOS
+  ;; (doomemacs/core#8554).  Refresh on switching windows and on leaving
+  ;; meow's insert state instead.
+  (diff-hl-refresh-on-select-mode)
+  (with-eval-after-load 'meow
+    (add-hook 'meow-insert-exit-hook #'diff-hl-refresh-maybe)))
 
 ;; Step through a file's history one revision at a time.
 (use-package git-timemachine

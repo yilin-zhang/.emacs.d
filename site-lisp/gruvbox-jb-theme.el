@@ -311,11 +311,8 @@ Meant for `python-ts-mode-hook'."
    (flymake-error   :underline `(:style dots :color ,error))
    (flymake-warning :underline `(:style dots :color ,warning))
    (flymake-note    :underline '(:style dots :color foreground-color))
-   ;;;; whitespace: tabs and trailing spaces as quiet gray marks
+   ;;;; whitespace: tabs as quiet gray marks
    (whitespace-tab      :foreground base4 :background 'unspecified)
-   ;; doom's base gives these a red background and a red bold
-   ;; foreground; drop both to keep syntax colors visible.
-   (whitespace-trailing :foreground base4 :background 'unspecified :inherit nil)
    (whitespace-line     :foreground 'unspecified :background base3
                         :weight 'normal :underline t)
    (whitespace-space-before-tab :foreground violet :background base3)

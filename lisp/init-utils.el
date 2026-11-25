@@ -127,6 +127,8 @@ one stop further and file icons and names end up a column left."
 (use-package minimap
   :ensure nil
   :load-path yilin/site-lisp-directory
+  ;; Terminal can't show small characters in the minimap
+  :if (display-graphic-p)
   :hook (after-init . minimap-mode)
   :custom
   (minimap-major-modes '(prog-mode))

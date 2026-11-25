@@ -12,21 +12,8 @@
   (corfu-auto t)                    ;; Enable auto completion
   (corfu-auto-delay 0.1)
   (corfu-auto-prefix 2)
-  (corfu-preselect 'prompt)         ;; RET inserts your input; arrow down to pick a candidate
-  (corfu-on-exact-match nil)        ;; don't auto-insert on an exact match
+  (corfu-preselect 'prompt)         ;; nothing selected until TAB or an arrow key
   (corfu-count 16)                  ;; show more candidates (default 10)
-  ;; Stay open across orderless separators (insert one with M-SPC) so you
-  ;; can refine in-buffer completion the same way as in the minibuffer.
-  (corfu-quit-at-boundary 'separator)
-  (corfu-quit-no-match 'separator)
-  ;; (corfu-separator ?\s)          ;; Orderless field separator
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
-  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
-  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
 
   ;; Use TAB for cycling, default is `corfu-complete'.
   :bind
@@ -56,10 +43,7 @@
 (use-package corfu-history
   :ensure nil
   :after corfu
-  :hook (corfu-mode . corfu-history-mode)
-  :config
-  (with-eval-after-load 'savehist
-    (add-to-list 'savehist-additional-variables 'corfu-history)))
+  :hook (corfu-mode . corfu-history-mode))
 
 ;; A custom package to show icons in corfu completion
 ;; Adapted from `'https://emacs-china.org/t/corfu-all-the-icons-icon/20907'

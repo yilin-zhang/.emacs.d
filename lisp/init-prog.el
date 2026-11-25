@@ -82,9 +82,9 @@ a missing file."
               ("C-c C-d" . yilin/eglot-documentation-at-point))
   :custom
   (eglot-events-buffer-config '(:size 0 :format full))
-  ;; Nothing ignored: we want hover docs (a quick glance in the echo
-  ;; area) AND documentHighlight (same-symbol highlighting) both on.
-  (eglot-ignored-server-capabilities nil)
+  ;; No formatting while typing. Hover docs (a quick glance in the echo
+  ;; area) and documentHighlight (same-symbol highlighting) both stay on.
+  (eglot-ignored-server-capabilities '(:documentOnTypeFormattingProvider))
   (eglot-autoshutdown t)
   ;; Announce available code actions in the Eldoc line only. The default
   ;; also puts a marker in the left fringe, which diff-hl already uses,

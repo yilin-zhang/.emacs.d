@@ -8,13 +8,13 @@
 ;; --------------------------------------------------------------
 ;;                         Performance
 ;; --------------------------------------------------------------
-;; settings from Centaur Emacs
+;; settings from Doom Emacs
 (use-package gcmh
   :hook emacs-startup
   :custom
   (gcmh-idle-delay 'auto)
   (gcmh-auto-idle-delay-factor 10)
-  (gcmh-high-cons-threshold #x1000000)) ; 16MB
+  (gcmh-high-cons-threshold (* 64 1024 1024))) ; 64MB
 
 ;; Warm up heavy multi-file packages on idle time after startup, so
 ;; the first interactive use (e.g. `C-c a' for `org-agenda') doesn't
@@ -23,7 +23,6 @@
 ;; `emacs-startup-hook'. Consumers declare what to warm up via the
 ;; `:warmup' use-package keyword. See site-lisp/warmup.el.
 (use-package warmup
-  :ensure nil
   :load-path yilin/site-lisp-directory
   :demand t)
 
@@ -42,8 +41,7 @@
   :init
   ;; The setting of this variable must come before enable
   ;; display-time-mode, or it will not work.
-  (setopt display-time-24hr-format t
-          display-time-string-forms
+  (setopt display-time-string-forms
           '((propertize (concat 24-hours ":" minutes " ")
                         'face 'font-lock-constant-face)))
   ;; UI: window-divider defaults moved to early-init.el.
@@ -61,8 +59,6 @@
   ;; Cursor and scrolling
   (setopt mouse-wheel-scroll-amount '(1 ((shift) . 1)) ; one line at a time
           mouse-wheel-progressive-speed nil            ; don't accelerate scrolling
-          mouse-wheel-follow-mouse t                    ; scroll window under mouse
-          scroll-step 1
           scroll-conservatively 100000                  ; keyboard scroll one line at a time
           scroll-preserve-screen-position 'always)      ; lock cursor position when scrolling
   ;; Frame: frame-resize-pixelwise moved to early-init.el.
@@ -233,10 +229,8 @@
           (auto-revert-handler)))))
   :hook after-init
   :custom
-  (auto-revert-verbose t) ; let us know when it happens
   ;; Files shown in windows are watched, so they revert as soon as they
   ;; change, without also being polled.
-  (auto-revert-use-notify t)
   (auto-revert-avoid-polling t)
   ;; Replacing a file by rename drops its watch, and the buffer is polled
   ;; until the watch is back; poll often, since few buffers ever are.

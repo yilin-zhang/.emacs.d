@@ -19,12 +19,13 @@
   ;; diff-hl owns the left fringe (see init-git.el), so give flymake the
   ;; right one, or the two indicators overlap.
   (flymake-fringe-indicator-position 'right-fringe)
-  ;; Messages show through Eldoc in the echo area once point is on the
-  ;; diagnostic, never as text at the end of the line.
-  (flymake-show-diagnostics-at-end-of-line nil)
   ;; The elisp checker byte-compiles the buffer, which runs its macros
-  ;; (CVE-2024-53920), so flymake only runs it on trusted files.
-  (trusted-content '("~/.emacs.d/"))
+  ;; (CVE-2024-53920), so flymake only runs it on trusted files.  Keep
+  ;; third-party code, such as elpa/, out of this list.
+  (trusted-content '("~/.emacs.d/early-init.el"
+                     "~/.emacs.d/lisp/"
+                     "~/.emacs.d/custom/"
+                     "~/.emacs.d/site-lisp/"))
   :config
   (defun yilin/elisp-flymake-inherit-load-path (fn &rest args)
     "Call FN with ARGS, letting the elisp checker see `load-path'.
@@ -90,10 +91,6 @@ a missing file."
   ;; also puts a marker in the left fringe, which diff-hl already uses,
   ;; and another in the margin.
   (eglot-code-action-indications '(eldoc-hint))
-  ;; Keep the echo-area glance to a tidy single line. The echo area
-  ;; can't render markdown (no wrapping/fontification), so multi-line
-  ;; there is just a "blob" -- real docs go to the buffer below.
-  (eldoc-echo-area-use-multiline-p 'truncate-sym-name-if-fit)
   :custom-face
   ;; Unused code (rust-analyzer's dead_code and friends) is greyed out by
   ;; default through `shadow', which hides the syntax colors and makes the
@@ -101,8 +98,6 @@ a missing file."
   ;; in the text's own color instead.
   (eglot-diagnostic-tag-unnecessary-face ((t (:inherit nil :underline (:style dots)))))
   :config
-  (add-to-list 'eglot-server-programs
-               '((json-mode json-ts-mode) . ("vscode-json-languageserver" "--stdio")))
   (add-to-list 'eglot-server-programs
                '(swift-mode . ("sourcekit-lsp")))
   ;; Eglot's built-in Ruby entry offers solargraph first and falls back
@@ -159,11 +154,6 @@ a missing file."
 (use-package dape
   :hook
   (dape-repl-mode . yilin/disable-meow)
-  :custom
-  ;; Info buffers to the left.
-  (dape-buffer-window-arrangement 'left)
-  ;; Show inlay hints.
-  (dape-inlay-hints t)
   :config
   ;; Save breakpoints on quit, but only after dape has actually been used.
   ;; A top-level `kill-emacs' hook would autoload dape during every shutdown.
@@ -188,7 +178,7 @@ a missing file."
 (use-package c-ts-mode
   :ensure nil
   :custom
-  (c-ts-mode-indent-offset 4)
+  (c-ts-indent-offset 4)
   (c-ts-mode-indent-style 'k&r))
 
 (use-package cmake-mode)
@@ -297,14 +287,13 @@ pyright reports a venv it cannot find."
    ("\\.mustache\\'" . web-mode)
    ("\\.djhtml\\'" . web-mode))
   :hook
-  (web-mode . (lambda () (setopt-local tab-width web-mode-indent-style)))
+  (web-mode . (lambda () (setopt-local tab-width web-mode-markup-indent-offset)))
   :custom
   (web-mode-auto-close-style 2)
   (web-mode-markup-indent-offset 2)
   (web-mode-css-indent-offset 2)
   (web-mode-code-indent-offset 2)
   (web-mode-part-padding 0)
-  (web-mode-block-padding 0)
   (web-mode-style-padding 0)
   (web-mode-script-padding 0))
 
@@ -312,20 +301,13 @@ pyright reports a venv it cannot find."
   :hook ((css-mode css-ts-mode js-mode js-ts-mode typescript-ts-mode tsx-ts-mode)
          . rainbow-mode))
 
-(use-package js-mode
+(use-package js
   :ensure nil
-  :custom (js-indent-level 2))  ; this indent level also applies to json-mode
+  :custom (js-indent-level 2))
 
 (use-package css-mode
   :ensure nil
   :custom (css-indent-offset 2))
-
-(use-package typescript-ts-mode
-  :ensure nil
-  :mode (("\\.ts\\'" . typescript-ts-mode)
-         ("\\.tsx\\'" . tsx-ts-mode))
-  :custom
-  (typescript-ts-mode-indent-offset 2))
 
 ;; --------------------------------------------------------------
 ;;                       Ruby Configurations
@@ -335,8 +317,7 @@ pyright reports a venv it cannot find."
 ;; `ruby-mode', which mangles indentation and fontification. Signature files
 ;; get their own mode. Reading only: the language server for RBS itself is
 ;; Steep, not ruby-lsp, so nothing is registered with Eglot here.
-(use-package rbs-mode
-  :mode "\\.rbs\\'")
+(use-package rbs-mode)
 
 ;; --------------------------------------------------------------
 ;;                       Rust Configurations
@@ -383,8 +364,7 @@ pyright reports a venv it cannot find."
 ;; --------------------------------------------------------------
 ;; `sourcekit-lsp' ships with Apple's Swift toolchain. Register it explicitly
 ;; because Eglot has no built-in Swift server mapping.
-(use-package swift-mode
-  :mode "\\.swift\\'")
+(use-package swift-mode)
 
 ;; --------------------------------------------------------------
 ;;                       Zig Configurations
@@ -401,7 +381,6 @@ pyright reports a venv it cannot find."
 
 (use-package pico8-mode
   :vc (:url "https://github.com/Kaali/pico8-mode.git")
-  :mode "\\.p8\\'"
   :preface
   (defun yilin/pico8-narrow-buffer ()
     (interactive)

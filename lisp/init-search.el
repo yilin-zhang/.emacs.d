@@ -16,7 +16,6 @@
 (use-package vertico
   :hook after-init
   :custom
-  (vertico-count 10)                    ; Number of candidates to display
   (vertico-resize nil)
   (vertico-cycle t) ; Go from last to first candidate and first to last (cycle)?
   :bind
@@ -63,17 +62,15 @@
   ;; info-menu, ...) that pin those categories to `basic'/`substring', and
   ;; they take precedence over `completion-styles' -- so orderless would
   ;; silently not apply to `C-x b', project file lookup, xref and friends.
-  ;; Clear them so orderless really is the completion style everywhere.
+  ;; Clear them so orderless comes first there too. Packages loaded later
+  ;; can still add entries; eglot, for one, puts its own style first.
   (completion-category-defaults nil)
   ;; Keep `partial-completion' for its `/u/s/l' -> `/usr/share/lib' path
   ;; expansion, but let orderless match file names too.
   (completion-category-overrides '((file (styles orderless partial-completion)))))
 
 (use-package marginalia
-  ;; Either bind `marginalia-cycle' globally or only in the minibuffer
-  :bind (("M-A" . marginalia-cycle)
-         :map minibuffer-local-map
-         ("M-A" . marginalia-cycle))
+  :bind ("M-A" . marginalia-cycle)
   ;; Deferred via :hook. The marginalia README puts `(marginalia-mode)'
   ;; in :init which forces eager loading -- we defer it instead so
   ;; `use-package-always-defer' is honored.
@@ -89,9 +86,6 @@
   (consult-async-input-throttle 0.2)  ; default 0.5
   (consult-async-input-debounce 0.1)  ; default 0.2
   (consult-async-refresh-delay 0.15)  ; default 0.2
-  ;; Report line numbers relative to the whole buffer, not the current
-  ;; narrowing.
-  (consult-line-numbers-widen t)
   ;; Replace bindings. Lazily loaded by `use-package'.
   :bind (("C-s" . consult-line)
          ("C-c i" . consult-minor-mode-menu)
@@ -112,7 +106,6 @@
          ("C-M-#" . consult-register)
          ;; Other custom bindings
          ("M-Y" . consult-yank-pop)                ;; orig. yank-pop (M-y is for yasnippet, use Y instead)
-         ("<help> a" . consult-apropos)            ;; orig. apropos-command
          ;; M-g bindings (goto-map)
          ("M-g e" . consult-compile-error)
          ("M-g f" . consult-flymake)
@@ -131,7 +124,6 @@
          ("M-s r" . consult-ripgrep)
          ("M-s l" . consult-line)
          ("M-s L" . consult-line-multi)
-         ("M-s m" . consult-multi-occur)
          ("M-s k" . consult-keep-lines)
          ("M-s u" . consult-focus-lines)
          ;; Isearch integration
@@ -174,12 +166,7 @@
    ("M-." . embark-dwim)        ;; good alternative: M-.
    ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
 
-  :init
-  ;; This command variable is not a Customize user option.
-  (setq prefix-help-command #'embark-prefix-help-command)
-
   :config
-
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
@@ -236,7 +223,6 @@ of every symbol it reports, and imenu keeps that on the node as
 ;; A custom package: file and symbol-kind icons in the breadcrumb header
 ;; line, sharing corfu's icon table so a symbol looks the same in both.
 (use-package breadcrumb-nerd-icons
-  :ensure nil
   :load-path yilin/site-lisp-directory
   :after breadcrumb
   :demand t

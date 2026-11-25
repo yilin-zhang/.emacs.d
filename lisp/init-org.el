@@ -30,8 +30,7 @@ The buffer's major mode should be `org-mode'."
       (user-error "org-mode should be enabled in the current buffer."))
 
     ;; `org-set-emph-re' is still a two-argument Customize setter, so it
-    ;; cannot be used by Emacs 31's `setopt-local'.  Keep this assignment
-    ;; buffer-local and rebuild Org's emphasis regexp explicitly below.
+    ;; cannot be used by Emacs 31's `setopt-local'.
     (setq-local org-emphasis-alist '(("*" bold)
                                      ("/" italic)
                                      ("_" underline)
@@ -92,24 +91,21 @@ The buffer's major mode should be `org-mode'."
   ("C-c b" . org-switchb)
   ("C-c c" . org-capture)
   :hook
-  (org-mode . org-indent-mode)
   (org-mode . auto-fill-mode)
   (org-mode . (lambda () (setopt-local truncate-lines nil)))
   (org-mode . yilin/prettify-org-buffer)
-  (org-mode . (lambda () (corfu-mode -1)))
   (org-agenda-finalize . yilin/org-agenda-time-grid-spacing)
   (org-after-todo-state-change . yilin/org-remove-priority-when-done-or-cancel)
   :custom
   (org-log-done 'time)                 ; add time stamp after an item is DONE
   (org-log-into-drawer t)              ; put log notes into drawer by default
   (org-log-reschedule 'time)           ; log reschedule by default
-  (org-src-fontify-natively t)         ; fontify code in code blocks
   (org-startup-indented t)             ; indent at startup
   (org-hide-emphasis-markers t)        ; hide emphasis markers
   (org-pretty-entities t)              ; make special character format visible
   (org-ellipsis "⤵")
   (org-image-actual-width nil)         ; make org support image scaling
-  (org-edit-src-content-indentation 0)
+  (org-src-content-indentation 0)
   (org-priority-faces `((?A . (:foreground ,(face-foreground 'error)))
                         (?B . (:foreground ,(face-foreground 'warning)))
                         (?C . (:foreground ,(face-foreground 'success)))))
@@ -183,15 +179,14 @@ The buffer's major mode should be `org-mode'."
   (setcar (nthcdr 2 org-emphasis-regexp-components) " \t\n")
   (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
   (setq system-time-locale "C")       ; make sure the time stamps are in English
-  ;; Load habit module, then force `org-modules' to be loaded right
-  ;; now (during this :config block) instead of lazily on first
+  ;; Load habit module. Setting `org-modules' here also loads the modules
+  ;; right now (during this :config block) instead of lazily on first
   ;; `org-mode' activation. Combined with the incremental loader
   ;; pre-`require'ing `org' itself during idle, this moves the entire
   ;; `org-load-modules-maybe' cascade off the user's first `C-c a' --
   ;; profiling showed it was ~44% of that command's CPU time.
   (setopt org-modules (append (remove 'org-habit org-modules)
                               '(org-habit)))
-  (org-load-modules-maybe)
   ;; This value depends on Org's existing plist, so set it after Org loads.
   (setopt org-format-latex-options
           (plist-put org-format-latex-options :scale 2.3))
@@ -236,7 +231,6 @@ The buffer's major mode should be `org-mode'."
 ;; (`:demand t') so its `advice-add' on `org-agenda' is registered
 ;; before any agenda command runs. See site-lisp/org-agenda-compose.el.
 (use-package org-agenda-compose
-  :ensure nil
   :load-path yilin/site-lisp-directory
   :demand t)
 

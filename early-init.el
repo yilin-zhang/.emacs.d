@@ -21,28 +21,22 @@
 ;; --------------------------------------------------------------
 ;;           GC: completely disable during startup
 ;; --------------------------------------------------------------
-;; Emacs triggers GC when EITHER of these is true:
-;;   (a) allocated bytes > gc-cons-threshold
-;;   (b) allocated bytes > bytes-after-last-gc * (1 + gc-cons-percentage)
+;; Emacs runs GC once the memory allocated since the last GC exceeds the
+;; LARGER of:
+;;   (a) gc-cons-threshold
+;;   (b) the size of the live heap * gc-cons-percentage
 ;;
-;; Previously only `gc-cons-threshold' was raised in init.el, but the
-;; default `gc-cons-percentage' of 0.1 was still kicking in, firing GCs
-;; during startup anyway. Both need to be relaxed together for startup
-;; GC to actually be suppressed.
+;; Raising (a) alone is therefore enough, and `gc-cons-percentage' keeps
+;; its default of 0.1.
 ;;
-;; WARNING: these values MUST be restored to something reasonable once
+;; WARNING: this value MUST be restored to something reasonable once
 ;; startup is done, otherwise memory usage runs away. `gcmh' (configured
 ;; in init-basic.el) takes care of that on `emacs-startup-hook'.
-(setq gc-cons-threshold most-positive-fixnum
-      gc-cons-percentage 1.0)
+(setq gc-cons-threshold most-positive-fixnum)
 
-;; During startup we don't need to compare mtimes between .el and .elc
-;; files. The default `load-prefer-newer' = t makes every `load' stat
-;; both files. With hundreds of files loaded at startup, those stat
-;; calls add up. Restore it after startup so later interactive loads
-;; prefer edited source over stale byte-code.
-(setq load-prefer-newer nil)
-
+;; After startup, prefer edited source over stale byte-code. Not earlier:
+;; it makes every `load' stat both the .el and the .elc, and with hundreds
+;; of files loaded at startup those calls add up.
 (add-hook 'emacs-startup-hook
           (lambda ()
             (setq load-prefer-newer t))
@@ -121,27 +115,16 @@
 ;; --------------------------------------------------------------
 ;;           Startup screen / scratch buffer
 ;; --------------------------------------------------------------
-;; `inhibit-startup-screen' only suppresses *displaying* the splash
-;; screen, Emacs still builds it internally (rendering the logo,
-;; preparing text, etc.). `initial-major-mode' is changed to
-;; `fundamental-mode' because the default `lisp-interaction-mode'
-;; loads a pile of elisp-mode machinery into the scratch buffer.
-;; `initial-scratch-message' nil skips the default comment text.
-;;
-;; `inhibit-startup-echo-area-message' has an anti-abuse design: its
-;; value must equal the current login name for the suppression to
-;; trigger. This prevents users from blindly setting it to t and
-;; missing important startup messages.
+;; `initial-major-mode' is changed to `fundamental-mode' because the
+;; default `lisp-interaction-mode' loads a pile of elisp-mode machinery
+;; into the scratch buffer. `initial-scratch-message' nil skips the
+;; default comment text.
 (setq inhibit-startup-screen t
-      inhibit-startup-echo-area-message user-login-name
       initial-major-mode 'fundamental-mode
       initial-scratch-message nil)
 
-;; The variables above control *display*, but the underlying functions
-;; still get called. Override them to no-ops to skip the construction
-;; work entirely (the startup screen involves image I/O). Belt and
-;; suspenders.
-(advice-add #'display-startup-screen :override #'ignore)
+;; `inhibit-startup-echo-area-message' only works as a literal login name
+;; in the init file, so silence the function instead.
 (advice-add #'display-startup-echo-area-message :override #'ignore)
 
 
@@ -224,20 +207,17 @@
 ;; pass is basically useless on Linux/macOS -- pure waste.
 (setq auto-mode-case-fold nil)
 
-;; Disable bidirectional text reordering. Emacs supports RTL scripts
-;; like Arabic and Hebrew by analyzing direction and possibly
-;; reordering characters on every rendered line. For Chinese+English
-;; usage we don't need this at all.
-(setq-default bidi-display-reordering 'left-to-right
-              bidi-paragraph-direction 'left-to-right)
+;; Force left-to-right paragraphs. Emacs otherwise works out each
+;; paragraph's direction for RTL scripts like Arabic and Hebrew, which
+;; Chinese+English usage doesn't need.
+(setq-default bidi-paragraph-direction 'left-to-right)
 ;; BPA = Bracket Pair Algorithm, used to decide bracket direction in
 ;; mixed-direction text. With forced LTR above, it's unnecessary.
 (setq bidi-inhibit-bpa t)
 
-;; Don't draw "hollow" cursors or region highlights in non-selected
-;; windows. Saves redisplay work when you have splits open.
+;; Don't draw "hollow" cursors in non-selected windows. Saves redisplay
+;; work when you have splits open.
 (setq-default cursor-in-non-selected-windows nil)
-(setq highlight-nonselected-windows nil)
 
 ;; Skip precise fontification while scrolling fast over large files.
 ;; Highlighting may lag a beat behind, but scrolling itself is

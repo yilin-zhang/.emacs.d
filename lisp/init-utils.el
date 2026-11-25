@@ -10,9 +10,6 @@
 ;;                         File Tree
 ;; --------------------------------------------------------------
 (use-package treemacs
-  :commands (treemacs-follow-mode
-             treemacs-filewatch-mode
-             treemacs-git-mode)
   :custom-face
   (cfrs-border-color ((t (:inherit posframe-border))))
   :bind (([f8]        . treemacs)
@@ -48,32 +45,21 @@ under the key, so the children of a collapsed directory went uncolored."
   :config
   (advice-add 'treemacs--apply-annotations-deferred :before
               #'yilin/treemacs-cache-git-under-key)
-  (setopt treemacs-collapse-dirs           (if treemacs-python-executable 3 0)
-          treemacs-missing-project-action  'remove
+  (setopt treemacs-missing-project-action  'remove
           ;; Case-insensitive so `Zebra' doesn't sort before `apple'.
           treemacs-sorting                 'alphabetic-case-insensitive-asc
           treemacs-follow-after-init       t
           treemacs-width                   30
           ;; Skip the sidebar when cycling windows (`C-x o' etc.) so the
           ;; cursor never lands in the file tree by accident.
-          treemacs-is-never-other-window   t
-          treemacs-no-png-images           nil
-          ;; treemacs ships deliberately lazy refresh defaults: 2000ms of
-          ;; collecting filewatch events before anything is redrawn, then
-          ;; another 0.5s of *idle* before deferred git-mode paints the
-          ;; faces.  On a sidebar whose whole job is showing git state
-          ;; that reads as broken rather than as batching.
-          treemacs-file-event-delay        500
-          treemacs-deferred-git-apply-delay 0.2)
-  (treemacs-follow-mode t)
-  (treemacs-filewatch-mode t)
-  (treemacs-project-follow-mode t)
-  (pcase (cons (not (null (executable-find "git")))
-               (not (null (executable-find "python3"))))
-    (`(t . t)
-     (treemacs-git-mode 'deferred))
-    (`(t . _)
-     (treemacs-git-mode 'simple))))
+          treemacs-is-never-other-window   t)
+  ;; By default treemacs collects filewatch events for 2000ms before
+  ;; anything is redrawn. On a sidebar whose whole job is showing git
+  ;; state that reads as broken rather than as batching. A float, since
+  ;; treemacs divides by 1000 and an integer 500 would become 0; `setq',
+  ;; since the option's type is integer and `setopt' would warn.
+  (setq treemacs-file-event-delay 500.0)
+  (treemacs-project-follow-mode t))
 
 ;; kqueue, the `file-notify' backend on macOS, never reports writes to the
 ;; contents of an existing file, and treemacs never watches .git, so git
@@ -81,7 +67,6 @@ under the key, so the children of a collapsed directory went uncolored."
 ;; terminal. treemacs-fswatch feeds treemacs FSEvents through fswatch
 ;; (`brew install fswatch'). Linux's inotify does report content changes.
 (use-package treemacs-fswatch
-  :ensure nil
   :load-path yilin/site-lisp-directory
   :if (eq system-type 'darwin)
   :after treemacs
@@ -125,13 +110,11 @@ one stop further and file icons and names end up a column left."
 ;; Patched copy of GNU ELPA's minimap: draws code as colored bars and
 ;; mirrors the diff-hl gutter. See site-lisp/minimap.el.
 (use-package minimap
-  :ensure nil
   :load-path yilin/site-lisp-directory
   ;; Terminal can't show small characters in the minimap
   :if (display-graphic-p)
   :hook (after-init . minimap-mode)
   :custom
-  (minimap-major-modes '(prog-mode))
   ;; Follow every redisplay instead of waiting for 0.1s of idle time,
   ;; which froze the minimap while scrolling.
   (minimap-update-delay 0)
@@ -267,7 +250,6 @@ Intended to be registered on `org-agenda-compose-functions'."
 ;;                            Sys Tools
 ;; --------------------------------------------------------------
 (use-package macmount
-  :ensure nil
   :load-path yilin/site-lisp-directory
   :if (eq system-type 'darwin)
   :commands (macmount-mount macmount-unmount macmount-eject))

@@ -41,13 +41,11 @@
 ;; --------------------------------------------------------------
 
 (use-package indent-shift
-  :ensure nil
   :load-path yilin/site-lisp-directory
   :after meow
   :demand t)
 
 (use-package surround-region
-  :ensure nil
   :load-path yilin/site-lisp-directory
   :after meow
   :demand t)
@@ -79,9 +77,6 @@ modal editing gets in the way."
      '("<escape>" . ignore)
      '("/" . execute-extended-command))
     (meow-leader-define-key
-     ;; SPC j will run the original command in MOTION state.
-     ;; (No "k" passthrough -- SPC k is taken by `kill-buffer' below.)
-     '("j" . "H-j")
      ;; Use SPC (0-9) for digit arguments.
      '("1" . meow-digit-argument)
      '("2" . meow-digit-argument)

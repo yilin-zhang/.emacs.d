@@ -54,7 +54,6 @@
 ;; A custom package to show icons in corfu completion
 ;; Adapted from `'https://emacs-china.org/t/corfu-all-the-icons-icon/20907'
 (use-package kind-nerd-icons
-  :ensure nil
   :load-path yilin/site-lisp-directory
   :after corfu
   :demand t

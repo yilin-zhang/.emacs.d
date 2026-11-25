@@ -63,10 +63,8 @@
 ;; --------------------------------------------------------------
 ;;                      Parentheses and Region
 ;; --------------------------------------------------------------
-;; enable show-paren-mode for emacs-lisp-mode
 (use-package paren
   :ensure nil
-  :hook (after-init . show-paren-mode)
   :custom
   (show-paren-style 'mixed))
 
@@ -101,7 +99,6 @@
 (use-package whitespace
   :ensure nil
   :custom
-  (whitespace-line-column nil)
   (whitespace-style
    '(face                               ; visualize things below:
      empty                              ; empty lines at beginning/end of buffer
@@ -149,7 +146,6 @@
   (indent-bars-prefer-character t)
   (indent-bars-starting-column 0)
   ;; Subtle, not the default rainbow -- a dim comment-colored line.
-  (indent-bars-width-frac 0.15)
   (indent-bars-color-by-depth nil)
   (indent-bars-color '(font-lock-comment-face :face-bg nil :blend 0.425))
   (indent-bars-highlight-current-depth nil)
@@ -202,7 +198,6 @@
      ("TRICK" font-lock-constant-face bold)
      ("DEPRECATED" font-lock-doc-face bold)
      ("NOTE" success bold)))
-  :custom-face (hl-todo ((t (:box t :inherit))))
   :bind (:map hl-todo-mode-map
               ([C-f3] . hl-todo-occur)
               ("C-c t p" . hl-todo-previous)

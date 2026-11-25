@@ -7,7 +7,6 @@
 
 ;; Magit
 (use-package magit
-  :commands (transient-insert-suffix magit-status)
   :bind ("C-x g" . magit-status)
   :init
   ;; Set before Magit loads so disabling its global mode stays lazy.
@@ -30,9 +29,7 @@
           (or (executable-find magit-git-executable) "git"))
   ;; Turn URLs in process output into clickable buttons.
   (add-hook 'magit-process-mode-hook #'goto-address-mode)
-  ;; A couple of switches common enough to want one keystroke away.
-  (transient-append-suffix 'magit-fetch "-p"
-    '("-t" "Fetch all tags" ("-t" "--tags")))
+  ;; A switch common enough to want one keystroke away.
   (transient-append-suffix 'magit-pull "-r"
     '("-a" "Autostash" "--autostash")))
 
@@ -177,7 +174,6 @@ Height tracks `frame-char-height', the buffer's text scale and
   (with-no-warnings
     ;; Integration with magit
     (with-eval-after-load 'magit
-      (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
       (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))))
 
 (use-package diff-hl-refresh

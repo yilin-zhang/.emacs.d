@@ -22,9 +22,7 @@
 ;;                     Markdown Mode Configurations
 ;; --------------------------------------------------------------
 (use-package markdown-mode
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
+  :mode ("README\\.md\\'" . gfm-mode)
   :custom
   (markdown-command "multimarkdown")
   (markdown-fontify-code-blocks-natively t)
@@ -96,7 +94,6 @@
 ;;                      Typst Mode Configuration
 ;; --------------------------------------------------------------
 (use-package typst-ts-mode
-  :mode "\\.typ\\'"
   :init
   ;; Some Typst projects bundle fonts locally and set
   ;; `typst-ts-compile-options' through .dir-locals.el so compilation can find

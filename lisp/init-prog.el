@@ -391,7 +391,8 @@ pyright reports a venv it cannot find."
 ;; --------------------------------------------------------------
 ;; eglot already maps `zig-mode' -> ("zls"), so installing the `zls'
 ;; binary (brew install zls) is all that's needed.
-(use-package zig-mode)
+(use-package zig-mode
+  :custom (zig-format-on-save nil))
 
 ;; --------------------------------------------------------------
 ;;                       Lua Configurations

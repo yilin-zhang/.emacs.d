@@ -27,7 +27,13 @@
   ;; still request Dabbrev manually with `M-/'.
   :hook ((prog-mode . corfu-mode)
          ;; Close the corfu popup when meow leaves insert state.
-         (meow-insert-exit . corfu-quit)))
+         (meow-insert-exit . corfu-quit))
+  :config
+  ;; RET inserts the selected candidate, or acts as usual if none is selected.
+  (keymap-set corfu-map "RET"
+              `(menu-item "" corfu-insert
+                          :filter ,(lambda (cmd)
+                                     (and (>= corfu--index 0) cmd)))))
 
 ;; Show documentation / signature for the selected candidate in a popup
 ;; beside the completion list. (corfu built-in extension.)

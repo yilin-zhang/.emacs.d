@@ -7,9 +7,8 @@
 
 (use-package org
   :ensure nil
-  ;; Pre-load Org's sub-packages on idle so the first `C-c a' /
-  ;; `C-c c' doesn't pause while ~17 sub-packages get `require'd
-  ;; synchronously. List and order are canonical doomemacs.
+  ;; Load these while idle, so that the first `C-c a' doesn't pause.  The
+  ;; list and its order come from doomemacs.
   :warmup (calendar find-func format-spec
            org-macs org-compat org-faces org-entities
            org-list org-pcomplete org-src org-footnote
@@ -29,8 +28,7 @@ The buffer's major mode should be `org-mode'."
     (unless (derived-mode-p 'org-mode)
       (user-error "org-mode should be enabled in the current buffer."))
 
-    ;; `org-set-emph-re' is still a two-argument Customize setter, so it
-    ;; cannot be used by Emacs 31's `setopt-local'.
+    ;; Its Customize setter doesn't work with `setopt-local'.
     (setq-local org-emphasis-alist '(("*" bold)
                                      ("/" italic)
                                      ("_" underline)
@@ -79,12 +77,6 @@ The buffer's major mode should be `org-mode'."
     (insert (format-time-string "%Y年%-m月%-d日 ")
             (aref ["日" "一" "二" "三" "四" "五" "六"]
                   (string-to-number (format-time-string "%w")))))
-
-  :init
-  ;; Agenda files composition (static + dynamic sources, refresh on
-  ;; every `org-agenda' call) lives in `org-agenda-compose' above.
-  ;; `org-default-notes-file' (the capture default) is a plain org
-  ;; variable -- set it directly in custom-post.el if you want one.
 
   :bind
   ("C-c a" . org-agenda)
@@ -179,24 +171,15 @@ The buffer's major mode should be `org-mode'."
   (setcar (nthcdr 2 org-emphasis-regexp-components) " \t\n")
   (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
   (setq system-time-locale "C")       ; make sure the time stamps are in English
-  ;; Load habit module. Setting `org-modules' here also loads the modules
-  ;; right now (during this :config block) instead of lazily on first
-  ;; `org-mode' activation. Combined with the incremental loader
-  ;; pre-`require'ing `org' itself during idle, this moves the entire
-  ;; `org-load-modules-maybe' cascade off the user's first `C-c a' --
-  ;; profiling showed it was ~44% of that command's CPU time.
+  ;; Setting `org-modules' also loads the modules.  Doing it here, while Org
+  ;; is loaded on idle, takes that off the first `C-c a'.
   (setopt org-modules (append (remove 'org-habit org-modules)
                               '(org-habit)))
-  ;; This value depends on Org's existing plist, so set it after Org loads.
+  ;; Needs Org's default value.
   (setopt org-format-latex-options
           (plist-put org-format-latex-options :scale 2.3))
-  ;; Render LaTeX on demand rather than on open: `C-c C-c' toggles the
-  ;; fragment at point, or renders the current section when point is
-  ;; not on one. Org's `C-c C-c' has no case of its own for fragments,
-  ;; and this hook is the last guard before its "can do nothing useful
-  ;; here" error, so no existing binding is shadowed.
-  ;; `org-latex-preview' already returns nil when it declines to act,
-  ;; which is exactly the contract the hook wants.
+  ;; `C-c C-c' toggles the LaTeX preview at point, or previews the section.
+  ;; This hook runs only when `C-c C-c' has nothing else to do.
   (add-hook 'org-ctrl-c-ctrl-c-final-hook #'org-latex-preview)
   ;; Uncomment the 2 settings below to enable breadcrumbs.
   ;; (setopt org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s %b")
@@ -215,21 +198,19 @@ The buffer's major mode should be `org-mode'."
                                      (?* . ?➤)
                                      (?- . ?–))))
 
-;; Auto hide and appear markers
+;; Show emphasis markers at point.
 (use-package org-appear
   :hook (org-mode . org-appear-mode))
 
-;; Auto toggle LaTeX fragment previews: the fragment under the cursor
-;; turns back into editable source, everything else stays rendered.
+;; Show the LaTeX source of the fragment at point.
 (use-package org-fragtog
   :hook (org-mode . org-fragtog-mode))
 
-;; Convert the buffer text and the associated decorations to HTML
+;; Convert a buffer with its faces to HTML.
 (use-package htmlize)
 
-;; Compose `org-agenda-files' from static and dynamic sources. Eager
-;; (`:demand t') so its `advice-add' on `org-agenda' is registered
-;; before any agenda command runs. See site-lisp/org-agenda-compose.el.
+;; Build `org-agenda-files' from several sources.  Loaded now, because it
+;; advises `org-agenda'.
 (use-package org-agenda-compose
   :load-path yilin/site-lisp-directory
   :demand t)

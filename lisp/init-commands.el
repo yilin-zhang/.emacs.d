@@ -1,8 +1,7 @@
 ;;; init-commands.el --- Personal interactive commands -*- lexical-binding: t -*-
 
 ;;; Commentary:
-;; Personal interactive commands and their keybindings.  Loaded as a
-;; regular config module from init.el.
+;; Personal interactive commands and their keybindings.
 
 ;;; Code:
 
@@ -137,19 +136,14 @@ is already narrowed."
 Used by `yilin/insert-greek-or-math-symbol'.")
 
 (defun yilin/insert-greek-or-math-symbol ()
-  "Replace region with corresponding Greek or math symbol, or prompt for one.
-If a region is active, trim whitespace around it and try to convert
-its contents into the corresponding Greek or math symbol. If successful,
-replace the region. If not, or if no region is active, prompt the user."
+  "Replace the region with its Greek or math symbol, or prompt for one."
   (interactive)
   (let* ((text (yilin/-region-text))
          (replacement (assoc-default text yilin/greek-math-symbol-map)))
     (if (and text replacement)
-        ;; Replace region
         (progn
           (delete-region (region-beginning) (region-end))
           (insert replacement))
-      ;; Prompt for input
       (let* ((name (completing-read "Greek letter: "
                                     (mapcar #'car yilin/greek-math-symbol-map)
                                     nil t))
@@ -306,15 +300,11 @@ Prefer Ghostty, then iTerm, then macOS Terminal."
 ;; --------------------------------------------------------------
 
 (defun yilin/-copy-file-path ()
-  "Return the file path of the current buffer or file under cursor.
-Returns nil if the buffer is not visiting a file and no file is under cursor."
+  "Return the path of the current file, or of the file at point in Dired."
   (cond
-   ;; If buffer is visiting a file, return its path
    ((buffer-file-name) (buffer-file-name))
-   ;; If in dired mode, return the full path of file under cursor
    ((eq major-mode 'dired-mode)
     (ignore-errors (dired-get-filename)))
-   ;; Otherwise return nil
    (t nil)))
 
 (defun yilin/copy-file-path ()
@@ -326,7 +316,7 @@ Returns nil if the buffer is not visiting a file and no file is under cursor."
       (message "Copied buffer file path '%s' to the clipboard." filename))))
 
 (defun yilin/copy-file-name ()
-  "Copy the current buffer file path to the clipboard."
+  "Copy the current file name, without its extension, to the clipboard."
   (interactive)
   (let ((path (yilin/-copy-file-path)))
     (if path
@@ -340,11 +330,8 @@ Returns nil if the buffer is not visiting a file and no file is under cursor."
 ;; --------------------------------------------------------------
 
 (defun yilin/lookup-thesaurus (&optional arg)
-  "Look up the word on an online thesaurus.
-If a region is active, use the text in that region (whitespaces stripped).
-If no region is active, use the word at point.
-If no word is at point, prompt for a word, using prefix ARG as default
-if provided."
+  "Look up the region or the word at point in an online thesaurus.
+If there is neither, prompt for a word, with ARG as the initial input."
   (interactive "P")
   (let ((word (or (yilin/-region-text)
                   (thing-at-point 'word t)
@@ -353,8 +340,7 @@ if provided."
     (browse-url (format "https://www.merriam-webster.com/thesaurus/%s" word))))
 
 (defun yilin/arxiv-get-paper-id ()
-  "Get arXiv paper ID from user input or selected region.
-Returns the paper ID as a trimmed string."
+  "Read an arXiv paper ID, offering the region if it looks like one."
   (let* ((region-text (yilin/-region-text))
          (looks-like-arxiv-id (when region-text
                                 (string-match-p "^\\([0-9]+\\.[0-9]+\\|[a-z-]+\\.[A-Z]+/[0-9]+\\)$" region-text)))
@@ -363,23 +349,19 @@ Returns the paper ID as a trimmed string."
                    "Enter arXiv paper ID: "))
          (user-input (read-string prompt)))
     (cond
-     ;; If user just pressed enter and we have a valid region ID, use it
      ((and looks-like-arxiv-id (string-empty-p user-input))
       (when (use-region-p) (delete-region (region-beginning) (region-end)))
       region-text)
-     ;; If user entered something, use that
      ((not (string-empty-p user-input))
       (when (use-region-p) (delete-region (region-beginning) (region-end)))
       (string-trim user-input))
-     ;; Fallback: use whatever the user typed
      (t (string-trim user-input)))))
 
 (defun yilin/arxiv-insert-org-link (paper-id)
-  "Insert an org-mode link for an arXiv paper given its ID.
-If called interactively, prompts for paper ID or uses selected text.
-PAPER-ID should be in format like `2301.07041' or `math.GT/0309136'."
+  "Insert an Org link to the arXiv paper PAPER-ID.
+PAPER-ID looks like 2301.07041 or math.GT/0309136."
   (interactive (list (yilin/arxiv-get-paper-id)))
-  (require 'url) ; simple lazy load
+  (require 'url)
   (let* ((url (format "https://arxiv.org/abs/%s" paper-id))
          (title (condition-case nil
                     (let ((buffer (url-retrieve-synchronously url t nil 10)))
@@ -395,16 +377,14 @@ PAPER-ID should be in format like `2301.07041' or `math.GT/0309136'."
     (message "Inserted link for %s" (or title paper-id))))
 
 (defun yilin/arxiv-open-paper (paper-id)
-  "Open an arXiv paper in the default browser.
-If called interactively, prompts for paper ID or uses selected text.
-PAPER-ID should be in format like `2301.07041' or `math.GT/0309136'."
+  "Open the arXiv paper PAPER-ID in the browser.
+PAPER-ID looks like 2301.07041 or math.GT/0309136."
   (interactive (list (yilin/arxiv-get-paper-id)))
   (browse-url (format "https://arxiv.org/abs/%s" paper-id)))
 
 (defun yilin/org-insert-link-with-html-title (url)
-  "Asynchronously fetch URL and insert an Org link with the page title at point."
+  "Fetch URL and insert an Org link with the page title."
   (interactive "sEnter URL: ")
-  ;; Capture the buffer and point where we should insert later
   (let ((target-buf (current-buffer))
         (target-pos (point)))
     (url-retrieve
@@ -413,9 +393,8 @@ PAPER-ID should be in format like `2301.07041' or `math.GT/0309136'."
      (list url target-buf target-pos))))
 
 (defun yilin/org--insert-link-callback (status url target-buf target-pos)
-  "Callback for `yilin/org-insert-link-with-title-async'.
-STATUS is the retrieval status. URL is the original URL.
-TARGET-BUF and TARGET-POS are where to insert the link."
+  "Insert a link to URL at TARGET-POS in TARGET-BUF.
+STATUS is the status from `url-retrieve'."
   (require 'url)
   (require 'dom)
   (if (plist-get status :error)
@@ -426,9 +405,7 @@ TARGET-BUF and TARGET-POS are where to insert the link."
     (let* ((dom (libxml-parse-html-region (point) (point-max)))
            (title-node (car (dom-by-tag dom 'title)))
            (title (when title-node (string-trim (dom-text title-node)))))
-      ;; Clean up this temporary buffer
       (kill-buffer (current-buffer))
-      ;; Insert into the original buffer at original position
       (when (buffer-live-p target-buf)
         (with-current-buffer target-buf
           (save-excursion

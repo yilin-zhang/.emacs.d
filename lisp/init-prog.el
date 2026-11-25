@@ -9,19 +9,17 @@
 (use-package flymake
   :ensure nil
   :hook (prog-mode . flymake-mode)
-  ;; The same keys flycheck uses under its C-c ! prefix.
+  ;; The same keys as flycheck.
   :bind (:map flymake-mode-map
               ("C-c ! n" . flymake-goto-next-error)
               ("C-c ! p" . flymake-goto-prev-error)
               ("C-c ! l" . flymake-show-buffer-diagnostics)
               ("C-c ! L" . flymake-show-project-diagnostics))
   :custom
-  ;; diff-hl owns the left fringe (see init-git.el), so give flymake the
-  ;; right one, or the two indicators overlap.
+  ;; diff-hl uses the left fringe.
   (flymake-fringe-indicator-position 'right-fringe)
-  ;; The elisp checker byte-compiles the buffer, which runs its macros
-  ;; (CVE-2024-53920), so flymake only runs it on trusted files.  Keep
-  ;; third-party code, such as elpa/, out of this list.
+  ;; The elisp checker runs the buffer's macros (CVE-2024-53920), so it only
+  ;; runs on trusted files.  Keep third-party code out of this list.
   (trusted-content '("~/.emacs.d/early-init.el"
                      "~/.emacs.d/lisp/"
                      "~/.emacs.d/custom/"
@@ -29,16 +27,14 @@
   :config
   (defun yilin/elisp-flymake-inherit-load-path (fn &rest args)
     "Call FN with ARGS, letting the elisp checker see `load-path'.
-Without this, every `require' of an installed package is reported as
-a missing file."
+Otherwise it can't find installed packages."
     (let ((elisp-flymake-byte-compile-load-path
            (append elisp-flymake-byte-compile-load-path load-path)))
       (apply fn args)))
   (advice-add 'elisp-flymake-byte-compile :around
               #'yilin/elisp-flymake-inherit-load-path)
 
-  ;; Keep the diagnostics list a quarter-height window below the current
-  ;; one, and don't let it steal point.
+  ;; Show the diagnostics list below the current window.
   (add-to-list 'display-buffer-alist
                '("\\`\\*Flymake diagnostics for "
                  (display-buffer-reuse-window display-buffer-below-selected)
@@ -54,16 +50,12 @@ a missing file."
 ;; --------------------------------------------------------------
 ;;                         Tree Sitter
 ;; --------------------------------------------------------------
-;; Bump tree-sitter fontification from the default of 3 to 4 (the max).
-;; At level 3 operators, delimiters, function calls, property accesses,
-;; `self'/`cls', escape sequences etc. stay the default foreground color,
-;; which makes buffers look "flat" / under-highlighted compared to
-;; VSCode/Zed. Level 4 colors them by category. Must be set before any
-;; `*-ts-mode' fontifies a buffer.
+;; Also highlight operators, function calls, properties, etc.  Must be set
+;; before a tree-sitter mode fontifies a buffer.
 (setopt treesit-font-lock-level 4)
 
-;; Prefer every tree-sitter mode known to Emacs.  Missing grammars are
-;; offered for installation according to `treesit-auto-install-grammar'.
+;; Use tree-sitter modes wherever possible.  Emacs offers to install missing
+;; grammars (see `treesit-auto-install-grammar').
 (setopt treesit-enabled-modes t)
 
 ;; --------------------------------------------------------------
@@ -78,39 +70,30 @@ a missing file."
 
 (use-package eglot
   :bind (:map eglot-mode-map
-              ;; The echo area is only a one-line glance; this opens the
-              ;; full, rendered docs for the symbol at point in a buffer.
+              ;; Full documentation in a buffer.
               ("C-c C-d" . yilin/eglot-documentation-at-point))
   :custom
   (eglot-events-buffer-config '(:size 0 :format full))
-  ;; No formatting while typing. Hover docs (a quick glance in the echo
-  ;; area) and documentHighlight (same-symbol highlighting) both stay on.
+  ;; No formatting while typing.
   (eglot-ignored-server-capabilities '(:documentOnTypeFormattingProvider))
   (eglot-autoshutdown t)
-  ;; Announce available code actions in the Eldoc line only. The default
-  ;; also puts a marker in the left fringe, which diff-hl already uses,
-  ;; and another in the margin.
+  ;; Announce code actions in the echo area only.  diff-hl uses the fringe.
   (eglot-code-action-indications '(eldoc-hint))
   :custom-face
-  ;; Unused code (rust-analyzer's dead_code and friends) is greyed out by
-  ;; default through `shadow', which hides the syntax colors and makes the
-  ;; name hard to read. Keep the colors and mark it with a dotted underline
-  ;; in the text's own color instead.
+  ;; Mark unused code with a dotted underline.  The default greys it out,
+  ;; which hides the syntax colors.
   (eglot-diagnostic-tag-unnecessary-face ((t (:inherit nil :underline (:style dots)))))
   :config
+  ;; Eglot has no entry for Swift.
   (add-to-list 'eglot-server-programs
                '(swift-mode . ("sourcekit-lsp")))
-  ;; Eglot's built-in Ruby entry offers solargraph first and falls back
-  ;; to ruby-lsp; pin ruby-lsp so the choice never depends on what
-  ;; happens to be installed. `add-to-list' prepends, so this wins.
+  ;; Eglot prefers solargraph by default.
   (add-to-list 'eglot-server-programs
                '((ruby-mode ruby-ts-mode) . ("ruby-lsp")))
 
-  ;; For Rust: paint rust-analyzer's own token types and the `trait'
-  ;; modifier too, so `self', lifetimes, derives and trait method calls
-  ;; can be told apart. No other server here sends these names. Eglot
-  ;; only paints names on these lists, through a face named after each;
-  ;; the faces start empty and gruvbox-jb colors them in Rust buffers.
+  ;; Highlight rust-analyzer's own token types and the `trait' modifier.
+  ;; Eglot only handles names on these lists, each with a face of that name.
+  ;; The gruvbox-jb theme sets the colors.
   (dolist (name '("selfKeyword" "lifetime" "typeAlias" "union" "derive"
                   "macroBang" "trait"))
     (custom-declare-face (intern (concat "eglot-semantic-" name)) '((t))
@@ -123,11 +106,7 @@ a missing file."
   (setq eglot-semantic-token-modifiers
         (append eglot-semantic-token-modifiers '("trait")))
 
-  ;; Documentation in a dedicated buffer, the way doom does it: the echo
-  ;; area can't render LSP hover markdown, so mirror doom's
-  ;; `+eglot-lookup-documentation' -- fetch hover synchronously and show
-  ;; the rendered (fontified, wrapped, scrollable, copyable) contents in
-  ;; a *eglot-help* window.
+  ;; Adapted from doom's `+eglot-lookup-documentation'.
   (defvar yilin/eglot--help-buffer nil)
   (defun yilin/eglot-documentation-at-point ()
     "Show LSP documentation for the symbol at point in a help buffer."
@@ -155,8 +134,8 @@ a missing file."
   :hook
   (dape-repl-mode . yilin/disable-meow)
   :config
-  ;; Save breakpoints on quit, but only after dape has actually been used.
-  ;; A top-level `kill-emacs' hook would autoload dape during every shutdown.
+  ;; Save breakpoints on quit.  Outside :config, this would load dape on
+  ;; every quit.
   (add-hook 'kill-emacs-hook #'dape-breakpoint-save)
   ;; Turn on global bindings for setting breakpoints with mouse
   (dape-breakpoint-global-mode)
@@ -202,24 +181,16 @@ a missing file."
   :ensure nil
   :init
   (defun yilin/python--venv-dir ()
-    "Return the `.venv' directory governing `default-directory', or nil.
-Only a venv with a usable interpreter counts."
+    "Return the `.venv' directory with a Python for this directory, or nil."
     (when-let* ((root (locate-dominating-file default-directory ".venv"))
                 (venv (expand-file-name ".venv" root))
                 ((file-executable-p (expand-file-name "bin/python" venv))))
       venv))
 
   (defun yilin/python-activate-venv ()
-    "Point this buffer at its project\\='s `.venv', buffer-locally.
-
-Unlike `pyvenv-activate', nothing global is mutated: the environment
-lives in this buffer only, so several projects can be open at once and
-each still gets its own interpreter.  Because this runs from
-`python-base-mode-hook', the environment is already in place whenever
-\\[eglot] is called later: eglot inherits the buffer\\='s
-`process-environment' and `exec-path' when it launches the server.
-The interpreter pyright resolves imports against is sent separately,
-by `yilin/eglot-workspace-configuration'."
+    "Use the project\\='s `.venv' in this buffer.
+Eglot starts its server with this environment too, but pyright gets its
+interpreter from `yilin/eglot-workspace-configuration'."
     (when-let* ((venv (yilin/python--venv-dir))
                 (bin (expand-file-name "bin" venv))
                 (python (expand-file-name "python" bin)))
@@ -233,9 +204,7 @@ by `yilin/eglot-workspace-configuration'."
       (setq-local python-shell-interpreter python)
       (setq-local python-shell-virtualenv-root venv)))
 
-  ;; Plain `add-hook' rather than use-package's `:hook': the latter would
-  ;; autoload `yilin/python-activate-venv' from `python', where it does
-  ;; not live.
+  ;; `:hook' would autoload this function from python.el.
   (add-hook 'python-base-mode-hook #'yilin/python-activate-venv)
   ;; PyCharm's Python-only colors; see site-lisp/gruvbox-jb-theme.el.
   (autoload 'gruvbox-jb-setup-python-faces "gruvbox-jb-theme")
@@ -243,12 +212,8 @@ by `yilin/eglot-workspace-configuration'."
 
 (defun yilin/generate-pyrightconfig ()
   "Generate a pyrightconfig.json file in the current directory.
-
-When the directory holds a usable `.venv\\=', record it as venvPath/venv so
-that a bare `pyright\\=' in a terminal resolves imports against the same
-interpreter eglot uses; `yilin/python-activate-venv\\=' only reaches the
-server eglot starts.  The pair is omitted when there is no venv, since
-pyright reports a venv it cannot find."
+If there is a `.venv', include it, so that pyright in a terminal uses it
+too."
   (interactive)
   (let ((path (expand-file-name "pyrightconfig.json")))
     (if (file-exists-p path)
@@ -312,11 +277,8 @@ pyright reports a venv it cannot find."
 ;; --------------------------------------------------------------
 ;;                       Ruby Configurations
 ;; --------------------------------------------------------------
-;; RBS is Ruby's type-signature language, and it is not a subset of Ruby --
-;; `def []: (int start, ?int length) -> String?' is unparseable by
-;; `ruby-mode', which mangles indentation and fontification. Signature files
-;; get their own mode. Reading only: the language server for RBS itself is
-;; Steep, not ruby-lsp, so nothing is registered with Eglot here.
+;; Ruby's type signatures.  Eglot isn't set up for them, because their
+;; language server is Steep.
 (use-package rbs-mode)
 
 ;; --------------------------------------------------------------
@@ -324,34 +286,25 @@ pyright reports a venv it cannot find."
 ;; --------------------------------------------------------------
 (use-package rust-mode
   :init
-  ;; Build `rust-mode' on top of `rust-ts-mode', so .rs files get
-  ;; tree-sitter highlighting and rust-mode's commands (C-c C-c C-u/C-k/
-  ;; C-t/C-r/C-l for cargo, C-c C-d for dbg!, `rust-format-on-save').
-  ;; Must be set before rust-mode loads.
+  ;; Derive `rust-mode' from `rust-ts-mode', to have both tree-sitter and
+  ;; rust-mode's commands.  Must be set before rust-mode loads.
   (setopt rust-mode-treesitter-derive t)
-  ;; `treesit-enabled-modes' remaps `rust-mode' to `rust-ts-mode', which
-  ;; would skip rust-mode again.
+  ;; `treesit-enabled-modes' remaps `rust-mode' to `rust-ts-mode'.  Undo it.
   (setq major-mode-remap-alist
         (delete '(rust-mode . rust-ts-mode) major-mode-remap-alist))
   ;; RustRover's Rust-only colors; see site-lisp/gruvbox-jb-theme.el.
   (autoload 'gruvbox-jb-setup-rust-faces "gruvbox-jb-theme")
   (add-hook 'rust-mode-hook #'gruvbox-jb-setup-rust-faces))
 
-;; Eglot reads this variable from its global value or from .dir-locals.el,
-;; never from a buffer-local value set in a mode hook. As a function it is
-;; called in a temporary buffer at the project root, which is enough to
-;; find a Python project's .venv.
+;; Eglot ignores buffer-local values set in mode hooks, so set the global one.
+;; It calls the function in a temporary buffer at the project root.
 (defun yilin/eglot-workspace-configuration (_server)
   "Settings eglot sends to language servers."
-  `(;; Code that is written but not called yet is normal mid-edit, so
-    ;; turn rustc's unused-code warnings into hints. They are still
-    ;; marked through the `unnecessary' tag, and `cargo build' still
-    ;; reports them.
+  `(;; Show rustc's unused-code warnings as hints.
     :rust-analyzer
     (:diagnostics
      (:warningsAsHint ["dead_code" "unused_variables" "unused_imports"
                        "unused_mut" "unused_assignments"]))
-    ;; Resolve imports against the project's .venv.
     :python
     (:analysis (:typeCheckingMode "standard")
      ,@(when-let* ((venv (yilin/python--venv-dir)))
@@ -362,15 +315,12 @@ pyright reports a venv it cannot find."
 ;; --------------------------------------------------------------
 ;;                      Swift Configurations
 ;; --------------------------------------------------------------
-;; `sourcekit-lsp' ships with Apple's Swift toolchain. Register it explicitly
-;; because Eglot has no built-in Swift server mapping.
 (use-package swift-mode)
 
 ;; --------------------------------------------------------------
 ;;                       Zig Configurations
 ;; --------------------------------------------------------------
-;; eglot already maps `zig-mode' -> ("zls"), so installing the `zls'
-;; binary (brew install zls) is all that's needed.
+;; Eglot needs zls (`brew install zls').
 (use-package zig-mode
   :custom (zig-format-on-save nil))
 
@@ -405,7 +355,6 @@ pyright reports a venv it cannot find."
   (set-face-attribute 'pico8--non-lua-overlay nil
                       :foreground (face-foreground 'shadow)
                       :weight 'bold)
-  ;; Register pico8 icon with nerd-icons if/when it's loaded.
   (with-eval-after-load 'nerd-icons
     (add-to-list 'nerd-icons-extension-icon-alist
                  '("p8" nerd-icons-sucicon "nf-seti-lua" :face nerd-icons-lpink))

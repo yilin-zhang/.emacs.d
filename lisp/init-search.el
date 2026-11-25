@@ -17,23 +17,21 @@
   :hook after-init
   :custom
   (vertico-resize nil)
-  (vertico-cycle t) ; Go from last to first candidate and first to last (cycle)?
+  (vertico-cycle t)
   :bind
-  (;; Re-run a past minibuffer session (needs `vertico-repeat-save' below).
+  (;; Reopen the last minibuffer session.  Needs `vertico-repeat-save' below.
    ("C-c v" . vertico-repeat)
    :map vertico-map
    ("<tab>" . vertico-insert)  ; Insert selected candidate into text area
    ("<escape>" . minibuffer-keyboard-quit) ; Close minibuffer
-   ;; Delete a whole directory component at once when completing file names.
+   ;; Delete a whole directory name at once.
    ("DEL" . vertico-directory-delete-char)
    ;; Cycle through candidate groups
    ("C-M-n" . vertico-next-group)
    ("C-M-p" . vertico-previous-group))
   :config
-  ;; Tidy up shadowed file paths as you move between directories:
-  ;; `~/foo/bar///' collapses to `/', and `~/foo/bar/~/' to `~/'.
+  ;; Clean up shadowed paths, such as `~/foo/bar///' to `/'.
   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
-  ;; Record each session so `vertico-repeat' has something to resume.
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save))
 
 (use-package crm
@@ -45,7 +43,7 @@
 (use-package emacs
   :ensure nil
   :init
-  ;; Keep native `*Completions*' readable when Vertico isn't in use.
+  ;; For the `*Completions*' buffer when Vertico isn't in use.
   (setopt completions-format 'one-column)
 
   ;; Do not allow the cursor in the minibuffer prompt
@@ -58,30 +56,21 @@
 (use-package orderless
   :custom
   (completion-styles '(orderless basic))
-  ;; Emacs ships per-category defaults (buffer, project-file, xref-location,
-  ;; info-menu, ...) that pin those categories to `basic'/`substring', and
-  ;; they take precedence over `completion-styles' -- so orderless would
-  ;; silently not apply to `C-x b', project file lookup, xref and friends.
-  ;; Clear them so orderless comes first there too. Packages loaded later
-  ;; can still add entries; eglot, for one, puts its own style first.
+  ;; The defaults put other styles before `completion-styles' for buffers,
+  ;; project files, xref, etc.  Clear them so that orderless comes first.
+  ;; Packages loaded later, such as eglot, can still add their own.
   (completion-category-defaults nil)
-  ;; Keep `partial-completion' for its `/u/s/l' -> `/usr/share/lib' path
-  ;; expansion, but let orderless match file names too.
+  ;; `partial-completion' expands `/u/s/l' to `/usr/share/lib'.
   (completion-category-overrides '((file (styles orderless partial-completion)))))
 
 (use-package marginalia
   :bind ("M-A" . marginalia-cycle)
-  ;; Deferred via :hook. The marginalia README puts `(marginalia-mode)'
-  ;; in :init which forces eager loading -- we defer it instead so
-  ;; `use-package-always-defer' is honored.
   :hook (after-init . marginalia-mode))
 
 (use-package consult
   :custom
   (consult-narrow-key "<")
-  ;; Start searching one character sooner, and cut the throttling roughly in
-  ;; half, so async sources (ripgrep, find, ...) keep up with typing instead
-  ;; of lagging a beat behind.
+  ;; Make async sources such as ripgrep respond faster.
   (consult-async-min-input 2)         ; default 3
   (consult-async-input-throttle 0.2)  ; default 0.5
   (consult-async-input-debounce 0.1)  ; default 0.2
@@ -142,16 +131,14 @@
   :hook (completion-list-mode . consult-preview-at-point-mode)
 
   :init
-  ;; These core options must take effect before Consult itself is loaded.
   (setopt register-preview-delay 0.5
           xref-show-xrefs-function #'consult-xref
           xref-show-definitions-function #'consult-xref)
-  ;; This is runtime plumbing rather than a user option.
   (setq register-preview-function #'consult-register-format)
   (advice-add #'register-preview :override #'consult-register-window)
 
   :config
-  ;; Debounce preview for the more expensive commands.
+  ;; Delay the preview for expensive commands.
   (consult-customize
    consult-theme :preview-key '(:debounce 0.2 any)
    consult-ripgrep consult-git-grep consult-grep
@@ -176,25 +163,21 @@
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
   :after (embark consult)
-  ;; if you want to have consult previews as you move around an
-  ;; auto-updating embark collect buffer
+  ;; Preview while moving around in an embark collect buffer.
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package nerd-icons-completion
   :after vertico
   :hook vertico-mode
-  ;; `:preface', not `:config': the byte-compiler must see the shared
-  ;; icon table's functions before it compiles the method below.
+  ;; In `:preface', so that the byte-compiler knows its functions when it
+  ;; compiles the method below.
   :preface (require 'kind-nerd-icons)
   :config
   (cl-defmethod nerd-icons-completion-get-icon (cand (_cat (eql imenu)))
     "Return the icon for the `consult-imenu' candidate CAND.
-Two sources, in order of authority.  A language server states the kind
-of every symbol it reports, and imenu keeps that on the node as
-`imenu-kind'.  Failing that, `consult-imenu' flattens the index into
-\"HEADING name\", so the heading -- one of the type names
-`consult-imenu-config' lists for the mode -- says what the symbol is."
+A language server gives the kind in the `imenu-kind' property.  Otherwise
+use the heading, as in \"HEADING name\"."
     (let* ((pos (text-property-not-all 0 (length cand) 'imenu-kind nil cand))
            (kind (if pos
                      (intern (downcase (get-text-property pos 'imenu-kind cand)))
@@ -220,8 +203,7 @@ of every symbol it reports, and imenu keeps that on the node as
 (use-package breadcrumb
   :hook ((prog-mode org-mode) . breadcrumb-local-mode))
 
-;; A custom package: file and symbol-kind icons in the breadcrumb header
-;; line, sharing corfu's icon table so a symbol looks the same in both.
+;; Icons for breadcrumb, the same as in corfu.
 (use-package breadcrumb-nerd-icons
   :load-path yilin/site-lisp-directory
   :after breadcrumb

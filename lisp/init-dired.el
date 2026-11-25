@@ -13,44 +13,33 @@
     "Listing switches understood by any ls, GNU or BSD.")
   (defconst yilin/dired-gnu-switches
     (concat yilin/dired-portable-switches " -v --group-directories-first")
-    "Listing switches for GNU coreutils ls.
-`-v' sorts `file2' before `file10' instead of after it, and
-`--group-directories-first' floats directories to the top.")
+    "Listing switches for GNU ls.
+`-v' sorts `file2' before `file10'.")
 
   (defun yilin/dired-drop-gnu-switches-maybe ()
-    "Fall back to portable listing switches where GNU ls isn't what runs.
-Over TRAMP the remote host may well be running BSD ls, and on Windows
-`ls-lisp' emulates the listing in Lisp; passing GNU-only switches there
-yields a blank dired buffer or unsortable entries."
+    "Use portable listing switches on remote hosts and with `ls-lisp'."
     (when (or (file-remote-p default-directory)
               (and (boundp 'ls-lisp-use-insert-directory-program)
                    (not ls-lisp-use-insert-directory-program)))
       (setq-local dired-actual-switches yilin/dired-portable-switches)))
   :hook (dired-mode . yilin/dired-drop-gnu-switches-maybe)
   :custom
-  ;; Revert only when the directory has actually changed on disk, rather
-  ;; than on every visit.
+  ;; Revert on visiting if the directory has changed on disk.
   (dired-auto-revert-buffer #'dired-buffer-stale-p)
   (dired-do-revert-buffer t)
   ;; Always delete and copy recursively
   (dired-recursive-deletes 'always)
   (dired-recursive-copies 'always)
-  ;; Offer to create missing parent directories rather than failing.
+  ;; Offer to create missing parent directories.
   (dired-create-destination-dirs 'ask)
   ;; Making deleted files go to the trash can
   (delete-by-moving-to-trash t)
-  ;; make copy files under dired mode easier
-  ;; it provides a dir choice which is the path of another buffer
+  ;; Suggest the directory of another Dired window as the target.
   (dired-dwim-target t)
   :config
-  ;; macOS ships BSD ls, which doesn't understand `--dired'; that's what
-  ;; triggers the "ls does not support --dired" warning. Prefer GNU ls
-  ;; (gls, from `brew install coreutils') for full dired support. Detect
-  ;; it robustly: `executable-find' can fail here if this runs before
-  ;; exec-path-from-shell has populated `exec-path', so also probe the
-  ;; standard Homebrew locations directly. If there's no gls at all, tell
-  ;; dired to stop trying `--dired' so the warning goes away, and stick to
-  ;; the switches BSD ls understands.
+  ;; The ls on macOS doesn't support `--dired', so use GNU ls (gls, from
+  ;; `brew install coreutils') if there is one.  Also look in the Homebrew
+  ;; directories, which may not be on `exec-path' yet.
   (if (not (eq system-type 'darwin))
       (setopt dired-listing-switches yilin/dired-gnu-switches)
     (let ((gls (or (executable-find "gls")

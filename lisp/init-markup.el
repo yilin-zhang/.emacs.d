@@ -26,18 +26,14 @@
   :custom
   (markdown-command "multimarkdown")
   (markdown-fontify-code-blocks-natively t)
-  ;; Highlight the whole heading line (background spans the line).
   (markdown-fontify-whole-heading-line t)
-  ;; Let `markdown-open' open exports in the macOS default app.
   (markdown-open-command "open")
-  ;; GitHub-flavored HTML for `markdown-export' / `markdown-preview':
-  ;; github-markdown-css provides layout, highlight.js handles code blocks,
-  ;; and MathJax renders math.
+  ;; Make exported HTML look like GitHub, with code highlighting and math.
   (markdown-content-type "application/xhtml+xml")
   (markdown-css-paths
    '("https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css"))
-  ;; The highlight.js theme follows the system's light/dark setting, as
-  ;; github-markdown-css does. %1$s is the highlight.js build URL.
+  ;; The code theme follows the system's light or dark setting.  %1$s is the
+  ;; highlight.js URL.
   (markdown-xhtml-header-content
    (format "\
 <meta name='viewport' content='width=device-width, initial-scale=1'/>
@@ -64,17 +60,15 @@
 </script>"
            "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build"))
   :config
-  ;; Fontify rust/python code blocks with the tree-sitter modes, so they
-  ;; pick up the same (level 4) highlighting as real source buffers.
+  ;; Highlight Rust and Python code blocks with tree-sitter.
   (add-to-list 'markdown-code-lang-modes '("rust" . rust-ts-mode))
   (add-to-list 'markdown-code-lang-modes '("python" . python-ts-mode))
 
-  ;; PERF: native code-block fontification calls a major mode without
-  ;; inhibiting its hooks; suppress them to speed it up (from doom).
+  ;; PERF: don't run mode hooks to fontify code blocks (from doom).
   (advice-add 'markdown-fontify-code-block-natively :around
               (lambda (fn &rest args) (delay-mode-hooks (apply fn args)))))
 
-;; Generate / refresh a table of contents in markdown buffers.
+;; Generate a table of contents.
 (use-package markdown-toc
   :after markdown-mode)
 
@@ -95,10 +89,8 @@
 ;; --------------------------------------------------------------
 (use-package typst-ts-mode
   :init
-  ;; Some Typst projects bundle fonts locally and set
-  ;; `typst-ts-compile-options' through .dir-locals.el so compilation can find
-  ;; them.  Trust only this exact relative font-path argument; arbitrary values
-  ;; remain unsafe because the option is passed to a shell command.
+  ;; Some Typst projects bundle fonts and set this option in .dir-locals.el.
+  ;; Only this value is safe, because the option goes to a shell command.
   (put 'typst-ts-compile-options 'safe-local-variable
        (lambda (value)
          (equal value '("--font-path" "fonts")))))

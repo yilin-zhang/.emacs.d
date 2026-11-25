@@ -51,21 +51,13 @@
   :demand t)
 
 (use-package meow
-  ;; No :demand -- meow loads lazily. `meow-setup' below runs on
-  ;; `after-init' and calls `(require 'meow)' explicitly, which pulls
-  ;; in all sub-modules (meow-helpers, meow-core, ...) and fires
-  ;; `(provide 'meow)', at which point `:config' runs and any
-  ;; `:after meow' declarations in other modules fire too. We can't
-  ;; rely on autoloads alone because the keymap helpers
-  ;; (`meow-motion-define-key', `meow-leader-define-key', ...) are
-  ;; defined in meow-helpers.el but not registered as autoloads.
+  ;; `meow-setup' requires meow explicitly, because the functions that
+  ;; define keys are not autoloaded.
   :custom
   (meow-use-clipboard t)
   :preface
   (defun yilin/disable-meow ()
-    "Turn `meow-mode' off in the current buffer.
-Hook this onto modes (vterm, dape-repl, color-rg, ...) where
-modal editing gets in the way."
+    "Turn `meow-mode' off in the current buffer."
     (meow-mode -1))
 
   (defun meow-setup ()
@@ -180,8 +172,7 @@ modal editing gets in the way."
         (meow-mode -1)
       (meow-mode 1)))
   :hook
-  ;; Should not put meow-setup under :config,
-  ;; otherwise some leader bindings will not bind
+  ;; Under :config, some leader bindings would not take effect.
   (after-init . meow-setup)
   :bind
   ("C-z" . yilin/toggle-meow-mode)

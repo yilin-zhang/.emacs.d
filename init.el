@@ -7,11 +7,6 @@
 
 ;;; Code:
 
-;; NOTE: All startup performance optimizations (GC, file-name-handler-alist,
-;; mode-line, UI elements, bidi, font cache, etc.) live in early-init.el.
-;; That's the only place those settings can actually take effect -- before
-;; package.el auto-initializes and before the initial frame is created.
-
 ;; --------------------------------------------------------------
 ;;                            Paths
 ;; --------------------------------------------------------------
@@ -36,8 +31,6 @@
 ;; --------------------------------------------------------------
 
 (require 'package)
-;; package-enable-at-startup is set to nil in early-init.el, where it
-;; actually takes effect.
 (setopt package-native-compile t)
 
 ;; Configure package sources

@@ -23,16 +23,15 @@
          ([mouse-1]   . treemacs-single-click-expand-action))
   :preface
   (defun yilin/treemacs-set-indentation ()
-    "Indent each level by the width of a chevron plus its tab.
-That puts each chevron under its parent's icon. With nerd-icons the
-pair spans three columns in a GUI frame and two in a terminal."
+    "Indent each level so that chevrons line up with the parent's icon.
+A chevron and its tab span three columns in a GUI frame and two in a
+terminal."
     (setq-local treemacs-indentation (if (display-graphic-p) 3 2)))
 
   (defun yilin/treemacs-cache-git-under-key (btn path buffer git-future)
-    "Also cache PATH's git status under BTN's key, where it is read back.
-A collapsed directory such as src/pkg has key src and path src/pkg.
-`treemacs--apply-annotations-deferred' caches under the path but reads
-under the key, so the children of a collapsed directory went uncolored."
+    "Also cache PATH's git status under BTN's key.
+Treemacs caches under the path but reads under the key, and the two
+differ for collapsed directories."
     (when (and (eq treemacs--git-mode 'deferred) (buffer-live-p buffer))
       (with-current-buffer buffer
         (when-let* (((<= (point-min) btn (point-max)))
@@ -46,26 +45,19 @@ under the key, so the children of a collapsed directory went uncolored."
   (advice-add 'treemacs--apply-annotations-deferred :before
               #'yilin/treemacs-cache-git-under-key)
   (setopt treemacs-missing-project-action  'remove
-          ;; Case-insensitive so `Zebra' doesn't sort before `apple'.
           treemacs-sorting                 'alphabetic-case-insensitive-asc
           treemacs-follow-after-init       t
           treemacs-width                   30
-          ;; Skip the sidebar when cycling windows (`C-x o' etc.) so the
-          ;; cursor never lands in the file tree by accident.
+          ;; Skip the sidebar in `C-x o'.
           treemacs-is-never-other-window   t)
-  ;; By default treemacs collects filewatch events for 2000ms before
-  ;; anything is redrawn. On a sidebar whose whole job is showing git
-  ;; state that reads as broken rather than as batching. A float, since
-  ;; treemacs divides by 1000 and an integer 500 would become 0; `setq',
-  ;; since the option's type is integer and `setopt' would warn.
+  ;; Refresh sooner than the default 2000ms.  Must be a float, because
+  ;; treemacs divides it by 1000.  `setopt' would warn about the type.
   (setq treemacs-file-event-delay 500.0)
   (treemacs-project-follow-mode t))
 
-;; kqueue, the `file-notify' backend on macOS, never reports writes to the
-;; contents of an existing file, and treemacs never watches .git, so git
-;; faces went stale after edits made outside Emacs and after git run in a
-;; terminal. treemacs-fswatch feeds treemacs FSEvents through fswatch
-;; (`brew install fswatch'). Linux's inotify does report content changes.
+;; On macOS, Emacs's file notifications miss changes to file contents, and
+;; treemacs doesn't watch .git, so git faces go stale.  This uses fswatch
+;; (`brew install fswatch') instead.
 (use-package treemacs-fswatch
   :load-path yilin/site-lisp-directory
   :if (eq system-type 'darwin)
@@ -75,16 +67,12 @@ under the key, so the children of a collapsed directory went uncolored."
 
 (use-package treemacs-nerd-icons
   :after nerd-icons
-  ;; Defer icon registration until treemacs is actually opened.
-  ;; Was on `after-init', which configured icons at every startup
-  ;; even when treemacs was never used.
   :hook (treemacs-mode . treemacs-nerd-icons-config)
   :preface
   (defun yilin/treemacs-nerd-icons-pad-files ()
     "Shift file icons one column right to line up with folder icons.
-A directory line starts with a chevron and a tab, a file line with a
-space and a tab. The chevron is wider than a column, so its tab jumps
-one stop further and file icons and names end up a column left."
+The chevron of a folder is wider than a column, so its tab ends one stop
+further."
     (let ((icons (treemacs-theme->gui-icons (treemacs--find-theme "nerd-icons"))))
       (maphash
        (lambda (key icon)
@@ -107,16 +95,14 @@ one stop further and file icons and names end up a column left."
 ;; --------------------------------------------------------------
 ;;                           Minimap
 ;; --------------------------------------------------------------
-;; Patched copy of GNU ELPA's minimap: draws code as colored bars and
-;; mirrors the diff-hl gutter. See site-lisp/minimap.el.
+;; Patched copy of GNU ELPA's minimap.
 (use-package minimap
   :load-path yilin/site-lisp-directory
   ;; Terminal can't show small characters in the minimap
   :if (display-graphic-p)
   :hook (after-init . minimap-mode)
   :custom
-  ;; Follow every redisplay instead of waiting for 0.1s of idle time,
-  ;; which froze the minimap while scrolling.
+  ;; With a delay, the minimap freezes while scrolling.
   (minimap-update-delay 0)
   ;; Each minimap fontifies its whole buffer, about 0.1s per 100KB.
   (minimap-max-buffer-size 100000))
@@ -150,10 +136,7 @@ one stop further and file icons and names end up a column left."
 ;; --------------------------------------------------------------
 
 (use-package denote
-  ;; Pre-load denote on idle so the first `org-agenda-compose-refresh'
-  ;; doesn't pay the `(require 'denote)' cost on the user's first
-  ;; `C-c a'. (The agenda refresh advice still re-scans the directory
-  ;; on every invocation -- that's I/O, not package loading.)
+  ;; `yilin/denote-agenda-files' needs it on the first `C-c a'.
   :warmup (denote)
   :commands yilin/denote-random-review
   :custom
@@ -189,18 +172,13 @@ one stop further and file icons and names end up a column left."
     "Denote keyword used to identify notes that belong in `org-agenda-files'.")
 
   (defun yilin/denote-agenda-files ()
-    "Return denote notes whose filename contains `yilin/denote-agenda-keyword'.
-Intended to be registered on `org-agenda-compose-functions'."
+    "Return denote notes whose filename contains `yilin/denote-agenda-keyword'."
     (require 'denote)
     (let ((re (concat "_" (regexp-quote yilin/denote-agenda-keyword)
                       ".*\\.org\\'")))
       (when (file-directory-p denote-directory)
         (directory-files denote-directory t re))))
 
-  ;; Register denote as a dynamic source for `org-agenda-files'. The
-  ;; actual scan happens lazily inside `org-agenda-compose-refresh'
-  ;; (defined in the org-agenda-compose package), which runs on org
-  ;; load and before every `org-agenda' invocation.
   (add-hook 'org-agenda-compose-functions #'yilin/denote-agenda-files))
 
 (use-package annotate)
@@ -269,10 +247,8 @@ Intended to be registered on `org-agenda-compose-functions'."
   (ghostel-mode . (lambda () (hl-line-mode -1)))
   :preface
   (defun yilin/ghostel-popup-toggle ()
-    "Toggle a ghostel terminal in a bottom popup window (VSCode-style).
-If the popup is selected, dismiss it.  If it is visible elsewhere,
-focus it.  Otherwise, show an existing ghostel buffer (or create
-one) in a bottom side window."
+    "Toggle a ghostel terminal in a bottom window.
+If the window is visible but not selected, select it."
     (interactive)
     (let ((win (seq-find
                 (lambda (w)

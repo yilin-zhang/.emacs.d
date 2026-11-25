@@ -10,9 +10,6 @@
 ;;                         Spell checker
 ;; --------------------------------------------------------------
 (use-package jinx
-  ;; Defer until first text/prog buffer instead of starting at
-  ;; emacs-startup. Avoids spawning the enchant subprocess + loading
-  ;; jinx eagerly when the user just opens Emacs to read the agenda.
   :hook ((text-mode . jinx-mode)
          (prog-mode . jinx-mode))
   :bind
@@ -37,14 +34,12 @@
   :init
   ;; Setup completion at point
   (defun tempel-setup-capf ()
-    ;; Add the Tempel Capf to `completion-at-point-functions'.  `tempel-expand'
-    ;; only triggers on exact matches. We add `tempel-expand' *before* the main
-    ;; programming mode Capf, such that it will be tried first.
+    ;; `tempel-expand' only triggers on exact matches.  Put it before the
+    ;; major mode's Capf so that it is tried first.
     (setq-local completion-at-point-functions
                 (cons #'tempel-expand completion-at-point-functions))
-    ;; Alternatively use `tempel-complete' if you want to see all matches.  Use
-    ;; a trigger prefix character in order to prevent Tempel from triggering
-    ;; unexpectly.
+    ;; Alternatively, `tempel-complete' shows all matches.  A trigger prefix
+    ;; keeps it from popping up unexpectedly.
     ;; (setq-local corfu-auto-trigger "/"
     ;;             completion-at-point-functions
     ;;             (cons (cape-capf-trigger #'tempel-complete ?/)
@@ -52,10 +47,7 @@
     )
   (dolist (hook '(conf-mode-hook prog-mode-hook text-mode-hook))
     (add-hook hook 'tempel-setup-capf))
-  ;; Make Tempel templates available to Abbrev in the same buffers where
-  ;; its completion-at-point function is installed.  A global mode on
-  ;; `after-init' would load Tempel at every startup, before any eligible
-  ;; buffer actually needs it.
+  ;; Not the global mode, which would load Tempel at startup.
   :hook ((conf-mode prog-mode text-mode) . tempel-abbrev-mode))
 
 (use-package tempel-collection)
@@ -75,9 +67,8 @@
   :custom
   (electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit))
 
-;; Rainbow parentheses, only where parens carry the structure.
-;; `lisp-data-mode' is the parent of Emacs Lisp, Lisp Interaction and
-;; Common Lisp modes.
+;; Rainbow parentheses for Lisp.  `lisp-data-mode' is the parent of the
+;; Emacs Lisp and Common Lisp modes.
 (use-package rainbow-delimiters
   :hook ((lisp-data-mode scheme-mode) . rainbow-delimiters-mode))
 
@@ -93,9 +84,8 @@
   (setopt tab-width 4
           indent-tabs-mode nil))
 
-;; Visualize TAB, (HARD) SPACE, NEWLINE
+;; Visualize TAB, (HARD) SPACE, NEWLINE.  Not enabled by default.
 ;; `https://github.com/condy0919/emacs-newbie/blob/master/introduction-to-builtin-modes.md'
-;; Off by default, as trailing blanks are noisy; turn it on when needed.
 (use-package whitespace
   :ensure nil
   :custom
@@ -115,15 +105,14 @@
   :preface
   (defun yilin/maybe-enable-aggressive-indent ()
     "Enable `aggressive-indent-mode' unless the buffer is large."
-    ;; Avoid its known performance problems in files over roughly 240 KB.
+    ;; It is slow in large files.
     ;; https://github.com/Malabarba/aggressive-indent-mode/issues/73
     (unless (> (buffer-size) (* 3000 80))
       (aggressive-indent-mode 1)))
   :hook ((lisp-mode . yilin/maybe-enable-aggressive-indent)
          (emacs-lisp-mode . yilin/maybe-enable-aggressive-indent)))
 
-;; Vertical indentation guides, like VSCode/Zed. Tree-sitter aware, so
-;; the bars follow real scopes in `*-ts-mode' buffers when supported.
+;; Vertical indentation guides.
 (use-package indent-bars
   :commands indent-bars-mode
   :preface
@@ -136,26 +125,21 @@
     (unless (apply #'derived-mode-p yilin/indent-bars-excluded-modes)
       (indent-bars-mode 1)))
   :hook
-  ;; Enable indentation guides in programming buffers except Lisp dialects,
-  ;; whose nested forms become visually noisy with vertical guides.
   (prog-mode . yilin/maybe-enable-indent-bars)
   :custom
   (indent-bars-treesit-support t)
-  ;; Bitmaps are inexplicably slow on macOS; character-based bars are
-  ;; fast and look the same here.
+  ;; Bitmaps are slow on macOS.
   (indent-bars-prefer-character t)
   (indent-bars-starting-column 0)
-  ;; Subtle, not the default rainbow -- a dim comment-colored line.
+  ;; A dim line in the comment color.
   (indent-bars-color-by-depth nil)
   (indent-bars-color '(font-lock-comment-face :face-bg nil :blend 0.425))
   (indent-bars-highlight-current-depth nil)
-  ;; Extend bars across blank lines *within* an indented block only, so
-  ;; there are no distracting gaps but no stray bars past the block end.
+  ;; On blank lines, only draw bars inside an indented block.
   (indent-bars-display-on-blank-lines 'least)
   :config
-  ;; HACK: `indent-bars-display-on-blank-lines' puts a display property
-  ;;   containing a newline on blank lines, which confuses `move-to-column'
-  ;;   and breaks `next-line' past such lines (jdtsmith/indent-bars#22).
+  ;; HACK: `indent-bars-display-on-blank-lines' confuses `move-to-column',
+  ;;   which breaks `next-line' (jdtsmith/indent-bars#22).
   (defun yilin/indent-bars--protect-move-to-column (fn col &rest args)
     (if-let* ((indent-bars-mode)
               (indent-bars-display-on-blank-lines)
@@ -180,11 +164,9 @@
 ;; Highlight TODO and similar keywords in comments and strings
 (use-package hl-todo
   :custom
-  ;; Highlight ":" after the keyword too, like doom.
+  ;; Highlight ":" after the keyword too.
   (hl-todo-highlight-punctuation ":")
-  ;; Semantic, distinctly-colored faces (instead of flattening everything
-  ;; into just error/warning red+yellow). Borrowed from doom's keyword set
-  ;; and extended with my own keywords.
+  ;; Doom's keywords plus my own.
   (hl-todo-keyword-faces
    '(("TODO" warning bold)
      ("FIXME" error bold)

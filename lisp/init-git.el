@@ -9,46 +9,34 @@
 (use-package magit
   :bind ("C-x g" . magit-status)
   :init
-  ;; Set before Magit loads so disabling its global mode stays lazy.
+  ;; Set before Magit loads, so that the mode never turns on.
   (setq magit-auto-revert-mode nil)
   :custom
   (magit-diff-refine-hunk t)           ; word-level diff in the selected hunk
-  ;; Don't autosave repo buffers (avoids surprise save-hooks / formatters).
+  ;; Don't save repo buffers, which would run save hooks and formatters.
   (magit-save-repository-buffers nil)
   (magit-revision-insert-related-refs nil) ; less clutter in commit buffers
-  ;; Two checkouts whose directories share a name (A/src and B/src
-  ;; both shorten to "src") otherwise look like one project to magit,
-  ;; and their status buffers hijack each other. Naming buffers after
-  ;; the full path avoids the collision.
+  ;; Otherwise checkouts with the same directory name, such as A/src and
+  ;; B/src, get mixed up.
   (magit-uniquify-buffer-names nil)
   :config
-  ;; PERF: on macOS magit re-resolves the git binary to an absolute
-  ;; path on every invocation. Resolve it once here. This expression
-  ;; reads Magit's existing value, so it belongs after Magit loads.
+  ;; PERF: use an absolute path, so that macOS doesn't look git up on every
+  ;; call.
   (setopt magit-git-executable
           (or (executable-find magit-git-executable) "git"))
-  ;; Turn URLs in process output into clickable buttons.
+  ;; Make URLs in process output clickable.
   (add-hook 'magit-process-mode-hook #'goto-address-mode)
-  ;; A switch common enough to want one keystroke away.
   (transient-append-suffix 'magit-pull "-r"
     '("-a" "Autostash" "--autostash")))
 
-;; Enforce good commit-message conventions: 50-char summary, blank
-;; second line, 72-char body wrap. This also catches COMMIT_EDITMSG
-;; opened from a terminal `git commit' via emacsclient, not just
-;; commits started from magit.
+;; Commit message conventions, also for a `git commit' in a terminal.
 ;;
-;; PERF: in magit 4.x, git-commit.el `require's the magit core
-;; (magit-git, magit-mode, magit-process, transient, with-editor) at
-;; load time, so enabling `global-git-commit-mode' on `after-init'
-;; would load most of magit at every startup. Instead, match filenames
-;; ourselves on `find-file' and only load git-commit when a commit
-;; message file is actually visited.
+;; PERF: `global-git-commit-mode' would load most of magit at startup, so
+;; load git-commit when a commit message file is visited.
 (use-package git-commit
   :ensure nil
   :preface
-  ;; Mirrors `git-commit-filename-regexp', inlined so the check runs
-  ;; without loading git-commit.
+  ;; A copy of `git-commit-filename-regexp', which needs git-commit loaded.
   (defconst yilin/git-commit-filename-regexp "/\\(\
 \\(\\(COMMIT\\|NOTES\\|PULLREQ\\|MERGEREQ\\|TAG\\)_EDIT\\|MERGE_\\|\\)MSG\
 \\|\\(BRANCH\\|EDIT\\)_DESCRIPTION\\)\\'")
@@ -67,9 +55,8 @@
   (add-hook 'git-commit-mode-hook
             (lambda () (setopt-local fill-column 72))))
 
-;; Auto-enable smerge-mode when opening a file that already contains
-;; conflict markers, so merge conflicts come with resolution UI (default
-;; keymap under `C-c ^').
+;; Enable smerge-mode in files with conflict markers.  Its keys are under
+;; `C-c ^'.
 (use-package smerge-mode
   :ensure nil
   :preface
@@ -87,7 +74,7 @@
   (blamer-idle-time 0.3)
   (blamer-min-offset 70)
   :config
-  ;; Colors come from the theme; an override spec keeps the size on top.
+  ;; The theme sets the colors, and this only overrides the size.
   (face-spec-set 'blamer-face '((t :height 140))))
 
 ;; Highlight uncommitted changes using VC
@@ -95,23 +82,17 @@
   :bind (:map diff-hl-command-map
               ("SPC" . diff-hl-mark-hunk))
   :hook ((after-init . global-diff-hl-mode)
-         ;; Clicking a gutter bar shows that hunk inline.
+         ;; Click a gutter bar to show the hunk.
          (after-init . global-diff-hl-show-hunk-mouse-mode)
-         ;; Ships with diff-hl (autoloaded from diff-hl-dired).
          (dired-mode . diff-hl-dired-mode-unless-remote))
   :preface
   ;; ---------------------------------------------------------------
   ;; Gutter appearance
   ;; ---------------------------------------------------------------
-  ;; The stock bitmap is a full-fringe block with a border, which is
-  ;; heavy and monopolizes the fringe. Redefine it as a solid bar taking
-  ;; up only the left half of the fringe, so the other half stays
-  ;; available to whoever else wants it (magit, flyspell, ...). Ported
-  ;; from doom's `ui/vc-gutter' +pretty flag.
+  ;; Draw a thin bar in the left half of the fringe, replacing the default
+  ;; full-width block.  Ported from doom's `ui/vc-gutter' module.
   (defun yilin/diff-hl-thin-bitmaps (&rest _)
-    "Redefine `diff-hl-bmp-middle' as a thin, borderless bar.
-Height tracks `frame-char-height', the buffer's text scale and
-`line-spacing' so the bar still spans a full line when either changes."
+    "Redefine `diff-hl-bmp-middle' as a thin bar as tall as a line."
     (let* ((scale (if (and (boundp 'text-scale-mode-amount)
                            (numberp text-scale-mode-amount))
                       (expt text-scale-mode-step text-scale-mode-amount)
@@ -140,9 +121,7 @@ Height tracks `frame-char-height', the buffer's text scale and
   (defun yilin/diff-hl-bmp-at-pos (type _pos)
     (if (eq type 'delete) 'diff-hl-bmp-delete 'diff-hl-bmp-middle))
 
-  ;; diff-hl builds its temp file paths through the auto-save mechanism,
-  ;; which makes TRAMP buffers prompt "auto-save file in local temp dir,
-  ;; continue?" every time the gutter updates.
+  ;; Otherwise TRAMP asks about the temp file every time the gutter updates.
   (defun yilin/diff-hl-silence-temp-file-prompts (fn &rest args)
     (let ((tramp-allow-unsafe-temporary-files t))
       (apply fn args)))
@@ -156,13 +135,11 @@ Height tracks `frame-char-height', the buffer's text scale and
   (diff-hl-update-async t)
   ;; Better diff algorithm for what the gutter shows.
   (vc-git-diff-switches '("--histogram"))
-  ;; Mark staged changes apart from unstaged ones. The stock reference
-  ;; highlighter draws an empty bitmap, which hides staged changes.
+  ;; Mark staged changes apart from unstaged ones.  The default highlighter
+  ;; hides them.
   (diff-hl-show-staged-changes nil)
   (diff-hl-highlight-reference-function #'diff-hl-highlight-on-fringe)
-  ;; Nothing to diff in a rendered image or PDF.
   (diff-hl-global-modes '(not image-mode pdf-view-mode))
-  ;; The thin bar is its own border.
   (diff-hl-draw-borders nil)
   (diff-hl-fringe-bmp-function #'yilin/diff-hl-bmp-at-pos)
   :config
@@ -178,12 +155,11 @@ Height tracks `frame-char-height', the buffer's text scale and
 
 (use-package diff-hl-refresh
   :load-path yilin/site-lisp-directory
-  ;; Catch git commands run outside Emacs, such as an agent's commit.
+  ;; Notice git commands run outside Emacs.
   :hook (after-init . diff-hl-refresh-mode)
   :config
-  ;; No flydiff: its many short-lived git processes choke Emacs on macOS
-  ;; (doomemacs/core#8554).  Refresh on switching windows and on leaving
-  ;; meow's insert state instead.
+  ;; Flydiff's git processes choke Emacs on macOS (doomemacs/core#8554), so
+  ;; refresh on switching windows and on leaving meow's insert state.
   (diff-hl-refresh-on-select-mode)
   (with-eval-after-load 'meow
     (add-hook 'meow-insert-exit-hook #'diff-hl-refresh-maybe)))
@@ -192,12 +168,11 @@ Height tracks `frame-char-height', the buffer's text scale and
 (use-package git-timemachine
   :bind ("C-c g t" . git-timemachine))
 
-;; Open the current file / line on the remote forge (GitHub, GitLab, ...).
+;; Open the current file or line on GitHub, GitLab, etc.
 (use-package browse-at-remote
   :bind ("C-c g b" . browse-at-remote)
   :custom
-  ;; Only add a line number when a region is selected, and produce
-  ;; permalinks (commit hash) rather than branch-relative URLs.
+  ;; Add line numbers only for a region, and link to the commit.
   (browse-at-remote-add-line-number-if-no-region-selected nil)
   (browse-at-remote-prefer-symbolic nil))
 

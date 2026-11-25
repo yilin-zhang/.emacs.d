@@ -16,12 +16,9 @@
   (gcmh-auto-idle-delay-factor 10)
   (gcmh-high-cons-threshold (* 64 1024 1024))) ; 64MB
 
-;; Warm up heavy multi-file packages on idle time after startup, so
-;; the first interactive use (e.g. `C-c a' for `org-agenda') doesn't
-;; pause while a tower of sub-packages is `require'd synchronously.
-;; Loading the package is enough -- it self-installs on
-;; `emacs-startup-hook'. Consumers declare what to warm up via the
-;; `:warmup' use-package keyword. See site-lisp/warmup.el.
+;; Load heavy packages while Emacs is idle, so that their first use doesn't
+;; pause.  Packages opt in with the `:warmup' keyword, and loading this
+;; package sets everything up.
 (use-package warmup
   :load-path yilin/site-lisp-directory
   :demand t)
@@ -39,41 +36,35 @@
                       (time-subtract after-init-time before-init-time)))
              gcs-done))
   :init
-  ;; The setting of this variable must come before enable
-  ;; display-time-mode, or it will not work.
+  ;; Must be set before `display-time-mode' is enabled.
   (setopt display-time-string-forms
           '((propertize (concat 24-hours ":" minutes " ")
                         'face 'font-lock-constant-face)))
-  ;; UI: window-divider defaults moved to early-init.el.
   ;; Confirmation
-  (setopt use-short-answers t) ; Emacs 28+: replaces (fset 'yes-or-no-p 'y-or-n-p)
+  (setopt use-short-answers t)
   (setopt confirm-kill-emacs 'yes-or-no-p)
   ;; Editing
   (setopt major-mode 'text-mode
           fill-column 80
           truncate-lines t)
-  ;; ring-bell-function moved to early-init.el.
-  ;; Enable indentation+completion using the TAB key.
-  ;; `completion-at-point' is often bound to M-TAB.
+  ;; TAB indents first, then completes.
   (setopt tab-always-indent 'complete)
   ;; Cursor and scrolling
   (setopt mouse-wheel-scroll-amount '(1 ((shift) . 1)) ; one line at a time
           mouse-wheel-progressive-speed nil            ; don't accelerate scrolling
           scroll-conservatively 100000                  ; keyboard scroll one line at a time
           scroll-preserve-screen-position 'always)      ; lock cursor position when scrolling
-  ;; Frame: frame-resize-pixelwise moved to early-init.el.
   ;; File saving
   (setopt make-backup-files nil  ; disable backup file
           auto-save-default nil) ; disable auto-save
-  ;; Resolve symlinks when visiting files, so buffers always point at
-  ;; the canonical path (also keeps doom-modeline's buffer name honest).
+  ;; Resolve symlinks when visiting files.
   (setopt find-file-visit-truename t)
   ;; Warning handling
   (setopt warning-suppress-types '((emacs)))
-  ;; Misc QoL tweaks (from emacsredux "stealing from the best configs").
+  ;; Borrowed from emacsredux.
   (setopt set-mark-command-repeat-pop t  ; keep popping the mark ring with C-SPC
           help-window-select t           ; focus help/helpful windows when they open
-          ffap-machine-p-known 'reject   ; never ping hostnames on find-file-at-point
+          ffap-machine-p-known 'reject   ; never ping hosts in find-file-at-point
           reb-re-syntax 'string)         ; readable string syntax in `re-builder'
   :hook
   (after-init . global-so-long-mode)
@@ -87,26 +78,19 @@
 ;; --------------------------------------------------------------
 ;;                              Icons
 ;; --------------------------------------------------------------
-;; No :demand -- doom-modeline (:hook after-init) requires nerd-icons,
-;; pulling it in at that point.  Other consumers (nerd-icons-ibuffer,
-;; treemacs-nerd-icons, kind-nerd-icons) rely on their :after chains.
 (use-package nerd-icons)
 
 ;; --------------------------------------------------------------
 ;;                        Theme and Modeline
 ;; --------------------------------------------------------------
-;; doom-themes-visual-bell-config must be loaded after setting
-;; ring-bell-function, or it will not work.
 (use-package doom-themes
   :demand t
   :config
-  ;; doom-gruvbox recolored after the JetBrains Gruvbox plugin; set
-  ;; `gruvbox-jb-variant' for the hard or soft background. See
-  ;; site-lisp/gruvbox-jb-theme.el.
+  ;; doom-gruvbox with the colors of the JetBrains Gruvbox plugin.  Set
+  ;; `gruvbox-jb-variant' for the hard or soft background.
   (add-to-list 'custom-theme-load-path yilin/site-lisp-directory)
   (load-theme 'gruvbox-jb t)
-  ;; Disable visual bell because it causes buffer selecting error
-  ;; when it works with dired-async
+  ;; The visual bell selects the wrong buffer when used with dired-async.
   ;; (doom-themes-visual-bell-config)
   (doom-themes-org-config))
 
@@ -120,28 +104,18 @@
 ;;                            Paths
 ;; --------------------------------------------------------------
 (use-package exec-path-from-shell
-  ;; Only relevant in GUI sessions; TTY/batch inherit the parent
-  ;; shell's environment already. `:if' is evaluated at use-package
-  ;; expansion time, so the whole block is dropped on non-GUI Emacs.
+  ;; In a terminal Emacs already inherits the shell's environment.
   :if (memq window-system '(mac ns x))
   :custom
-  ;; The default `exec-path-from-shell-arguments' is ("-l" "-i"), but
-  ;; `-i' forces loading ~/.zshrc / ~/.bashrc, which typically runs
-  ;; slow plugin init (nvm, rbenv, oh-my-zsh, conda init, ...) and can
-  ;; cost 100-500ms at startup. `-l' alone still reads ~/.zprofile /
-  ;; ~/.zlogin / /etc/profile, which by convention is where env
-  ;; variables belong. Put env vars in .zprofile, not .zshrc.
+  ;; Leave out `-i', which would load the slow ~/.zshrc.  Environment
+  ;; variables belong in ~/.zprofile.
   (exec-path-from-shell-arguments '("-l"))
   :hook (after-init . exec-path-from-shell-initialize))
 
-;; mise manages the Ruby toolchain (ruby-lsp, bundle, solargraph, ...),
-;; but its shim directory is only on PATH inside an interactive shell
-;; that ran `mise activate', so a GUI Emacs never sees it and
-;; `executable-find' misses every mise-managed tool. Each shim resolves
-;; the tool version from the mise config covering `default-directory',
-;; so a subprocess started in a project gets that project's Ruby.
-;; Depth 90 puts this after `exec-path-from-shell-initialize' on
-;; `after-init-hook', which replaces `exec-path' wholesale.
+;; mise manages the Ruby tools, but only an interactive shell puts them on
+;; PATH.  Its shims pick the tool version from `default-directory', so each
+;; project gets its own Ruby.  Depth 90 runs this after
+;; `exec-path-from-shell-initialize', which replaces `exec-path'.
 (defun yilin/add-mise-shims-to-path ()
   "Add mise's shim directory to `exec-path' and PATH."
   (let ((dir (expand-file-name "~/.local/share/mise/shims")))
@@ -157,18 +131,15 @@
 (use-package server
   :ensure nil
   :hook (after-init . (lambda ()
-                        ;; Another Emacs (e.g. an `emacs -nw') may already own the server.
+                        ;; Another Emacs may already own the server.
                         (require 'server)
                         (unless (server-running-p)
                           (server-start)))))
 
-;; Emacs's native macOS trash fails on iCloud Drive files with
-;; "Removing old name: Attribute not found", leaving the file in place.
-;; trash(1) run from Emacs fails the same way (no permission), but
-;; Finder, which owns iCloud's trash, succeeds, so retry through it.  The
-;; advice goes on `move-file-to-trash' rather than the
-;; `system-move-file-to-trash' primitive: natively compiled files.el
-;; calls that primitive directly, bypassing any advice on it.
+;; Emacs can't move iCloud Drive files to the trash on macOS ("Attribute not
+;; found"), and neither can trash(1), but Finder can.  The advice is on
+;; `move-file-to-trash' because natively compiled code bypasses advice on
+;; the `system-move-file-to-trash' primitive.
 (when (eq system-type 'darwin)
   (defun yilin/trash-with-macos-fallback (orig file)
     "Call ORIG on FILE; on `file-error', retry by asking Finder."
@@ -229,11 +200,10 @@
           (auto-revert-handler)))))
   :hook after-init
   :custom
-  ;; Files shown in windows are watched, so they revert as soon as they
-  ;; change, without also being polled.
+  ;; Files shown in windows are watched, so don't poll them as well.
   (auto-revert-avoid-polling t)
   ;; Replacing a file by rename drops its watch, and the buffer is polled
-  ;; until the watch is back; poll often, since few buffers ever are.
+  ;; until the watch is back.  Few buffers ever are, so poll often.
   (auto-revert-interval 1)
   (auto-revert-stop-on-user-input nil)
   ;; Only prompts for confirmation when buffer is unsaved.
@@ -242,7 +212,6 @@
 ;; --------------------------------------------------------------
 ;;                              Files
 ;; --------------------------------------------------------------
-;; enable recentf-mode
 (use-package recentf
   :ensure nil
   :hook after-init
@@ -280,7 +249,7 @@
   :preface
   (defvar yilin/default-font-size 15 "The default font size")
   (defvar yilin/fixed-pitch-font "Sarasa Term SC" "The fixed pitch font")
-  (defvar yilin/variable-pitch-font "Noto Serif" "The fixed pitch font")
+  (defvar yilin/variable-pitch-font "Noto Serif" "The variable pitch font")
 
   (defun yilin/set-fonts (&optional font-size)
     "Set fonts with the given FONT-SIZE."
@@ -293,7 +262,7 @@
       (if (find-font (font-spec :family yilin/variable-pitch-font))
           (set-face-attribute 'variable-pitch nil :font (font-spec :family yilin/variable-pitch-font :size (+ 2 actual-font-size)))
         (message "Font %s not found, keeping default variable-pitch" yilin/variable-pitch-font))
-      ;; Nerd Font fallback for PUA glyphs (nerd-icons, markview callouts, etc.)
+      ;; Fallback for icon glyphs.
       (when (find-font (font-spec :family "Symbols Nerd Font Mono"))
         (set-fontset-font t 'symbol "Symbols Nerd Font Mono" nil 'append)
         (set-fontset-font t 'unicode "Symbols Nerd Font Mono" nil 'append))))
@@ -317,8 +286,7 @@
           (#xF900 . #xFAFF)     ; CJK Compatibility Ideographs
           (#x20000 . #x2A6DF))) ; CJK Unified Ideographs Extension B
   "Regexp matching a single Han character.
-Deliberately not `\\cc', which also matches full-width punctuation --
-nothing should be inserted after the comma in \"中文，abc\".")
+Unlike `\\cc', it doesn't match full-width punctuation.")
 
 (defun yilin/space-han-latin (&optional beg end)
   "Separate Han characters from adjacent Latin letters and digits.
@@ -346,29 +314,21 @@ BEG and END bound the text to walk when called from Lisp."
 ;;                            Terminal
 ;; --------------------------------------------------------------
 
-;; Under `modifyOtherKeys' a terminal stops folding Ctrl combinations into
-;; their C0 control characters and reports them as escape sequences instead.
-;; Emacs asks for that mode (`xterm--init-modify-other-keys'), but decodes
-;; only a fixed table of such sequences, and Ctrl-[ (codepoint 91) and
-;; Ctrl-] (93) are missing from it -- the table stops at Ctrl-\ (92). The
-;; undecoded sequence then self-inserts, so `C-[' types "[91;5u" instead of
-;; acting as ESC. Ghostty sends the short CSI-u form; xterm's own
-;; formatOtherKeys=0 form is bound too, since both reach the same keymap.
+;; Emacs asks the terminal to report Ctrl keys as escape sequences
+;; (modifyOtherKeys), but doesn't decode those for C-[ and C-], so C-[ would
+;; insert "[91;5u".  Decode both the CSI-u form that Ghostty sends and the
+;; xterm form.
 ;;
-;; C-[ produces `escape', not the ESC character: translations through
-;; `input-decode-map' are not rescanned, so a bare ESC would slip past the
-;; filter `meow-esc-mode' installs there -- the one that turns a lone ESC
-;; into `escape' -- and modal state would never exit. `function-key-map'
-;; still maps `escape' to ESC, so its prefix use (C-[ x for M-x) is intact.
+;; C-[ becomes `escape', because a plain ESC would bypass the filter that
+;; `meow-esc-mode' installs in `input-decode-map'.  C-[ still works as the
+;; Meta prefix, through `function-key-map'.
 (defconst yilin/xterm-csi-u-control-keys
   '((91 . escape)       ; C-[  ->  <escape>
     (93 . ?\C-\]))       ; C-]  ->  GS
-  "Codepoints Emacs fails to decode under `modifyOtherKeys', and their keys.
-Each entry maps the ASCII codepoint of a Ctrl combination to the key that
-combination stands for.")
+  "Alist of codepoints of Ctrl keys that Emacs doesn't decode, and their keys.")
 
 (defun yilin/xterm-decode-csi-u-control-keys ()
-  "Teach `input-decode-map' the Ctrl sequences the xterm table omits."
+  "Decode the keys in `yilin/xterm-csi-u-control-keys'."
   (pcase-dolist (`(,code . ,key) yilin/xterm-csi-u-control-keys)
     ;; 5 is the modifier encoding for Ctrl (1 + 4).
     (define-key input-decode-map (format "\e[%d;5u" code) (vector key))

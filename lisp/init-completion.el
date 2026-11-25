@@ -80,10 +80,15 @@ Keeps the stock same-major-mode restriction and adds a size ceiling, so
 having one huge file open doesn't slow down every completion."
     (and (dabbrev--same-major-mode-p other-buffer)
          (< (buffer-size other-buffer) yilin/dabbrev-buffer-size-limit)))
+
+  (defun yilin/cape-dabbrev-buffers ()
+    "Return the current buffer and the others dabbrev allows scanning."
+    (require 'dabbrev)
+    (cons (current-buffer) (dabbrev--select-buffers)))
   :init
-  ;; This was removed as a user option in current Cape, so keep the legacy
-  ;; assignment as plain package state for compatibility with older versions.
-  (setq cape-dabbrev-check-other-buffers t)
+  ;; Cape picks its own buffers and skips dabbrev's filters, so hand it a
+  ;; list that went through them.
+  (setq cape-dabbrev-buffer-function #'yilin/cape-dabbrev-buffers)
   (add-hook 'prog-mode-hook #'yilin/cape-add-file-capf)
   (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook comint-mode-hook))
     (add-hook hook #'yilin/cape-add-dabbrev-capf))
@@ -93,9 +98,9 @@ having one huge file open doesn't slow down every completion."
   (advice-add #'eglot-completion-at-point :around #'cape-wrap-nonexclusive)
   (advice-add #'comint-completion-at-point :around #'cape-wrap-nonexclusive)
   (advice-add #'pcomplete-completions-at-point :around #'cape-wrap-nonexclusive)
-  ;; `cape-dabbrev-check-other-buffers' above lets dabbrev roam beyond the
-  ;; current buffer, so bound what it is allowed to walk into: nothing
-  ;; oversized, no internal buffers, no TAGS tables, no rendered documents.
+  ;; Dabbrev scans other buffers too, so bound what it is allowed to walk
+  ;; into: nothing oversized, no internal buffers, no TAGS tables, no
+  ;; rendered documents.
   (with-eval-after-load 'dabbrev
     (setopt dabbrev-friend-buffer-function #'yilin/dabbrev-friend-buffer-p
             dabbrev-ignored-buffer-regexps
